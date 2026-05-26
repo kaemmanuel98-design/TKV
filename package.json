@@ -14,7 +14,7 @@
     "build:bible": "node scripts/build-bible-strong.mjs",
     "build": "vite build",
     "generate:icons": "node scripts/generate-pwa-icons.mjs",
-    "prebuild": "node scripts/generate-pwa-icons.mjs && node scripts/build-bible-strong.mjs",
+    "prebuild": "node scripts/prebuild.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },
