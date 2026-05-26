@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 64" fill="none" overflow="visible">
+  <defs>
+    <linearGradient id="g" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F0E2B8"/>
+      <stop offset=".45" stop-color="#C9A962"/>
+      <stop offset="1" stop-color="#8A7340"/>
+    </linearGradient>
+    <linearGradient id="b" x1="32" y1="14" x2="32" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E8D5A3"/>
+      <stop offset="1" stop-color="#C9A962" stop-opacity=".35"/>
+    </linearGradient>
+    <linearGradient id="bg" x1="4" y1="4" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#161618"/>
+      <stop offset="1" stop-color="#0A0A0C"/>
+    </linearGradient>
+    <linearGradient id="text" x1="76" y1="16" x2="276" y2="48" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4F4F5"/>
+      <stop offset="1" stop-color="#C9A962"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <rect x="4" y="4" width="56" height="56" rx="13" fill="url(#bg)"/>
+    <rect x="4.5" y="4.5" width="55" height="55" rx="12.5" fill="none" stroke="url(#g)" stroke-width="1" stroke-opacity=".35"/>
+    <path d="M32 13 A19 19 0 0 0 13 29" stroke="url(#g)" stroke-width="1.35" stroke-linecap="round" stroke-opacity=".5" fill="none"/>
+    <path d="M32 13 A19 19 0 0 1 51 29" stroke="url(#g)" stroke-width="1.35" stroke-linecap="round" stroke-opacity=".5" fill="none"/>
+    <path d="M25 41 C17 36 18 28 22 23" stroke="url(#g)" stroke-width="2.25" stroke-linecap="round" fill="none"/>
+    <path d="M23 45 C13 38 14 27 19 20" stroke="url(#g)" stroke-width="1.6" stroke-linecap="round" stroke-opacity=".65" fill="none"/>
+    <path d="M39 41 C47 36 46 28 42 23" stroke="url(#g)" stroke-width="2.25" stroke-linecap="round" fill="none"/>
+    <path d="M41 45 C51 38 50 27 45 20" stroke="url(#g)" stroke-width="1.6" stroke-linecap="round" stroke-opacity=".65" fill="none"/>
+    <line x1="32" y1="18" x2="32" y2="47" stroke="url(#b)" stroke-width="2.6" stroke-linecap="round"/>
+    <circle cx="32" cy="14" r="6.5" fill="#C9A962" fill-opacity=".14"/>
+    <circle cx="32" cy="14" r="3.2" fill="url(#g)"/>
+    <path d="M20 49.5 H44" stroke="url(#g)" stroke-width="1.15" stroke-linecap="round" stroke-opacity=".35" fill="none"/>
+  </g>
+  <text x="76" y="38" font-family="Georgia, 'Cormorant Garamond', serif" font-size="28" font-weight="600" fill="url(#text)" letter-spacing="6">TKV</text>
+  <text x="76" y="54" font-family="system-ui, 'Outfit', sans-serif" font-size="9.5" font-weight="500" fill="#71717A" letter-spacing="2.8">THE KINGDOM&apos;S VOICE</text>
+</svg>

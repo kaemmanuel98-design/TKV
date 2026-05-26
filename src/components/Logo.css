@@ -1,0 +1,81 @@
+.logo-mark-svg,
+.logo-mark-img {
+  display: block;
+  flex-shrink: 0;
+  overflow: visible;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.hero-logo-wrap,
+.footer-logo-row,
+.auth-logo-wrap,
+.cta-logo-wrap,
+.loading-logo-mark {
+  overflow: visible;
+}
+
+.logo-full {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-full-name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.logo-full-tagline {
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.logo-full-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.hero-logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.hero-logo-wrap .logo-mark-svg,
+.hero-logo-wrap .logo-mark-img {
+  filter: drop-shadow(0 4px 20px rgba(201, 169, 98, 0.3));
+}
+
+.footer-logo-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.auth-logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.auth-logo-wrap .logo-mark-svg,
+.auth-logo-wrap .logo-mark-img {
+  filter: drop-shadow(0 6px 24px rgba(201, 169, 98, 0.2));
+}
+
+.cta-logo-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}

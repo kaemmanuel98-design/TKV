@@ -1,0 +1,50 @@
+{
+  "name": "tkv-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:api": "node server/index.js",
+    "ingest:knowledge": "node scripts/ingest-knowledge.mjs",
+    "ingest:knowledge:embed": "node scripts/ingest-knowledge.mjs --embed",
+    "upload:chunks": "node scripts/upload-chunks-to-supabase.mjs",
+    "upload:chunks:text": "node scripts/upload-chunks-to-supabase.mjs --text-only",
+    "seed:podcasts": "node scripts/seed-podcasts.mjs",
+    "build": "vite build",
+    "generate:icons": "node scripts/generate-pwa-icons.mjs",
+    "prebuild": "node scripts/generate-pwa-icons.mjs",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.105.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "openai": "^4.77.0",
+    "@vitalets/google-translate-api": "^9.2.1",
+    "i18next": "^26.0.9",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.14.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-i18next": "^17.0.6",
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^7.15.0",
+    "vite-plugin-pwa": "^1.3.0",
+    "zustand": "^5.0.13"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^10.2.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.5.0",
+    "sharp": "^0.34.5",
+    "vite": "^8.0.10"
+  }
+}

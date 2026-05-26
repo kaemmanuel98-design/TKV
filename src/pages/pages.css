@@ -1,0 +1,310 @@
+.page-header-block {
+  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.page-header--center .page-header-copy--center {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.page-header--center .section-eyebrow {
+  text-align: center;
+}
+
+.page-header-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.page-header-main--actions {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.page-header-actions {
+  flex-shrink: 0;
+}
+
+.page-header-logo {
+  margin-bottom: 0.75rem;
+}
+
+.page-header-copy .page-title {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+/* ——— Bible Strong ——— */
+.bible-reader-card {
+  font-size: 1.0625rem;
+  line-height: 1.85;
+}
+
+.bible-verse {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.bible-verse:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.bible-verse-num {
+  color: var(--gold);
+  font-weight: 600;
+  margin-right: 0.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.bible-word-strong {
+  color: var(--gold-bright);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(201, 169, 98, 0.45);
+  text-underline-offset: 3px;
+  transition: color var(--duration-fast);
+}
+
+.bible-word-strong:hover {
+  color: var(--gold-bright);
+  text-decoration-color: var(--gold);
+}
+
+.bible-verse-listen {
+  margin-left: 0.5rem;
+  vertical-align: middle;
+  padding: 0.2rem 0.45rem !important;
+  display: inline-flex !important;
+}
+
+.lexicon-panel {
+  width: 100%;
+  max-width: 320px;
+  position: sticky;
+  top: calc(var(--header-height) + 1rem);
+  height: fit-content;
+}
+
+.lexicon-body {
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ——— Book reader ——— */
+.book-reader {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.book-reader-loading {
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.book-meta {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.book-meta-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  color: var(--gold-bright);
+  margin-bottom: 0.35rem;
+}
+
+.book-meta-author {
+  color: var(--text-secondary);
+  font-style: italic;
+  font-size: 0.9375rem;
+}
+
+.book-chapter-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.book-chapter-title {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin: 0 0 1.25rem;
+  font-family: var(--font-display);
+}
+
+.book-content p {
+  margin-bottom: 1rem;
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  text-align: justify;
+}
+
+.book-quiz-card {
+  border-color: var(--border-gold) !important;
+}
+
+.quiz-option {
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  transition:
+    border-color var(--duration-fast),
+    background var(--duration-fast);
+}
+
+.quiz-option:hover:not(.quiz-option--locked) {
+  border-color: var(--border-gold-hover);
+}
+
+.quiz-option--selected {
+  background: rgba(201, 169, 98, 0.12);
+  border-color: var(--gold);
+}
+
+.quiz-option--correct {
+  background: rgba(74, 222, 128, 0.12);
+  border-color: rgba(74, 222, 128, 0.5);
+}
+
+.quiz-option--wrong {
+  background: rgba(248, 113, 113, 0.12);
+  border-color: rgba(248, 113, 113, 0.45);
+}
+
+.quiz-option--locked {
+  cursor: default;
+}
+
+.quiz-result {
+  padding: 1.25rem;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  margin-top: 1rem;
+}
+
+.quiz-result h4 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+}
+
+.quiz-result--perfect h4 {
+  color: #4ade80;
+}
+
+.book-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.book-nav-progress {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em;
+}
+
+/* ——— Cells ——— */
+.cells-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .cells-layout {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .cells-chat {
+    width: 100%;
+    max-width: 400px;
+    min-height: 500px;
+  }
+}
+
+.cells-video-card {
+  min-height: 400px;
+  background: var(--bg-base) !important;
+}
+
+.cells-video-placeholder {
+  padding: 2rem;
+  text-align: center;
+}
+
+.chat-bubble {
+  padding: 0.625rem 1rem;
+  border-radius: var(--radius-md);
+  max-width: 85%;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.chat-bubble--mine {
+  align-self: flex-end;
+  background: rgba(201, 169, 98, 0.12);
+  border-right: 3px solid var(--gold);
+}
+
+.chat-bubble--other {
+  align-self: flex-start;
+  background: rgba(0, 0, 0, 0.35);
+  border-left: 3px solid var(--gold);
+}
+
+.chat-feed {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-right: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.chat-head {
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* ——— Map ——— */
+.map-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--header-height) - 8rem);
+}
+
+.map-frame {
+  flex: 1;
+  min-height: 400px;
+}

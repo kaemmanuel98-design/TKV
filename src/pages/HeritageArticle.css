@@ -1,0 +1,23 @@
+.heritage-article {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding-bottom: 2.5rem;
+}
+
+.heritage-article-back {
+  margin-bottom: 1rem;
+}
+
+.heritage-article-body {
+  padding: 1.5rem 1.75rem;
+}
+
+.heritage-article-body p {
+  margin: 0 0 1.25rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+.heritage-article-body p:last-child {
+  margin-bottom: 0;
+}
