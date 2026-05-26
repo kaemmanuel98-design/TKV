@@ -31,13 +31,11 @@ const About = () => {
         <div className="about-split">
           <div className="about-split-block">
             <span className="about-split-label">{t('about_audience_seekers_label')}</span>
-            <span className="about-split-value">60%</span>
             <p className="text-muted">{t('about_audience_seekers_desc')}</p>
           </div>
           <div className="about-split-divider" aria-hidden="true" />
           <div className="about-split-block">
             <span className="about-split-label">{t('about_audience_believers_label')}</span>
-            <span className="about-split-value">40%</span>
             <p className="text-muted">{t('about_audience_believers_desc')}</p>
           </div>
         </div>

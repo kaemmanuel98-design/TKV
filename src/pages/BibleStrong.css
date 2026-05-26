@@ -78,14 +78,117 @@
   margin-bottom: 0.75rem;
 }
 
+.lexicon-original-script {
+  font-size: 2rem;
+  line-height: 1.35;
+  color: var(--gold-bright);
+  margin: 0.25rem 0 0.5rem;
+  font-family: 'Segoe UI Historic', 'Noto Sans Hebrew', 'SBL Hebrew', 'Cardo', serif;
+}
+
+.lexicon-translit {
+  font-size: 1.125rem;
+  font-style: italic;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.lexicon-pron {
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.lexicon-surface-line {
+  margin-bottom: 0.75rem;
+}
+
+.lexicon-speak-btn {
+  margin-bottom: 1rem;
+}
+
+.lexicon-block {
+  margin-top: 1rem;
+}
+
+.lexicon-block strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lexicon-derivation {
+  font-size: 0.875rem;
+}
+
 .lexicon-lemma {
   font-style: italic;
   margin-top: 0.25rem;
 }
 
+.lexicon-meaning-primary {
+  margin: 0.75rem 0 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius-md);
+  background: rgba(201, 169, 98, 0.12);
+  border: 1px solid rgba(201, 169, 98, 0.35);
+}
+
+.lexicon-meaning-primary strong {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+}
+
+.lexicon-meaning-primary p {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.lexicon-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0;
+}
+
+.lexicon-missing,
+.lexicon-hint {
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
+}
+
 @media (max-width: 1024px) {
   .lexicon-panel {
     max-width: none;
-    position: static;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 200;
+    margin: 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: min(70vh, 520px);
+    overflow-y: auto;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.55);
+  }
+
+  .lexicon-panel--open::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: -1;
+  }
+
+  .bible-strong-page {
+    padding-bottom: 5rem;
   }
 }

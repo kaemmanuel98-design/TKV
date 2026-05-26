@@ -11,9 +11,10 @@
     "upload:chunks": "node scripts/upload-chunks-to-supabase.mjs",
     "upload:chunks:text": "node scripts/upload-chunks-to-supabase.mjs --text-only",
     "seed:podcasts": "node scripts/seed-podcasts.mjs",
+    "build:bible": "node scripts/build-bible-strong.mjs",
     "build": "vite build",
     "generate:icons": "node scripts/generate-pwa-icons.mjs",
-    "prebuild": "node scripts/generate-pwa-icons.mjs",
+    "prebuild": "node scripts/generate-pwa-icons.mjs && node scripts/build-bible-strong.mjs",
     "lint": "eslint .",
     "preview": "vite preview"
   },

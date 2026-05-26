@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+scripts/.cache/
 dist
 TKV/
 dist-ssr
@@ -15,6 +16,7 @@ dist-ssr
 .env
 .env.*
 !.env.example
+jitsi-local-credentials.txt
 
 # Editor directories and files
 .vscode/*
@@ -26,3 +28,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+.vercel

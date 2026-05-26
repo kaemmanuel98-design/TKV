@@ -58,6 +58,9 @@ const SpeechSettings = () => {
       {!cloudAvailable && (
         <p className="text-muted speech-hint">{t('speech_cloud_unavailable')}</p>
       )}
+      {cloudAvailable && engine === 'browser' && (
+        <p className="text-muted speech-hint">{t('speech_cloud_recommended')}</p>
+      )}
 
       <label className="profile-label" htmlFor="speech-accent">
         {t('speech_accent_label')}

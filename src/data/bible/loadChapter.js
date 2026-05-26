@@ -1,22 +1,44 @@
-const LOADERS = {
-  'genesis:1': () => import('./chapters/genesis_1.js'),
-  'john:1': () => import('./chapters/john_1.js'),
-};
+import { BIBLE_BOOKS } from './books.js';
+
+let manifestPromise = null;
+
+async function loadManifest() {
+  if (!manifestPromise) {
+    manifestPromise = fetch('/bible/manifest.json')
+      .then((r) => {
+        if (!r.ok) throw new Error('manifest');
+        return r.json();
+      })
+      .catch(() => null);
+  }
+  return manifestPromise;
+}
 
 export function isChapterAvailable(bookId, chapter) {
-  return Boolean(LOADERS[`${bookId}:${chapter}`]);
+  const book = BIBLE_BOOKS.find((b) => b.id === bookId);
+  return Boolean(book && chapter >= 1 && chapter <= book.chapters);
 }
 
 export async function loadBibleChapter(bookId, chapter) {
-  const loader = LOADERS[`${bookId}:${chapter}`];
-  if (!loader) return null;
-  const mod = await loader();
-  return mod.default;
+  if (!isChapterAvailable(bookId, chapter)) return null;
+
+  try {
+    const res = await fetch(`/bible/chapters/${bookId}/${chapter}.json`);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
 }
 
-export function listAvailableChapters() {
-  return Object.keys(LOADERS).map((key) => {
-    const [bookId, chapter] = key.split(':');
-    return { bookId, chapter: Number(chapter, 10) };
-  });
+export async function listAvailableChapters() {
+  const manifest = await loadManifest();
+  if (!manifest?.books) {
+    return BIBLE_BOOKS.flatMap((b) =>
+      Array.from({ length: b.chapters }, (_, i) => ({ bookId: b.id, chapter: i + 1 }))
+    );
+  }
+  return manifest.books.flatMap((b) =>
+    Array.from({ length: b.chapters }, (_, i) => ({ bookId: b.id, chapter: i + 1 }))
+  );
 }

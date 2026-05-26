@@ -4,7 +4,6 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [
@@ -22,7 +21,7 @@
     }
   ],
   "functions": {
-    "api/index.js": {
+    "api/[...path].js": {
       "maxDuration": 60,
       "includeFiles": "server/data/**"
     }

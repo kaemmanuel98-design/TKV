@@ -1,0 +1,352 @@
+{
+  "version": 1,
+  "books": [
+    {
+      "id": "genesis",
+      "chapters": 50,
+      "testament": "ot"
+    },
+    {
+      "id": "exodus",
+      "chapters": 40,
+      "testament": "ot"
+    },
+    {
+      "id": "leviticus",
+      "chapters": 27,
+      "testament": "ot"
+    },
+    {
+      "id": "numbers",
+      "chapters": 36,
+      "testament": "ot"
+    },
+    {
+      "id": "deuteronomy",
+      "chapters": 34,
+      "testament": "ot"
+    },
+    {
+      "id": "joshua",
+      "chapters": 24,
+      "testament": "ot"
+    },
+    {
+      "id": "judges",
+      "chapters": 21,
+      "testament": "ot"
+    },
+    {
+      "id": "ruth",
+      "chapters": 4,
+      "testament": "ot"
+    },
+    {
+      "id": "1samuel",
+      "chapters": 31,
+      "testament": "ot"
+    },
+    {
+      "id": "2samuel",
+      "chapters": 24,
+      "testament": "ot"
+    },
+    {
+      "id": "1kings",
+      "chapters": 22,
+      "testament": "ot"
+    },
+    {
+      "id": "2kings",
+      "chapters": 25,
+      "testament": "ot"
+    },
+    {
+      "id": "1chronicles",
+      "chapters": 29,
+      "testament": "ot"
+    },
+    {
+      "id": "2chronicles",
+      "chapters": 36,
+      "testament": "ot"
+    },
+    {
+      "id": "ezra",
+      "chapters": 10,
+      "testament": "ot"
+    },
+    {
+      "id": "nehemiah",
+      "chapters": 13,
+      "testament": "ot"
+    },
+    {
+      "id": "esther",
+      "chapters": 10,
+      "testament": "ot"
+    },
+    {
+      "id": "job",
+      "chapters": 42,
+      "testament": "ot"
+    },
+    {
+      "id": "psalms",
+      "chapters": 150,
+      "testament": "ot"
+    },
+    {
+      "id": "proverbs",
+      "chapters": 31,
+      "testament": "ot"
+    },
+    {
+      "id": "ecclesiastes",
+      "chapters": 12,
+      "testament": "ot"
+    },
+    {
+      "id": "songofsolomon",
+      "chapters": 8,
+      "testament": "ot"
+    },
+    {
+      "id": "isaiah",
+      "chapters": 66,
+      "testament": "ot"
+    },
+    {
+      "id": "jeremiah",
+      "chapters": 52,
+      "testament": "ot"
+    },
+    {
+      "id": "lamentations",
+      "chapters": 5,
+      "testament": "ot"
+    },
+    {
+      "id": "ezekiel",
+      "chapters": 48,
+      "testament": "ot"
+    },
+    {
+      "id": "daniel",
+      "chapters": 12,
+      "testament": "ot"
+    },
+    {
+      "id": "hosea",
+      "chapters": 14,
+      "testament": "ot"
+    },
+    {
+      "id": "joel",
+      "chapters": 3,
+      "testament": "ot"
+    },
+    {
+      "id": "amos",
+      "chapters": 9,
+      "testament": "ot"
+    },
+    {
+      "id": "obadiah",
+      "chapters": 1,
+      "testament": "ot"
+    },
+    {
+      "id": "jonah",
+      "chapters": 4,
+      "testament": "ot"
+    },
+    {
+      "id": "micah",
+      "chapters": 7,
+      "testament": "ot"
+    },
+    {
+      "id": "nahum",
+      "chapters": 3,
+      "testament": "ot"
+    },
+    {
+      "id": "habakkuk",
+      "chapters": 3,
+      "testament": "ot"
+    },
+    {
+      "id": "zephaniah",
+      "chapters": 3,
+      "testament": "ot"
+    },
+    {
+      "id": "haggai",
+      "chapters": 2,
+      "testament": "ot"
+    },
+    {
+      "id": "zechariah",
+      "chapters": 14,
+      "testament": "ot"
+    },
+    {
+      "id": "malachi",
+      "chapters": 4,
+      "testament": "ot"
+    },
+    {
+      "id": "matthew",
+      "chapters": 28,
+      "testament": "nt"
+    },
+    {
+      "id": "mark",
+      "chapters": 16,
+      "testament": "nt"
+    },
+    {
+      "id": "luke",
+      "chapters": 24,
+      "testament": "nt"
+    },
+    {
+      "id": "john",
+      "chapters": 21,
+      "testament": "nt"
+    },
+    {
+      "id": "acts",
+      "chapters": 28,
+      "testament": "nt"
+    },
+    {
+      "id": "romans",
+      "chapters": 16,
+      "testament": "nt"
+    },
+    {
+      "id": "1corinthians",
+      "chapters": 16,
+      "testament": "nt"
+    },
+    {
+      "id": "2corinthians",
+      "chapters": 13,
+      "testament": "nt"
+    },
+    {
+      "id": "galatians",
+      "chapters": 6,
+      "testament": "nt"
+    },
+    {
+      "id": "ephesians",
+      "chapters": 6,
+      "testament": "nt"
+    },
+    {
+      "id": "philippians",
+      "chapters": 4,
+      "testament": "nt"
+    },
+    {
+      "id": "colossians",
+      "chapters": 4,
+      "testament": "nt"
+    },
+    {
+      "id": "1thessalonians",
+      "chapters": 5,
+      "testament": "nt"
+    },
+    {
+      "id": "2thessalonians",
+      "chapters": 3,
+      "testament": "nt"
+    },
+    {
+      "id": "1timothy",
+      "chapters": 6,
+      "testament": "nt"
+    },
+    {
+      "id": "2timothy",
+      "chapters": 4,
+      "testament": "nt"
+    },
+    {
+      "id": "titus",
+      "chapters": 3,
+      "testament": "nt"
+    },
+    {
+      "id": "philemon",
+      "chapters": 1,
+      "testament": "nt"
+    },
+    {
+      "id": "hebrews",
+      "chapters": 13,
+      "testament": "nt"
+    },
+    {
+      "id": "james",
+      "chapters": 5,
+      "testament": "nt"
+    },
+    {
+      "id": "1peter",
+      "chapters": 5,
+      "testament": "nt"
+    },
+    {
+      "id": "2peter",
+      "chapters": 3,
+      "testament": "nt"
+    },
+    {
+      "id": "1john",
+      "chapters": 5,
+      "testament": "nt"
+    },
+    {
+      "id": "2john",
+      "chapters": 1,
+      "testament": "nt"
+    },
+    {
+      "id": "3john",
+      "chapters": 1,
+      "testament": "nt"
+    },
+    {
+      "id": "jude",
+      "chapters": 1,
+      "testament": "nt"
+    },
+    {
+      "id": "revelation",
+      "chapters": 22,
+      "testament": "nt"
+    }
+  ],
+  "chapterCount": 1189,
+  "languages": [
+    "fr",
+    "en",
+    "es",
+    "nl",
+    "pt",
+    "ar"
+  ],
+  "sources": {
+    "en": "Berean Standard Bible with Strong (public domain)",
+    "fr": "Bible de l'Épée (thiagobodruk/bible)",
+    "es": "Reina-Valera (thiagobodruk/bible)",
+    "pt": "Almeida Atualizada (thiagobodruk/bible)",
+    "ar": "Smith-Van Dyck (thiagobodruk/bible)",
+    "nl": "Statenvertaling (getBible API)"
+  }
+}

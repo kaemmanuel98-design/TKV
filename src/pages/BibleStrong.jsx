@@ -1,49 +1,68 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBibleStore } from '../store/useBibleStore';
-import { Volume2, BookOpen, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { Volume2, VolumeX, BookOpen, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { BIBLE_BOOKS, getBookName } from '../data/bible/catalog';
 import { loadBibleChapter, isChapterAvailable } from '../data/bible/loadChapter';
-import { getLexiconEntry } from '../data/bible/lexicon';
+import {
+  getLexiconEntryAsync,
+  getLexiconDisplayMeaning,
+  isLexiconLoadFailed,
+  preloadLexicon,
+} from '../data/bible/lexicon';
 import { verseText } from '../data/bible/utils';
+import { prepareChapterSpeechText } from '../lib/speech/prepareText';
+import { resolveBibleReadLang, pickBibleChapterLang } from '../data/bible/languages';
+import { resolveStrongForSurface } from '../data/bible/strongAlignHints';
 import { useSpeak } from '../hooks/useSpeak';
 import './BibleStrong.css';
 
 const BibleStrong = () => {
   const { t, i18n } = useTranslation();
-  const lang = ['fr', 'en'].includes(i18n.language.split('-')[0])
-    ? i18n.language.split('-')[0]
-    : 'fr';
+  const lang = resolveBibleReadLang(i18n.language);
+  const readLang = lang;
 
   const { bookId, currentChapter, lexiconSelection, setBook, setChapter, setLexiconSelection, clearLexicon, getBookMeta } =
     useBibleStore();
 
   const bookMeta = getBookMeta();
   const bookLabel = getBookName(bookId, lang);
-  const chapterAvailable = isChapterAvailable(bookId, currentChapter);
-
   const [chapterData, setChapterData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [buildMissing, setBuildMissing] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [lexiconLoading, setLexiconLoading] = useState(false);
+  const [lexiconFetchFailed, setLexiconFetchFailed] = useState(false);
+  const lexiconPanelRef = useRef(null);
+
+  useEffect(() => {
+    preloadLexicon().then(() => setLexiconFetchFailed(isLexiconLoadFailed()));
+  }, []);
 
   const loadChapter = useCallback(async () => {
     setLoading(true);
     setChapterData(null);
-    if (!chapterAvailable) {
+    setBuildMissing(false);
+    if (!isChapterAvailable(bookId, currentChapter)) {
       setLoading(false);
       return;
     }
     try {
       const data = await loadBibleChapter(bookId, currentChapter);
-      const localized = data?.[lang] || data?.fr;
-      setChapterData(localized || null);
+      if (!data) {
+        setBuildMissing(true);
+        setChapterData(null);
+        return;
+      }
+      setChapterData(pickBibleChapterLang(data, readLang));
     } catch (err) {
       console.error(err);
       setChapterData(null);
     } finally {
       setLoading(false);
     }
-  }, [bookId, currentChapter, lang, chapterAvailable]);
+  }, [bookId, currentChapter, readLang]);
 
   useEffect(() => {
     loadChapter();
@@ -51,19 +70,78 @@ const BibleStrong = () => {
   }, [loadChapter, clearLexicon]);
 
   const verses = chapterData?.verses || [];
-  const { speak } = useSpeak();
+  const { speak, stop } = useSpeak();
 
-  const readWholeChapter = () => {
-    speak(verses.map((v) => verseText(v)).join(' '));
+  const readWholeChapter = async () => {
+    if (isSpeaking) {
+      stop();
+      setIsSpeaking(false);
+      return;
+    }
+    const chapterText = prepareChapterSpeechText(verses, { locale: i18n.language });
+    if (!chapterText.trim()) return;
+
+    setIsSpeaking(true);
+    try {
+      await speak(chapterText, { prepared: true });
+    } catch {
+      /* alertes gérées dans useSpeak */
+    } finally {
+      setIsSpeaking(false);
+    }
   };
 
-  const openLexicon = (strongId, surface) => {
-    const entry = getLexiconEntry(strongId, lang);
-    if (!entry) return;
-    setLexiconSelection({ strongId, surface, ...entry });
+  const readVerse = async (verse) => {
+    if (isSpeaking) stop();
+    const text = verseText(verse);
+    if (!text.trim()) return;
+
+    setIsSpeaking(true);
+    try {
+      await speak(text);
+    } catch {
+      /* alertes gérées dans useSpeak */
+    } finally {
+      setIsSpeaking(false);
+    }
+  };
+
+  const scrollToLexiconPanel = () => {
+    requestAnimationFrame(() => {
+      lexiconPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  };
+
+  const openLexicon = async (strongId, surface) => {
+    const resolvedId = resolveStrongForSurface(surface, lang, strongId);
+    setLexiconLoading(true);
+    setLexiconSelection({ strongId: resolvedId, surface, loading: true });
+    scrollToLexiconPanel();
+
+    try {
+      const entry = await getLexiconEntryAsync(resolvedId, lang);
+      setLexiconSelection({ ...entry, surface, loading: false });
+    } finally {
+      setLexiconLoading(false);
+    }
   };
 
   const lexicon = lexiconSelection;
+  const lexiconMeaning =
+    lexicon && !lexicon.loading ? getLexiconDisplayMeaning(lexicon, lang) : '';
+
+  const speakLemma = async () => {
+    if (!lexiconSelection?.speakLemma) return;
+    if (isSpeaking) stop();
+    setIsSpeaking(true);
+    try {
+      await speak(lexiconSelection.speakLemma);
+    } catch {
+      /* alertes gérées dans useSpeak */
+    } finally {
+      setIsSpeaking(false);
+    }
+  };
 
   const goPrevChapter = () => {
     if (currentChapter > 1) setChapter(currentChapter - 1);
@@ -89,9 +167,14 @@ const BibleStrong = () => {
             }
             subtitle={t('bible_subtitle')}
             actions={
-              chapterAvailable && verses.length > 0 ? (
-                <button type="button" className="btn btn-primary btn-sm" onClick={readWholeChapter}>
-                  <Volume2 size={18} /> {t('bible_listen_chapter')}
+              verses.length > 0 ? (
+                <button
+                  type="button"
+                  className={`btn btn-sm ${isSpeaking ? 'btn-ghost' : 'btn-primary'}`}
+                  onClick={readWholeChapter}
+                >
+                  {isSpeaking ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                  {isSpeaking ? t('bible_stop_listening') : t('bible_listen_chapter')}
                 </button>
               ) : null
             }
@@ -159,21 +242,21 @@ const BibleStrong = () => {
             </div>
           </div>
 
-          {!chapterAvailable && (
+          {buildMissing && !loading && (
             <div className="card bible-unavailable">
-              <p>{t('bible_chapter_unavailable')}</p>
-              <p className="text-muted bible-available-hint">{t('bible_available_hint')}</p>
+              <p>{t('bible_build_missing')}</p>
+              <p className="text-muted bible-available-hint">{t('bible_build_missing_hint')}</p>
             </div>
           )}
 
-          {chapterAvailable && loading && (
+          {loading && (
             <p className="bible-loading text-muted">
               <Loader2 size={20} className="spin" />
               {t('bible_loading')}
             </p>
           )}
 
-          {chapterAvailable && !loading && verses.length > 0 && (
+          {!loading && !buildMissing && verses.length > 0 && (
             <div className="card bible-reader-card">
               {verses.map((verse) => (
                 <div key={verse.id} className="bible-verse">
@@ -199,7 +282,7 @@ const BibleStrong = () => {
                   <button
                     type="button"
                     className="btn btn-ghost bible-verse-listen"
-                    onClick={() => speak(verseText(verse))}
+                    onClick={() => readVerse(verse)}
                     title={t('bible_listen_verse')}
                     aria-label={t('bible_listen_verse')}
                   >
@@ -212,7 +295,11 @@ const BibleStrong = () => {
         </div>
 
         {lexicon && (
-          <aside className="card lexicon-panel animate-fade-in">
+          <aside
+            ref={lexiconPanelRef}
+            className="card lexicon-panel lexicon-panel--open animate-fade-in"
+            aria-live="polite"
+          >
             <div className="flex justify-between items-center mb-4">
               <h3 style={{ margin: 0, color: 'var(--gold-bright)', fontFamily: 'var(--font-display)' }}>
                 {t('bible_lexicon_title')}
@@ -231,19 +318,79 @@ const BibleStrong = () => {
               <p className="lexicon-lang-badge">
                 {lexicon.isGreek ? t('bible_lexicon_greek') : t('bible_lexicon_hebrew')}
               </p>
-              <p>
+
+              <p className="lexicon-surface-line">
                 <strong>{t('bible_lexicon_word')}:</strong> {lexicon.surface}
+                <span className="text-muted"> · {lexicon.strongId}</span>
               </p>
-              <p>
-                <strong>{t('bible_lexicon_code')}:</strong> {lexicon.strongId}
-              </p>
-              {lexicon.lemma && (
-                <p className="text-muted lexicon-lemma">{lexicon.lemma}</p>
+
+              {(lexicon.loading || lexiconLoading) && (
+                <p className="lexicon-loading text-muted">
+                  <Loader2 size={18} className="spin" />
+                  {t('bible_lexicon_loading')}
+                </p>
               )}
-              <p className="mt-4">
-                <strong>{t('bible_lexicon_definition')}:</strong>
-              </p>
-              <p className="text-muted">{lexicon.gloss}</p>
+
+              {!lexicon.loading && !lexiconLoading && lexiconMeaning && (
+                <div className="lexicon-meaning-primary">
+                  <strong>{t('bible_lexicon_meaning')}:</strong>
+                  <p>{lexiconMeaning}</p>
+                </div>
+              )}
+
+              {!lexicon.loading && !lexiconLoading && !lexiconMeaning && (
+                <p className="text-muted lexicon-missing">{t('bible_lexicon_not_found')}</p>
+              )}
+
+              {!lexicon.loading && lexiconFetchFailed && (
+                <p className="text-muted lexicon-hint">{t('bible_lexicon_fetch_hint')}</p>
+              )}
+
+              {lexicon.lemmaOriginal && (
+                <p className="lexicon-original-script" dir="auto" lang={lexicon.isGreek ? 'grc' : 'he'}>
+                  {lexicon.lemmaOriginal}
+                </p>
+              )}
+
+              {lexicon.transliteration && (
+                <p className="lexicon-translit">{lexicon.transliteration}</p>
+              )}
+
+              {lexicon.pronunciation && (
+                <p className="text-muted lexicon-pron">
+                  <strong>{t('bible_lexicon_pronunciation')}:</strong> {lexicon.pronunciation}
+                </p>
+              )}
+
+              {lexicon.speakLemma && (
+                <button type="button" className="btn btn-outline btn-sm lexicon-speak-btn" onClick={speakLemma}>
+                  <Volume2 size={16} />
+                  {t('bible_lexicon_listen_word')}
+                </button>
+              )}
+
+              {lexicon.definitionOriginal &&
+                lexicon.definitionOriginal !== lexiconMeaning && (
+                <div className="lexicon-block">
+                  <strong>{t('bible_lexicon_original_meaning')}:</strong>
+                  <p className="text-muted">{lexicon.definitionOriginal}</p>
+                </div>
+              )}
+
+              {lexicon.derivation && (
+                <div className="lexicon-block">
+                  <strong>{t('bible_lexicon_derivation')}:</strong>
+                  <p className="text-muted lexicon-derivation">{lexicon.derivation}</p>
+                </div>
+              )}
+
+              {lexicon.kjvDef && (
+                <div className="lexicon-block">
+                  <strong>{t('bible_lexicon_kjv')}:</strong>
+                  <p className="text-muted">{lexicon.kjvDef}</p>
+                </div>
+              )}
+
             </div>
           </aside>
         )}

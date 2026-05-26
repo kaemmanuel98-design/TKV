@@ -16,6 +16,7 @@ import {
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
 import { LogoMark } from './Logo';
+import ProfileAvatar from './ProfileAvatar';
 import PaymentModal from './PaymentModal';
 import OnboardingGate from './OnboardingGate';
 import './Layout.css';
@@ -47,6 +48,7 @@ const Layout = () => {
   const { t, i18n } = useTranslation();
   const { user, signOut } = useAuthStore();
   const fetchProfile = useProfileStore((s) => s.fetchProfile);
+  const profile = useProfileStore((s) => s.profile);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
@@ -145,8 +147,12 @@ const Layout = () => {
           </div>
 
           {user ? (
-            <Link to="/profile" className="btn btn-outline btn-sm hide-mobile">
-              <User size={16} />
+            <Link to="/profile" className="header-profile-link" title={t('tab_profile')}>
+              <ProfileAvatar
+                src={profile?.avatar_url || user.user_metadata?.avatar_url}
+                name={profile?.name || user.user_metadata?.name}
+                size={36}
+              />
             </Link>
           ) : (
             <Link to="/auth" className="btn btn-outline btn-sm">

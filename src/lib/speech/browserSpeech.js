@@ -1,3 +1,5 @@
+import { chunkTextForSpeech } from './chunkText.js';
+
 const QUALITY_HINTS = [
   'natural',
   'neural',
@@ -17,7 +19,26 @@ const QUALITY_HINTS = [
 ];
 const LOW_QUALITY = ['espeak', 'compact', 'android'];
 
+const PREFERRED_VOICES = {
+  fr: ['hortense', 'denise', 'henri', 'thomas', 'amelie', 'marie', 'claire', 'google français'],
+  en: ['samantha', 'daniel', 'karen', 'moira', 'zira', 'david', 'google us english'],
+  es: ['helena', 'paulina', 'monica', 'jorge', 'lucia', 'google español'],
+  nl: ['colette', 'fenna', 'xander', 'google nederlands'],
+  pt: ['raquel', 'joana', 'felipe', 'luciana', 'google português'],
+  ar: ['hoda', 'naayf', 'tarik', 'google العربية'],
+};
+
+const RATE_BY_LANG = {
+  ar: 0.88,
+  fr: 0.94,
+  en: 0.96,
+  es: 0.94,
+  nl: 0.94,
+  pt: 0.94,
+};
+
 let voicesCache = [];
+let stopRequested = false;
 
 export function preloadSpeechVoices() {
   if (typeof window === 'undefined' || !window.speechSynthesis) return;
@@ -31,24 +52,38 @@ export function preloadSpeechVoices() {
   window.speechSynthesis.onvoiceschanged = refresh;
 }
 
+function voiceMatchesLocale(voice, locale) {
+  const target = locale.toLowerCase();
+  const langPrefix = target.split('-')[0];
+  const voiceLang = voice.lang.toLowerCase();
+  if (voiceLang === target) return true;
+  if (voiceLang.startsWith(`${langPrefix}-`)) return true;
+  return false;
+}
+
 function scoreVoice(voice, locale) {
+  if (!voiceMatchesLocale(voice, locale)) return -1;
+
   const target = locale.toLowerCase();
   const voiceLang = voice.lang.toLowerCase();
+  const langPrefix = target.split('-')[0];
   let score = 0;
 
-  if (voiceLang === target) score += 120;
-  else if (voiceLang.startsWith(target.split('-')[0])) score += 40;
-  else return -1;
+  if (voiceLang === target) score += 150;
+  else if (voiceLang.startsWith(`${langPrefix}-`)) score += 80;
 
   const name = voice.name.toLowerCase();
+  for (const pref of PREFERRED_VOICES[langPrefix] || []) {
+    if (name.includes(pref)) score += 40;
+  }
   for (const hint of QUALITY_HINTS) {
-    if (name.includes(hint)) score += 18;
+    if (name.includes(hint)) score += 15;
   }
   for (const bad of LOW_QUALITY) {
-    if (name.includes(bad)) score -= 40;
+    if (name.includes(bad)) score -= 50;
   }
-  if (!voice.localService) score += 12;
-  if (voice.default) score += 4;
+  if (!voice.localService) score += 10;
+  if (voice.default && !voiceLang.startsWith(langPrefix)) score -= 100;
 
   return score;
 }
@@ -60,16 +95,23 @@ export function pickVoice(locale) {
     .filter((r) => r.score >= 0)
     .sort((a, b) => b.score - a.score);
 
-  return ranked[0]?.voice || voices.find((v) => v.lang.toLowerCase().startsWith(locale.split('-')[0])) || null;
+  return ranked[0]?.voice || null;
+}
+
+export function hasVoiceForLocale(locale) {
+  return Boolean(pickVoice(locale));
 }
 
 export function listVoicesForLocale(locale) {
   const voices = voicesCache.length ? voicesCache : window.speechSynthesis.getVoices();
-  const prefix = locale.split('-')[0].toLowerCase();
-  return voices.filter((v) => v.lang.toLowerCase().startsWith(prefix));
+  return voices.filter((v) => voiceMatchesLocale(v, locale));
 }
 
-function waitForVoices(maxMs = 2500) {
+export function ensureVoicesReady() {
+  return waitForVoices();
+}
+
+function waitForVoices(maxMs = 6000) {
   return new Promise((resolve) => {
     const grab = () => {
       const list = window.speechSynthesis.getVoices();
@@ -94,33 +136,62 @@ function waitForVoices(maxMs = 2500) {
   });
 }
 
+function speakOneChunk(text, voice, locale) {
+  return new Promise((resolve, reject) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.voice = voice;
+    utterance.lang = voice.lang;
+
+    const langCode = locale.split('-')[0];
+    utterance.rate = RATE_BY_LANG[langCode] ?? 0.94;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+
+    let settled = false;
+    const finish = (err) => {
+      if (settled) return;
+      settled = true;
+      if (err) reject(err);
+      else resolve();
+    };
+
+    utterance.onend = () => finish();
+    utterance.onerror = (e) => finish(e.error || new Error('speech_error'));
+
+    window.speechSynthesis.speak(utterance);
+
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+    }
+  });
+}
+
 export async function speakWithBrowser(text, locale) {
   if (!window.speechSynthesis) {
     throw new Error('unsupported');
   }
 
+  stopRequested = false;
   await waitForVoices();
   window.speechSynthesis.cancel();
 
-  return new Promise((resolve, reject) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = locale;
+  const voice = pickVoice(locale);
+  if (!voice) {
+    throw new Error('no_voice_for_locale');
+  }
 
-    const voice = pickVoice(locale);
-    if (voice) utterance.voice = voice;
+  const chunks = chunkTextForSpeech(text);
 
-    utterance.rate = 0.94;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-
-    utterance.onend = () => resolve();
-    utterance.onerror = (e) => reject(e.error || new Error('speech_error'));
-
-    window.speechSynthesis.speak(utterance);
-  });
+  for (const chunk of chunks) {
+    if (stopRequested) break;
+    await speakOneChunk(chunk, voice, locale);
+    if (stopRequested) break;
+    await new Promise((r) => setTimeout(r, 40));
+  }
 }
 
 export function stopBrowserSpeech() {
+  stopRequested = true;
   if (typeof window !== 'undefined' && window.speechSynthesis) {
     window.speechSynthesis.cancel();
   }

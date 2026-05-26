@@ -30,11 +30,51 @@
   color: var(--gold-bright);
 }
 
+.community-filter-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.community-filter-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.community-filter-btn.active {
+  border-color: var(--gold);
+  color: var(--gold-bright);
+  background: rgba(201, 169, 98, 0.1);
+}
+
 .community-compose {
   margin-bottom: 1.5rem;
   padding: 1rem 1.25rem;
   display: flex;
   justify-content: center;
+}
+
+.community-compose-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.community-compose-kind {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--gold-bright);
+  margin: 0;
 }
 
 .community-form {
@@ -66,8 +106,36 @@
 .community-post-header {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  gap: 0.5rem;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.community-post-author-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.community-post-author {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.community-post-badge {
+  display: inline-block;
+  margin-top: 0.15rem;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.community-post--testimony {
+  border-color: rgba(201, 169, 98, 0.35);
 }
 
 .community-post-date {

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '../lib/supabase';
+import { uploadAvatarFile } from '../lib/uploadAvatar';
 import { PROFILE_TYPE_KEY, ONBOARDING_KEY } from './useGamificationStore';
 
 export const useProfileStore = create((set, get) => ({
@@ -48,6 +49,11 @@ export const useProfileStore = create((set, get) => ({
     } finally {
       set({ loading: false });
     }
+  },
+
+  uploadAvatar: async (userId, file) => {
+    const avatar_url = await uploadAvatarFile(userId, file);
+    return get().updateProfile(userId, { avatar_url });
   },
 
   updateProfile: async (userId, updates) => {
