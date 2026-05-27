@@ -33,12 +33,10 @@ async function ensureCloudAvailable() {
   return available;
 }
 
-function shouldTryCloud(engine, cloudAvailable) {
-  if (!cloudAvailable) return false;
-  return engine !== 'browser';
+function wantsCloudOnly(engine) {
+  return engine === 'cloud';
 }
 
-/** Pour un chapitre entier : plusieurs requêtes cloud si besoin */
 async function speakWithCloudLong(text, locale) {
   const chunks = chunkTextForSpeech(text, 3800);
   for (const chunk of chunks) {
@@ -51,7 +49,7 @@ export async function speakText(text, { language = 'fr', locale, prepared = fals
   const targetLocale = resolveSpeechLocale(language, locale, store.getAccent);
   const trimmed = prepared
     ? text?.trim()
-    : prepareSpeechText(text, { locale: targetLocale });
+    : prepareSpeechText(text, { locale: targetLocale, keepReferences: true });
 
   if (!trimmed) {
     throw new Error('empty_text');
@@ -66,10 +64,21 @@ export async function speakText(text, { language = 'fr', locale, prepared = fals
     }
 
     const cloudAvailable = await ensureCloudAvailable();
-    const tryCloud = shouldTryCloud(store.engine, cloudAvailable);
-    let cloudFailed = false;
+    const engine = store.engine;
 
-    if (tryCloud) {
+    if (engine !== 'cloud' && 'speechSynthesis' in window) {
+      try {
+        await speakWithBrowser(trimmed, targetLocale);
+        return;
+      } catch (browserErr) {
+        console.warn('[TKV TTS] browser:', browserErr?.message || browserErr);
+        if (engine === 'browser' && !cloudAvailable) {
+          throw browserErr;
+        }
+      }
+    }
+
+    if (cloudAvailable && engine !== 'browser') {
       try {
         if (trimmed.length > 3800) {
           await speakWithCloudLong(trimmed, targetLocale);
@@ -78,30 +87,22 @@ export async function speakText(text, { language = 'fr', locale, prepared = fals
         }
         return;
       } catch (cloudErr) {
-        cloudFailed = true;
-        console.warn('[TKV TTS] cloud failed:', cloudErr?.message || cloudErr);
-        const authBlocked = cloudErr?.status === 401;
-        if (cloudErr?.message === 'tts_quota_exceeded') {
-          store.setCloudAvailable(false);
+        console.warn('[TKV TTS] cloud:', cloudErr?.message || cloudErr);
+        if (wantsCloudOnly(engine)) throw cloudErr;
+        if ('speechSynthesis' in window) {
+          await speakWithBrowser(trimmed, targetLocale);
+          return;
         }
-        if (store.engine === 'cloud' && !('speechSynthesis' in window)) {
-          throw cloudErr;
-        }
-        if (authBlocked && !('speechSynthesis' in window)) {
-          throw new Error('tts_login_required');
-        }
+        throw cloudErr;
       }
     }
 
-    if (!('speechSynthesis' in window)) {
-      if (cloudAvailable && !cloudFailed) {
-        await speakWithCloud(trimmed.slice(0, 4096), targetLocale);
-        return;
-      }
-      throw new Error('unsupported');
+    if ('speechSynthesis' in window) {
+      await speakWithBrowser(trimmed, targetLocale);
+      return;
     }
 
-    await speakWithBrowser(trimmed, targetLocale);
+    throw new Error('unsupported');
   } finally {
     speaking = false;
   }

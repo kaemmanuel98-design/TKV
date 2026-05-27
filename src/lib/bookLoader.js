@@ -1,9 +1,5 @@
 import { BOOK_META } from '../data/bookMeta';
-import {
-  isLikelyFrench,
-  isUsableInLanguage,
-  translateBookData,
-} from './translateOnDemand';
+import { isLikelyFrench, isUsableInLanguage } from './translateOnDemand';
 
 const BOOK_LANGS = ['fr', 'en', 'es', 'nl', 'pt', 'ar'];
 const SUPPORTED_SLUGS = ['gynosko', 'eido'];
@@ -28,6 +24,10 @@ function enrichBook(slug, data, uiLang, fileLang, extra = {}) {
   const meta = BOOK_META[slug]?.langs[uiLang] || BOOK_META[slug]?.langs.fr;
   const metaRoot = BOOK_META[slug];
 
+  const sample = data.chapters[0]?.content || '';
+  const usableInUi =
+    fileLang === uiLang && (uiLang === 'fr' || uiLang === 'en' || isUsableInLanguage(sample, uiLang));
+
   return {
     ...data,
     slug,
@@ -39,20 +39,20 @@ function enrichBook(slug, data, uiLang, fileLang, extra = {}) {
     author: data.author || 'Ange Emmanuel Kouamé',
     contentLang: fileLang,
     uiLang,
-    usingFallback: fileLang !== uiLang,
+    usingFallback: !usableInUi,
     contentMismatch:
-      uiLang !== fileLang &&
+      !usableInUi &&
       uiLang !== 'fr' &&
-      fileLang !== 'en' &&
-      isLikelyFrench(data.chapters[0]?.content || ''),
+      isLikelyFrench(sample),
+    needsChapterTranslation: !usableInUi && uiLang !== fileLang,
     ...extra,
   };
 }
 
 /**
- * Charge un livre ; traduit à la demande via /api/translate si la langue n'est pas disponible.
+ * Charge un livre immédiatement (sans traduire tout le livre — traduction par chapitre dans le lecteur).
  */
-export async function loadBook(slug, language, { onTranslateProgress } = {}) {
+export async function loadBook(slug, language) {
   if (!SUPPORTED_SLUGS.includes(slug)) return null;
 
   const uiLang = normalizeLang(language);
@@ -68,28 +68,12 @@ export async function loadBook(slug, language, { onTranslateProgress } = {}) {
     }
   }
 
-  const sourceLang = (await importBookFile(slug, 'fr')) ? 'fr' : 'en';
-  const sourceData = (await importBookFile(slug, sourceLang)) || (await importBookFile(slug, 'fr'));
+  const frData = await importBookFile(slug, 'fr');
+  const sourceData = frData || (await importBookFile(slug, 'en'));
   if (!sourceData) return null;
 
-  if (uiLang === sourceLang) {
-    return enrichBook(slug, sourceData, uiLang, sourceLang);
-  }
-
-  const base = enrichBook(slug, sourceData, uiLang, sourceLang, {
-    usingFallback: true,
-    contentMismatch: true,
-  });
-
-  try {
-    const translated = await translateBookData(base, uiLang, {
-      onProgress: onTranslateProgress,
-    });
-    return translated;
-  } catch (e) {
-    console.warn('[bookLoader] translate on demand failed', e);
-    return base;
-  }
+  const sourceLang = frData ? 'fr' : 'en';
+  return enrichBook(slug, sourceData, uiLang, sourceLang);
 }
 
-export { SUPPORTED_SLUGS };
+export { SUPPORTED_SLUGS, normalizeLang as normalizeBookLang };

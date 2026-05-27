@@ -1,5 +1,5 @@
-const CACHE_VERSION = 'tkv_tr_v1';
-const CACHE_MAX = 400;
+const CACHE_VERSION = 'tkv_tr_v2';
+const CACHE_MAX = 500;
 const BOOK_LANGS = ['fr', 'en', 'es', 'nl', 'pt', 'ar'];
 
 const API_BASE = import.meta.env.VITE_API_URL || '';
@@ -40,10 +40,12 @@ function writeCache(store) {
 
 function cacheGet(from, to, text) {
   const store = readCache();
-  return store[`${from}|${to}|${hashKey(text)}`];
+  const hit = store[`${from}|${to}|${hashKey(text)}`];
+  return hit != null && String(hit).trim() ? hit : null;
 }
 
 function cacheSet(from, to, text, translated) {
+  if (!translated?.trim()) return;
   const store = readCache();
   store[`${from}|${to}|${hashKey(text)}`] = translated;
   writeCache(store);
@@ -55,38 +57,37 @@ export function isLikelyFrench(text) {
 }
 
 export function isUsableInLanguage(text, lang) {
-  if (!text?.trim()) return true;
+  if (!text?.trim()) return false;
   if (lang === 'fr') return isLikelyFrench(text);
   return !isLikelyFrench(text);
 }
 
 async function fetchTranslations(texts, { from, to }) {
-  const res = await fetch(`${API_BASE}/api/translate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ texts, from, to }),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 90000);
 
-  if (!res.ok) {
-    const err = new Error('translate_failed');
-    err.status = res.status;
-    try {
-      const data = await res.json();
-      err.code = data.error;
-    } catch {
-      /* ignore */
+  try {
+    const res = await fetch(`${API_BASE}/api/translate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texts, from, to }),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const err = new Error('translate_failed');
+      err.status = res.status;
+      throw err;
     }
-    throw err;
-  }
 
-  const data = await res.json();
-  return data.translations || [];
+    const data = await res.json();
+    return data.translations || [];
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
-/**
- * Traduit une liste de textes (cache local + API).
- */
-export async function translateTexts(texts, { from = 'fr', to, onProgress } = {}) {
+export async function translateTexts(texts, { from = 'fr', to } = {}) {
   const target = normalizeLang(to);
   const source = normalizeLang(from);
 
@@ -109,89 +110,55 @@ export async function translateTexts(texts, { from = 'fr', to, onProgress } = {}
     pending.push({ index, text });
   });
 
-  onProgress?.(list.length - pending.length, list.length);
-
-  const BATCH = 8;
+  const BATCH = 4;
   for (let i = 0; i < pending.length; i += BATCH) {
     const slice = pending.slice(i, i + BATCH);
-    const translated = await fetchTranslations(
-      slice.map((p) => p.text),
-      { from: source, to: target }
-    );
-    slice.forEach((item, j) => {
-      const value = translated[j] ?? item.text;
-      results[item.index] = value;
-      cacheSet(source, target, item.text, value);
-    });
-    onProgress?.(list.length - pending.length + Math.min(i + BATCH, pending.length), list.length);
+    try {
+      const translated = await fetchTranslations(
+        slice.map((p) => p.text),
+        { from: source, to: target }
+      );
+      slice.forEach((item, j) => {
+        const value = translated[j]?.trim() ? translated[j] : item.text;
+        results[item.index] = value;
+        if (value !== item.text) cacheSet(source, target, item.text, value);
+      });
+    } catch {
+      slice.forEach((item) => {
+        results[item.index] = item.text;
+      });
+      break;
+    }
   }
 
   return results;
 }
 
-export async function translateBookData(bookData, targetLang, { onProgress } = {}) {
-  const to = normalizeLang(targetLang);
-  const from =
-    bookData.contentLang && bookData.chapters?.[0]?.content
-      ? normalizeLang(bookData.contentLang)
-      : 'fr';
+/** Traduit un seul chapitre (titre + contenu) — rapide et fiable. */
+export async function translateChapter(chapter, { from = 'fr', to, title } = {}) {
+  const target = normalizeLang(to);
+  const source = normalizeLang(from);
 
-  if (to === from) return bookData;
+  if (target === source) {
+    return { title: title || chapter.title, content: chapter.content };
+  }
 
-  const titleFields = [];
-  if (bookData.title?.trim()) titleFields.push(bookData.title);
-  if (bookData.subtitle?.trim()) titleFields.push(bookData.subtitle);
-  const chapterTitles = bookData.chapters.map((c) => c.title);
-  const chapterBodies = bookData.chapters.map((c) => c.content);
-  const quizTexts = [];
+  const texts = [];
+  if (title?.trim()) texts.push(title);
+  if (chapter.content?.trim()) texts.push(chapter.content);
 
-  bookData.chapters.forEach((ch) => {
-    ch.quiz?.forEach((q) => {
-      quizTexts.push(q.question);
-      q.options?.forEach((o) => quizTexts.push(o.text));
-    });
-  });
+  if (!texts.length) {
+    return { title: title || chapter.title, content: chapter.content || '' };
+  }
 
-  const allTexts = [...titleFields, ...chapterTitles, ...chapterBodies, ...quizTexts];
-  const total = allTexts.length;
-  let done = 0;
-
-  const translated = await translateTexts(allTexts, {
-    from,
-    to,
-    onProgress: (d) => {
-      done = d;
-      onProgress?.(done, total);
-    },
-  });
-
-  let cursor = 0;
-  const next = () => translated[cursor++];
-
-  const newTitle = bookData.title?.trim() ? next() : bookData.title;
-  const newSubtitle = bookData.subtitle?.trim() ? next() : bookData.subtitle;
-
-  const chapters = bookData.chapters.map((ch) => {
-    const title = next();
-    const content = next();
-    const quiz = (ch.quiz || []).map((q) => ({
-      ...q,
-      question: next(),
-      options: q.options.map((o) => ({ ...o, text: next() })),
-    }));
-    return { ...ch, title, content, quiz };
-  });
+  const out = await translateTexts(texts, { from: source, to: target });
+  let i = 0;
+  const newTitle = title?.trim() ? out[i++] : title || chapter.title;
+  const newContent = chapter.content?.trim() ? out[i++] : chapter.content || '';
 
   return {
-    ...bookData,
-    title: newTitle,
-    subtitle: newSubtitle,
-    chapters,
-    contentLang: to,
-    uiLang: to,
-    usingFallback: false,
-    contentMismatch: false,
-    translatedOnDemand: true,
+    title: newTitle?.trim() ? newTitle : title || chapter.title,
+    content: newContent?.trim() ? newContent : chapter.content,
   };
 }
 

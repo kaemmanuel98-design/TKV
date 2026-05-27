@@ -22,7 +22,7 @@ function mapCatalogItem(item, t) {
 }
 
 const Podcasts = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const isPremium = useProfileStore((s) => s.isPremium);
   const [episodes, setEpisodes] = useState(() => PODCAST_CATALOG.map((p) => mapCatalogItem(p, t)));
   const [active, setActive] = useState(null);
@@ -44,7 +44,7 @@ const Podcasts = () => {
         setActive(mapped[0]);
       }
     })();
-  }, [i18n.language]);
+  }, [t, i18n.language]);
 
   const playEpisode = (ep) => {
     if (ep.is_premium && !isPremium()) {

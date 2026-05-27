@@ -6,6 +6,7 @@ import { LogoMark } from '../components/Logo';
 import { useSpeak } from '../hooks/useSpeak';
 import { stopSpeech } from '../lib/speech';
 import { loadBook, SUPPORTED_SLUGS } from '../lib/bookLoader';
+import { translateChapter } from '../lib/translateOnDemand';
 import { formatBookContent } from '../lib/formatBookContent';
 import { prepareBookChapterSpeech } from '../lib/prepareBookSpeech';
 import './BookReader.css';
@@ -23,7 +24,8 @@ const BookReader = () => {
   const [unavailable, setUnavailable] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [translating, setTranslating] = useState(false);
-  const [translateProgress, setTranslateProgress] = useState(0);
+  const [translateError, setTranslateError] = useState(false);
+  const [displayChapter, setDisplayChapter] = useState(null);
   const isRtl = i18n.dir() === 'rtl';
 
   useEffect(() => {
@@ -31,34 +33,23 @@ const BookReader = () => {
 
     const load = async () => {
       setBook(null);
+      setDisplayChapter(null);
       setUnavailable(false);
-      setTranslating(false);
-      setTranslateProgress(0);
+      setTranslateError(false);
 
       if (!SUPPORTED_SLUGS.includes(id)) {
         if (!cancelled) setUnavailable(true);
         return;
       }
 
-      setTranslating(true);
-      try {
-        const data = await loadBook(id, i18n.language, {
-          onTranslateProgress: (done, total) => {
-            if (!cancelled && total > 0) {
-              setTranslateProgress(Math.round((done / total) * 100));
-            }
-          },
-        });
-        if (cancelled) return;
-        if (!data) {
-          setUnavailable(true);
-          return;
-        }
-        setBook(data);
-        setCurrentChapterIdx(0);
-      } finally {
-        if (!cancelled) setTranslating(false);
+      const data = await loadBook(id, i18n.language);
+      if (cancelled) return;
+      if (!data) {
+        setUnavailable(true);
+        return;
       }
+      setBook(data);
+      setCurrentChapterIdx(0);
     };
 
     load();
@@ -66,6 +57,48 @@ const BookReader = () => {
       cancelled = true;
     };
   }, [i18n.language, id]);
+
+  useEffect(() => {
+    if (!book?.chapters?.length) return undefined;
+
+    let cancelled = false;
+    const raw = book.chapters[currentChapterIdx];
+    if (!raw) return undefined;
+
+    const run = async () => {
+      setTranslateError(false);
+
+      if (!book.needsChapterTranslation && book.uiLang === book.contentLang) {
+        setDisplayChapter(raw);
+        setTranslating(false);
+        return;
+      }
+
+      setDisplayChapter(raw);
+      setTranslating(true);
+
+      try {
+        const translated = await translateChapter(raw, {
+          from: book.contentLang || 'fr',
+          to: book.uiLang,
+          title: raw.title,
+        });
+        if (!cancelled) setDisplayChapter({ ...raw, ...translated });
+      } catch {
+        if (!cancelled) {
+          setDisplayChapter(raw);
+          setTranslateError(true);
+        }
+      } finally {
+        if (!cancelled) setTranslating(false);
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [book, currentChapterIdx, i18n.language]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -85,10 +118,9 @@ const BookReader = () => {
   };
 
   const submitQuiz = () => {
-    if (!book) return;
-    const chapter = book.chapters[currentChapterIdx];
+    if (!displayChapter) return;
     let currentScore = 0;
-    chapter.quiz.forEach((q, idx) => {
+    displayChapter.quiz.forEach((q, idx) => {
       if (quizAnswers[idx] === q.answer) currentScore++;
     });
     setScore(currentScore);
@@ -96,15 +128,14 @@ const BookReader = () => {
   };
 
   const toggleListen = useCallback(async () => {
-    if (!book) return;
+    if (!displayChapter) return;
     if (isSpeaking) {
       stop();
       setIsSpeaking(false);
       return;
     }
 
-    const chapter = book.chapters[currentChapterIdx];
-    const speechText = prepareBookChapterSpeech(chapter.content, {
+    const speechText = prepareBookChapterSpeech(displayChapter.content, {
       locale: i18n.language,
     });
     if (!speechText.trim()) return;
@@ -117,7 +148,7 @@ const BookReader = () => {
     } finally {
       setIsSpeaking(false);
     }
-  }, [book, currentChapterIdx, i18n.language, isSpeaking, speak, stop]);
+  }, [displayChapter, i18n.language, isSpeaking, speak, stop]);
 
   const goToChapter = (idx) => {
     setCurrentChapterIdx(idx);
@@ -136,26 +167,17 @@ const BookReader = () => {
     );
   }
 
-  if (!book) {
+  if (!book || !displayChapter) {
     return (
       <div className="container book-reader-loading animate-fade-in">
         <LogoMark size={64} />
-        <p className="text-muted">
-          {translating ? t('content_translating') : t('book_loading')}
-        </p>
-        {translating && translateProgress > 0 && (
-          <p className="text-muted" style={{ fontSize: '0.875rem' }}>
-            {translateProgress}%
-          </p>
-        )}
+        <p className="text-muted">{t('book_loading')}</p>
       </div>
     );
   }
 
-  const chapter = book.chapters[currentChapterIdx];
-  const showTranslationNotice =
-    !book.translatedOnDemand &&
-    (book.contentMismatch || (book.usingFallback && book.uiLang !== 'en'));
+  const chapter = displayChapter;
+  const showTranslationNotice = translateError || (book.usingFallback && translating);
 
   return (
     <div
@@ -206,7 +228,17 @@ const BookReader = () => {
         </nav>
 
         <div className="book-reader-main">
-          {showTranslationNotice && (
+          {translating && (
+            <p className="book-reader-notice" role="status">
+              {t('content_translating')}
+            </p>
+          )}
+          {translateError && !translating && (
+            <p className="book-reader-notice" role="status">
+              {t('content_translate_error')}
+            </p>
+          )}
+          {showTranslationNotice && !translating && !translateError && (
             <p className="book-reader-notice" role="status">
               {t('book_translation_notice')}
             </p>
@@ -224,7 +256,7 @@ const BookReader = () => {
                 type="button"
                 className={`btn btn-sm ${isSpeaking ? 'btn-ghost' : 'btn-primary'}`}
                 onClick={toggleListen}
-                disabled={translating}
+                disabled={!chapter.content?.trim()}
                 title={isSpeaking ? t('book_stop_listen') : t('book_listen_chapter')}
               >
                 {isSpeaking ? <VolumeX size={18} /> : <Volume2 size={18} />}
@@ -235,7 +267,13 @@ const BookReader = () => {
             </div>
 
             <div className="book-chapter-body">
-              <div className="book-content">{formatBookContent(chapter.content)}</div>
+              <div className="book-content">
+                {chapter.content?.trim()
+                  ? formatBookContent(chapter.content)
+                  : (
+                    <p className="text-muted">{t('book_chapter_empty')}</p>
+                  )}
+              </div>
             </div>
           </article>
 

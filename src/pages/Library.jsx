@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { Link } from 'react-router-dom';
 import { Lock, Unlock, Download, BookOpen, GraduationCap, Headphones } from 'lucide-react';
@@ -6,17 +6,34 @@ import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/PageHeader';
 import { LibraryLogo } from '../components/SectionLogos';
 import { useProfileStore } from '../store/useProfileStore';
+import { BOOK_META } from '../data/bookMeta';
+import { normalizeBookLang } from '../lib/bookLoader';
 
-const books = [
-  { id: 1, slug: 'essence-foi', title: "L'Essence de la Foi", author: 'A.E.K.', isPremium: false, coverUrl: 'https://placehold.co/300x440/121214/c9a962?text=Essence' },
-  { id: 2, slug: 'gynosko', title: 'GYNOSKO', author: 'Ange Emmanuel Kouamé', isPremium: false, coverUrl: '/covers/gynosko-cover.png' },
-  { id: 4, slug: 'eido', title: 'EIDO', author: 'Ange Emmanuel Kouamé', isPremium: false, coverUrl: '/covers/eido-cover.png' },
-  { id: 3, slug: 'masque-foi', title: 'Le Masque de la Foi', author: 'Ange Emmanuel Kouamé', isPremium: true, coverUrl: 'https://placehold.co/300x440/121214/c9a962?text=Masque' },
+const BOOK_CATALOG = [
+  { id: 1, slug: 'essence-foi', titleKey: 'lib_book_essence_title', authorKey: 'lib_book_author_aek', isPremium: false, coverUrl: 'https://placehold.co/300x440/121214/c9a962?text=Essence' },
+  { id: 2, slug: 'gynosko', title: 'GYNOSKO', authorKey: 'lib_book_author_aek', isPremium: false, coverUrl: '/covers/gynosko-cover.png' },
+  { id: 4, slug: 'eido', title: 'EIDO', authorKey: 'lib_book_author_aek', isPremium: false, coverUrl: '/covers/eido-cover.png' },
+  { id: 3, slug: 'masque-foi', titleKey: 'lib_book_masque_title', authorKey: 'lib_book_author_aek', isPremium: true, coverUrl: 'https://placehold.co/300x440/121214/c9a962?text=Masque' },
 ];
 
 const Library = () => {
   const { user } = useAuthStore();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = normalizeBookLang(i18n.language);
+
+  const books = useMemo(
+    () =>
+      BOOK_CATALOG.map((book) => {
+        const meta = BOOK_META[book.slug]?.langs?.[lang] || BOOK_META[book.slug]?.langs?.fr;
+        return {
+          ...book,
+          title: book.titleKey ? t(book.titleKey) : book.title,
+          author: t(book.authorKey),
+          description: meta?.tagline || meta?.subtitle || (book.slug === 'gynosko' ? t('gynosko_library_desc') : null),
+        };
+      }),
+    [lang, t],
+  );
   const isPremiumUser = useProfileStore((s) => s.isPremium());
 
   return (
@@ -81,9 +98,15 @@ const Library = () => {
               <h3 style={{ fontSize: '1.125rem', marginBottom: '0.25rem', fontFamily: 'var(--font-display)' }}>
                 {book.title}
               </h3>
-              <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: '1rem' }}>
+              <p className="text-muted" style={{ fontSize: '0.875rem', marginBottom: '0.35rem' }}>
                 {book.author}
               </p>
+              {book.description && (
+                <p className="text-muted" style={{ fontSize: '0.8125rem', marginBottom: '1rem', lineHeight: 1.45 }}>
+                  {book.description}
+                </p>
+              )}
+              {!book.description && <div style={{ marginBottom: '1rem' }} />}
 
               <div className="mt-auto flex gap-2">
                 {book.isPremium && !isPremiumUser ? (

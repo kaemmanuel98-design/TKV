@@ -34,6 +34,7 @@ const Friends = () => {
   const [searching, setSearching] = useState(false);
   const [busyId, setBusyId] = useState(null);
   const [notifyApp, setNotifyApp] = useState(true);
+  const [notifyEmail, setNotifyEmail] = useState(false);
 
   const reload = useCallback(async () => {
     if (!user?.id) return;
@@ -61,6 +62,7 @@ const Friends = () => {
   useEffect(() => {
     if (profile) {
       setNotifyApp(profile.notify_friend_online_app !== false);
+      setNotifyEmail(profile.notify_friend_online_email === true);
     }
   }, [profile]);
 
@@ -86,7 +88,7 @@ const Friends = () => {
   const handleNotifySave = async () => {
     if (!user?.id) return;
     await updateProfile(user.id, {
-      notify_friend_online_email: false,
+      notify_friend_online_email: notifyEmail,
       notify_friend_online_app: notifyApp,
     });
   };

@@ -47,12 +47,12 @@ const CourseModule = () => {
         return;
       }
 
-      setTranslating(false);
       setTranslateError(false);
 
       const direct = content.sections[lang];
       if (direct?.length && (lang === 'fr' || lang === 'en' || isUsableInLanguage(direct.join(' '), lang))) {
         setParagraphs(direct);
+        setTranslating(false);
         return;
       }
 
@@ -61,18 +61,17 @@ const CourseModule = () => {
 
       if (lang === sourceLang) {
         setParagraphs(source);
+        setTranslating(false);
         return;
       }
 
+      setParagraphs(source);
       setTranslating(true);
       try {
         const translated = await translateParagraphs(source, lang, sourceLang);
         if (!cancelled) setParagraphs(translated);
       } catch {
-        if (!cancelled) {
-          setParagraphs(source);
-          setTranslateError(true);
-        }
+        if (!cancelled) setTranslateError(true);
       } finally {
         if (!cancelled) setTranslating(false);
       }

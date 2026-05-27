@@ -166,6 +166,25 @@ function speakOneChunk(text, voice, locale) {
   });
 }
 
+function resolveVoice(locale) {
+  const voices = voicesCache.length ? voicesCache : window.speechSynthesis.getVoices();
+  const langCode = locale.split('-')[0];
+  const fallbacks = [locale, `${langCode}-${langCode.toUpperCase()}`, 'fr-FR', 'en-US', 'en-GB'];
+
+  for (const loc of fallbacks) {
+    const v = pickVoice(loc);
+    if (v) return v;
+  }
+
+  return (
+    voices.find((v) => v.lang?.toLowerCase().startsWith(langCode)) ||
+    voices.find((v) => v.lang?.toLowerCase().startsWith('en')) ||
+    voices.find((v) => v.default) ||
+    voices[0] ||
+    null
+  );
+}
+
 export async function speakWithBrowser(text, locale) {
   if (!window.speechSynthesis) {
     throw new Error('unsupported');
@@ -175,18 +194,19 @@ export async function speakWithBrowser(text, locale) {
   await waitForVoices();
   window.speechSynthesis.cancel();
 
-  const voice = pickVoice(locale);
+  const voice = resolveVoice(locale);
   if (!voice) {
     throw new Error('no_voice_for_locale');
   }
 
-  const chunks = chunkTextForSpeech(text);
+  const utterLocale = voice.lang || locale;
+  const chunks = chunkTextForSpeech(text, 280);
 
   for (const chunk of chunks) {
     if (stopRequested) break;
-    await speakOneChunk(chunk, voice, locale);
+    await speakOneChunk(chunk, voice, utterLocale);
     if (stopRequested) break;
-    await new Promise((r) => setTimeout(r, 40));
+    await new Promise((r) => setTimeout(r, 60));
   }
 }
 
