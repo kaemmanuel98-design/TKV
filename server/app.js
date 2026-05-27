@@ -20,7 +20,9 @@ const corsOptions = {
     if (!origin) return callback(null, true);
     if (!config.isProduction) return callback(null, true);
     if (config.corsOrigins.length === 0) {
-      return callback(null, config.appPublicUrl && origin === config.appPublicUrl);
+      if (config.appPublicUrl && origin === config.appPublicUrl) return callback(null, true);
+      if (origin && /\.vercel\.app$/i.test(origin)) return callback(null, true);
+      return callback(null, false);
     }
     if (config.corsOrigins.includes(origin)) return callback(null, true);
     return callback(new Error('cors_not_allowed'));
