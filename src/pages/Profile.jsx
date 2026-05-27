@@ -1,7 +1,19 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Award, Target, Shield, LogOut, Loader2 } from 'lucide-react';
+import {
+  Award,
+  Target,
+  Shield,
+  LogOut,
+  Loader2,
+  Flame,
+  TrendingUp,
+  Video,
+  BookOpen,
+  Landmark,
+  MapPin,
+} from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import ProfileAvatar from '../components/ProfileAvatar';
 import PaywallModal from '../components/PaywallModal';
@@ -13,6 +25,8 @@ import { useProfileStore } from '../store/useProfileStore';
 import { useGamificationStore } from '../store/useGamificationStore';
 import { PROFILE_TYPE_KEY } from '../store/useGamificationStore';
 import { supabase } from '../lib/supabase';
+import MimshackLogo from '../components/MimshackLogo';
+import { LibraryLogo, ProfileLogo } from '../components/SectionLogos';
 import './Profile.css';
 
 const badgeDefs = [
@@ -24,13 +38,32 @@ const badgeDefs = [
 
 const profileTypes = ['believer', 'skeptic', 'curious'];
 
+const profileQuickLinks = [
+  { to: '/bible', icon: BookOpen, labelKey: 'nav_bible' },
+  { to: '/heritage', icon: Landmark, labelKey: 'nav_heritage' },
+  { to: '/cells', icon: Video, labelKey: 'cells' },
+  { to: '/map', icon: MapPin, labelKey: 'map' },
+  { to: '/agent', mimshack: true, labelKey: 'tab_agent' },
+  { to: '/library', mark: 'library', labelKey: 'tab_library' },
+];
+
 const Profile = () => {
   const { t } = useTranslation();
   const { user, session, signOut } = useAuthStore();
   const navigate = useNavigate();
   const { profile, fetchProfile, updateProfile, uploadAvatar, getPlanType } = useProfileStore();
-  const { badges, streakCurrent, readingProgress, iaQuestionsCount, awardBadge, incrementCommunityPosts } =
-    useGamificationStore();
+  const {
+    badges,
+    streakCurrent,
+    streakBest,
+    readingProgress,
+    iaQuestionsCount,
+    awardBadge,
+    incrementCommunityPosts,
+    checkInToday,
+    hasCheckedInToday,
+  } = useGamificationStore();
+  const checkedInToday = hasCheckedInToday();
   const [country, setCountry] = useState('');
   const [bio, setBio] = useState('');
   const [showOnMap, setShowOnMap] = useState(false);
@@ -183,7 +216,11 @@ const Profile = () => {
 
   return (
     <div className="container profile-page animate-fade-in">
-      <PageHeader title={t('profile_title')} subtitle={displayName} />
+      <PageHeader
+        title={t('profile_title')}
+        subtitle={displayName}
+        mark={<ProfileLogo size={52} title={t('profile_title')} />}
+      />
 
       <section className="card profile-identity-card">
         <div className="profile-identity-row">
@@ -216,6 +253,79 @@ const Profile = () => {
               <p className="text-muted profile-avatar-hint">{t('profile_avatar_login')}</p>
             )}
           </div>
+        </div>
+      </section>
+
+      <section className="card profile-activity-card">
+        <h2 className="profile-section-title">{t('profile_activity_title')}</h2>
+        <p className="text-muted profile-activity-desc">{t('profile_activity_desc')}</p>
+
+        <div className="profile-activity-stats">
+          <div className="profile-activity-stat">
+            <div className="profile-activity-stat-head">
+              <Flame size={18} aria-hidden="true" />
+              <span>{t('dashboard_streak_label')}</span>
+            </div>
+            <p className="profile-activity-stat-value">
+              {streakCurrent === 1
+                ? t('dashboard_streak_days', { count: streakCurrent })
+                : t('dashboard_streak_days_plural', { count: streakCurrent })}
+            </p>
+            {streakBest > 0 && (
+              <p className="profile-activity-stat-meta">
+                {t('dashboard_streak_record', { count: streakBest })}
+              </p>
+            )}
+            <button
+              type="button"
+              className="btn btn-outline btn-sm profile-activity-checkin"
+              disabled={checkedInToday}
+              onClick={() => checkInToday()}
+            >
+              {checkedInToday ? t('dashboard_checkin_done') : t('dashboard_checkin')}
+            </button>
+          </div>
+
+          <div className="profile-activity-stat">
+            <div className="profile-activity-stat-head">
+              <TrendingUp size={18} aria-hidden="true" />
+              <span>{t('dashboard_progress_label')}</span>
+            </div>
+            <p className="profile-activity-stat-value">
+              {t('dashboard_progress_value', { percent: readingProgress })}
+            </p>
+            <div className="profile-progress-bar profile-activity-progress">
+              <div className="profile-progress-fill" style={{ width: `${readingProgress}%` }} />
+            </div>
+          </div>
+        </div>
+
+        <h3 className="profile-quick-title">{t('dashboard_quick_title')}</h3>
+        <div className="profile-quick-grid">
+          {profileQuickLinks.map(({ to, icon: Icon, labelKey, mimshack, mark }) => (
+            <Link key={to} to={to} className="profile-quick-link">
+              {mimshack ? (
+                <MimshackLogo size={18} />
+              ) : mark === 'library' ? (
+                <LibraryLogo size={18} />
+              ) : (
+                <Icon size={18} aria-hidden="true" />
+              )}
+              <span>{t(labelKey)}</span>
+            </Link>
+          ))}
+        </div>
+
+        <div className="profile-activity-banners">
+          <Link to="/cells" className="profile-activity-banner">
+            <span className="profile-activity-banner-badge">{t('dashboard_live_badge')}</span>
+            <strong>{t('dashboard_live_title')}</strong>
+            <p>{t('dashboard_live_desc')}</p>
+          </Link>
+          <Link to="/agent" className="profile-activity-banner">
+            <strong>{t('dashboard_ia_title')}</strong>
+            <p>{t('dashboard_ia_desc')}</p>
+          </Link>
         </div>
       </section>
 
@@ -269,6 +379,16 @@ const Profile = () => {
           </Link>
         )}
       </section>
+
+      {user && (
+        <section className="card profile-friends-link-card">
+          <h2 className="profile-section-title">{t('friends_title')}</h2>
+          <p className="text-muted">{t('friends_subtitle')}</p>
+          <Link to="/friends" className="btn btn-outline btn-sm">
+            {t('friends_nav')}
+          </Link>
+        </section>
+      )}
 
       <section className="card profile-plan-card">
         <div>

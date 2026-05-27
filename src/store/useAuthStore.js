@@ -20,9 +20,16 @@ export const useAuthStore = create((set) => ({
   loading: true,
 
   initialize: async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    applySession(set, session);
-    set({ loading: false });
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) console.warn('auth getSession', error);
+      applySession(set, session);
+    } catch (err) {
+      console.warn('auth initialize failed', err);
+      applySession(set, null);
+    } finally {
+      set({ loading: false });
+    }
 
     if (!authListenerBound) {
       authListenerBound = true;

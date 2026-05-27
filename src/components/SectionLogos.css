@@ -1,0 +1,29 @@
+.tkv-mark-svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+.tkv-mark-nav {
+  display: block;
+}
+
+.nav-link .tkv-mark-nav,
+.mobile-nav-link .tkv-mark-nav {
+  margin: 0 auto;
+}
+
+.home-path-icon--mark {
+  border: none;
+  background: transparent;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+}
+
+.page-header-mark {
+  margin-bottom: 1rem;
+}
+
+.page-header-mark .tkv-mark-svg {
+  filter: drop-shadow(0 4px 12px rgba(201, 169, 98, 0.12));
+}

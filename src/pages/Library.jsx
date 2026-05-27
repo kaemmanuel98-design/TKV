@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Lock, Unlock, Download, BookOpen, GraduationCap, Headphones } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import PageHeader from '../components/PageHeader';
+import { LibraryLogo } from '../components/SectionLogos';
 import { useProfileStore } from '../store/useProfileStore';
 
 const books = [
@@ -23,7 +24,7 @@ const Library = () => {
         eyebrow={t('home_section_eyebrow')}
         title={t('library')}
         subtitle={t('lib_subtitle')}
-        showLogo
+        mark={<LibraryLogo size={52} title={t('library')} />}
         actions={
           <>
             <Link to="/courses" className="btn btn-outline btn-sm">

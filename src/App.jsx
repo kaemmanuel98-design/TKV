@@ -1,29 +1,37 @@
-import React, { useEffect } from 'react';
+import React, { Suspense, lazy, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAuthStore } from './store/useAuthStore';
 import { useProfileStore } from './store/useProfileStore';
 import { useGamificationStore } from './store/useGamificationStore';
 import Layout from './components/Layout';
 import LoadingScreen from './components/LoadingScreen';
+import ErrorBoundary from './components/ErrorBoundary';
 import Onboarding from './pages/Onboarding';
-import Home from './pages/Home';
-import Agent from './pages/Agent';
-import Community from './pages/Community';
-import Profile from './pages/Profile';
-import BibleStrong from './pages/BibleStrong';
-import Heritage from './pages/Heritage';
-import Library from './pages/Library';
-import Courses from './pages/Courses';
-import CourseDetail from './pages/CourseDetail';
-import Podcasts from './pages/Podcasts';
-import Cells from './pages/Cells';
-import MapPage from './pages/MapPage';
 import AuthPage from './pages/AuthPage';
-import BookReader from './pages/BookReader';
-import HeritageArticle from './pages/HeritageArticle';
-import CourseModule from './pages/CourseModule';
-import About from './pages/About';
+import Home from './pages/Home';
 import { initSpeechEngine } from './lib/speech';
+
+const Agent = lazy(() => import('./pages/Agent'));
+const Community = lazy(() => import('./pages/Community'));
+const Profile = lazy(() => import('./pages/Profile'));
+const BibleStrong = lazy(() => import('./pages/BibleStrong'));
+const Heritage = lazy(() => import('./pages/Heritage'));
+const Library = lazy(() => import('./pages/Library'));
+const Courses = lazy(() => import('./pages/Courses'));
+const CourseDetail = lazy(() => import('./pages/CourseDetail'));
+const Podcasts = lazy(() => import('./pages/Podcasts'));
+const Cells = lazy(() => import('./pages/Cells'));
+const MapPage = lazy(() => import('./pages/MapPage'));
+const BookReader = lazy(() => import('./pages/BookReader'));
+const HeritageArticle = lazy(() => import('./pages/HeritageArticle'));
+const CourseModule = lazy(() => import('./pages/CourseModule'));
+const About = lazy(() => import('./pages/About'));
+const Friends = lazy(() => import('./pages/Friends'));
+const FriendChat = lazy(() => import('./pages/FriendChat'));
+
+function PageFallback() {
+  return <LoadingScreen />;
+}
 
 function App() {
   const { initialize, loading, user } = useAuthStore();
@@ -48,30 +56,153 @@ function App() {
   }
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="agent" element={<Agent />} />
-          <Route path="community" element={<Community />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="library" element={<Library />} />
-          <Route path="courses" element={<Courses />} />
-          <Route path="courses/:courseId" element={<CourseDetail />} />
-          <Route path="courses/:courseId/module/:moduleIndex" element={<CourseModule />} />
-          <Route path="podcasts" element={<Podcasts />} />
-          <Route path="book/:id" element={<BookReader />} />
-          <Route path="bible" element={<BibleStrong />} />
-          <Route path="heritage" element={<Heritage />} />
-          <Route path="heritage/article/:slug" element={<HeritageArticle />} />
-          <Route path="cells" element={<Cells />} />
-          <Route path="map" element={<MapPage />} />
-          <Route path="about" element={<About />} />
-        </Route>
-      </Routes>
-    </Router>
+    <ErrorBoundary>
+      <Router>
+        <Routes>
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/auth" element={<AuthPage />} />
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route
+              path="agent"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <Agent />
+                </Suspense>
+              }
+            />
+            <Route
+              path="community"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <Community />
+                </Suspense>
+              }
+            />
+            <Route
+              path="friends"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <Friends />
+                </Suspense>
+              }
+            />
+            <Route
+              path="friends/chat/:friendId"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <FriendChat />
+                </Suspense>
+              }
+            />
+            <Route
+              path="profile"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <Profile />
+                </Suspense>
+              }
+            />
+            <Route
+              path="library"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <Library />
+                </Suspense>
+              }
+            />
+            <Route
+              path="courses"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <Courses />
+                </Suspense>
+              }
+            />
+            <Route
+              path="courses/:courseId"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <CourseDetail />
+                </Suspense>
+              }
+            />
+            <Route
+              path="courses/:courseId/module/:moduleIndex"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <CourseModule />
+                </Suspense>
+              }
+            />
+            <Route
+              path="podcasts"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <Podcasts />
+                </Suspense>
+              }
+            />
+            <Route
+              path="book/:id"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <BookReader />
+                </Suspense>
+              }
+            />
+            <Route
+              path="bible"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <BibleStrong />
+                </Suspense>
+              }
+            />
+            <Route
+              path="heritage"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <Heritage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="heritage/article/:slug"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <HeritageArticle />
+                </Suspense>
+              }
+            />
+            <Route
+              path="cells"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <Cells />
+                </Suspense>
+              }
+            />
+            <Route
+              path="map"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <MapPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="about"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <About />
+                </Suspense>
+              }
+            />
+          </Route>
+        </Routes>
+      </Router>
+    </ErrorBoundary>
   );
 }
 

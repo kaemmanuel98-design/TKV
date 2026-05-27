@@ -4,6 +4,23 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vite.dev/config/
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/leaflet') || id.includes('react-leaflet')) {
+            return 'leaflet';
+          }
+          if (id.includes('node_modules/i18next') || id.includes('react-i18next')) {
+            return 'i18n';
+          }
+          if (id.includes('node_modules/@supabase')) {
+            return 'supabase';
+          }
+        },
+      },
+    },
+  },
   server: {
     proxy: {
       '/api': {

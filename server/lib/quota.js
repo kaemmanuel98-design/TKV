@@ -1,5 +1,5 @@
 import { PLAN_LIMITS } from '../config.js';
-import { getSupabaseAdmin } from './supabaseAdmin.js';
+import { getSupabaseAdmin, getUserProfile } from './supabaseAdmin.js';
 
 const memoryUsage = new Map();
 
@@ -7,8 +7,14 @@ function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function memoryKey(userId) {
-  return `${userId}:${todayKey()}`;
+function memoryKey(userId, req) {
+  if (userId) return `${userId}:${todayKey()}`;
+  const forwarded = req?.headers?.['x-forwarded-for'];
+  const ip =
+    typeof forwarded === 'string'
+      ? forwarded.split(',')[0].trim()
+      : req?.socket?.remoteAddress || 'guest';
+  return `guest:${ip}:${todayKey()}`;
 }
 
 export function resolvePlan(profile) {
@@ -18,7 +24,7 @@ export function resolvePlan(profile) {
   return 'free';
 }
 
-export async function checkAndIncrementUsage(userId, type = 'chat') {
+export async function checkAndIncrementUsage(userId, type = 'chat', req = null) {
   const profile = userId ? await getUserProfile(userId) : null;
   const plan = resolvePlan(profile);
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
@@ -56,7 +62,7 @@ export async function checkAndIncrementUsage(userId, type = 'chat') {
     return { allowed: true, plan, limit, used: next, remaining: Math.max(0, limit - next) };
   }
 
-  const key = memoryKey(userId || 'guest');
+  const key = memoryKey(userId, req);
   const usage = memoryUsage.get(key) || { chat: 0, perspectives: 0 };
   const used = usage[type] ?? 0;
   if (used >= limit) {

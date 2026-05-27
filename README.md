@@ -1,16 +1,65 @@
-# React + Vite
+# THE KINGDOM'S VOICE (TKV)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Application web (PWA) pour explorer la foi : Bible Strong, agent IA, cellules mondiales (chat + visio), communauté, cours, bibliothèque, carte du Royaume.
 
-Currently, two official plugins are available:
+## Démarrage rapide (local)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+```bash
+npm install
+npm run dev          # frontend → http://localhost:5173
+npm run dev:api      # API Express → http://localhost:3001
+```
 
-## React Compiler
+Copiez `.env.example` vers `.env` et renseignez Supabase + OpenAI. Pour la visio locale, voir `docs/JITSI_INSTALL_WINDOWS.md` et `jitsi-local-credentials.txt`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Déploiement
 
-## Expanding the ESLint configuration
+- **Production** : [https://tkv-app.vercel.app](https://tkv-app.vercel.app)
+- Guide : `DEPLOY_VERCEL.md`
+- Variables d'environnement : dashboard Vercel (équipe **ae-mindset**, projet **tkv-app**)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## API (routes principales)
+
+| Route | Description |
+|-------|-------------|
+| `GET /api/health` | Santé API |
+| `GET /api/jitsi/status` | Visio disponible |
+| `POST /api/jitsi/join` | URL visio (JWT) |
+| `POST /api/agent/chat` | Agent IA |
+| `POST /api/agent/perspectives` | Perspectives |
+| `POST /api/tts` | Synthèse vocale |
+
+## Base de données (Supabase)
+
+Exécuter les scripts SQL dans cet ordre :
+
+1. `supabase_init.sql`
+2. `supabase_migration_v3.sql`
+3. `supabase_cells.sql`
+4. `supabase_community_patch.sql`
+5. `supabase_community_antispam.sql` (anti-flood + anti-doublon côté serveur)
+6. `supabase_community_delete.sql` (suppression de ses propres posts)
+7. `supabase_friends.sql` (demandes d’ami + présence + alertes in-app)
+8. `supabase_friend_chat.sql` (chat privé entre amis)
+9. `supabase_map_patch.sql`
+10. `supabase_pgvector.sql`
+11. `supabase_security_patch.sql` (réactions communauté + quota IA en lecture seule côté client)
+
+Agent RAG (optionnel) : `npm run ingest:knowledge:embed` puis `npm run upload:chunks`.
+
+## Structure
+
+- `src/` — React (pages, composants, i18n)
+- `server/` — API Express
+- `api/` — handler Vercel (serverless)
+- `public/bible/` — chapitres Bible (JSON)
+- `docs/` — Jitsi, sécurité
+
+## Scripts utiles
+
+| Commande | Usage |
+|----------|--------|
+| `npm run build` | Build production (Vite) |
+| `npm run build:bible` | Régénérer Bible Strong (local, Windows) |
+| `npm run ingest:knowledge` | Préparer chunks RAG |
+| `npm run lint` | ESLint |

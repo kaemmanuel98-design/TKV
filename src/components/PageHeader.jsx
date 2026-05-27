@@ -8,6 +8,7 @@ const PageHeader = ({
   actions,
   centered = false,
   showLogo = false,
+  mark = null,
   className = '',
 }) => (
   <header
@@ -15,7 +16,8 @@ const PageHeader = ({
   >
     <div className={`page-header-main ${actions ? 'page-header-main--actions' : ''}`}>
       <div className={centered ? 'page-header-copy page-header-copy--center' : 'page-header-copy'}>
-        {showLogo && (
+        {mark && <div className="page-header-mark">{mark}</div>}
+        {!mark && showLogo && (
           <div className="page-header-logo">
             <LogoMark size={48} />
           </div>

@@ -4,10 +4,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { LogoMark } from '../components/Logo';
 import { getAuthErrorKey } from '../lib/authErrors';
-import { isSupabaseConfigured } from '../lib/supabase';
+import { isSupabaseConfigured, pingSupabaseAuth } from '../lib/supabase';
 import { getResendCooldownMs, setResendCooldown } from '../lib/authCooldown';
 
-const MIN_PASSWORD_LENGTH = 6;
+const MIN_PASSWORD_LENGTH = 8;
 const PENDING_EMAIL_KEY = 'tkv_pending_confirm_email';
 
 const AuthPage = () => {
@@ -25,6 +25,7 @@ const AuthPage = () => {
   const [forgotMode, setForgotMode] = useState(false);
   const [recoveryMode, setRecoveryMode] = useState(false);
   const [newPassword, setNewPassword] = useState('');
+  const [connectivityIssue, setConnectivityIssue] = useState(null);
 
   const { signIn, signUp, resendSignupEmail, resetPassword, updatePassword } = useAuthStore();
   const navigate = useNavigate();
@@ -34,6 +35,22 @@ const AuthPage = () => {
   const refreshResendCooldown = useCallback((address) => {
     const ms = getResendCooldownMs(address);
     setResendSeconds(Math.ceil(ms / 1000));
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!isSupabaseConfigured()) {
+      setConnectivityIssue('not_configured');
+      return undefined;
+    }
+    pingSupabaseAuth().then((result) => {
+      if (cancelled) return;
+      if (!result.ok) setConnectivityIssue(result.reason || 'network');
+      else setConnectivityIssue(null);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -313,6 +330,12 @@ const AuthPage = () => {
           </p>
         </div>
 
+        {!isSupabaseConfigured() && (
+          <div className="form-error mb-4">{t('auth_error_not_configured')}</div>
+        )}
+        {connectivityIssue === 'network' && isSupabaseConfigured() && (
+          <div className="form-error mb-4">{t('auth_error_network')}</div>
+        )}
         {error && <div className="form-error mb-4">{error}</div>}
         {info && !error && (
           <div
@@ -400,7 +423,11 @@ const AuthPage = () => {
               )}
             </div>
           )}
-          <button type="submit" className="btn btn-primary w-full mt-2" disabled={submitting}>
+          <button
+            type="submit"
+            className="btn btn-primary w-full mt-2"
+            disabled={submitting || !isSupabaseConfigured()}
+          >
             {submitting
               ? t('auth_submitting')
               : forgotMode

@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { MessageCircle } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { supabase } from '../lib/supabase';
 import { coordsForCountry, jitterCoords } from '../data/countryCoords';
+import { loadFriendMapMembers, isOnline } from '../lib/friends';
 import PageHeader from '../components/PageHeader';
 import ProfileAvatar from '../components/ProfileAvatar';
 import { useProfileStore } from '../store/useProfileStore';
@@ -44,6 +47,7 @@ const MapPage = () => {
   const fetchProfile = useProfileStore((s) => s.fetchProfile);
   const [userLocation, setUserLocation] = useState(null);
   const [members, setMembers] = useState([]);
+  const [friendMembers, setFriendMembers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -66,12 +70,36 @@ const MapPage = () => {
     (async () => {
       setLoading(true);
       const rows = await fetchMapMembers();
+      const friends = user?.id ? await loadFriendMapMembers(user.id, t).catch(() => []) : [];
+
       if (cancelled) return;
 
+      const friendIds = new Set(friends.map((f) => f.id));
       const placed = [];
+      const friendPlaced = [];
       const seen = new Set();
+      const seenFriends = new Set();
+
+      for (const row of friends) {
+        const base = coordsForCountry(row.country);
+        if (!base) continue;
+        const pos = jitterCoords(base, row.id);
+        const key = `f:${pos[0].toFixed(2)}:${pos[1].toFixed(2)}`;
+        if (seenFriends.has(key)) continue;
+        seenFriends.add(key);
+        friendPlaced.push({
+          id: row.id,
+          name: row.name,
+          country: row.country,
+          avatarUrl: row.avatarUrl,
+          location: pos,
+          isFriend: true,
+          online: isOnline(row.lastSeenAt),
+        });
+      }
 
       for (const row of rows) {
+        if (friendIds.has(row.id)) continue;
         const base = coordsForCountry(row.country);
         if (!base) continue;
         const pos = jitterCoords(base, row.id);
@@ -84,26 +112,76 @@ const MapPage = () => {
           country: row.country,
           avatarUrl: row.avatar_url || null,
           location: pos,
+          isFriend: false,
         });
       }
 
       setMembers(placed);
+      setFriendMembers(friendPlaced);
       setLoading(false);
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [t]);
+  }, [t, user?.id]);
+
+  const renderPopup = (member) => (
+    <Popup>
+      <div className="map-popup-avatar">
+        <ProfileAvatar src={member.avatarUrl} name={member.name} size={36} />
+        <div className="map-popup-meta">
+          <strong>{member.name}</strong>
+          <span>{member.country}</span>
+          {member.isFriend && (
+            <span className={`map-popup-friend-badge ${member.online ? 'map-popup-friend-badge--on' : ''}`}>
+              {member.online ? t('friends_status_online') : t('map_friend_label')}
+            </span>
+          )}
+        </div>
+      </div>
+      {member.isFriend && user && member.id !== user.id && (
+        <Link to={`/friends/chat/${member.id}`} className="btn btn-primary btn-sm map-popup-chat-btn">
+          <MessageCircle size={14} />
+          {t('friend_chat_open')}
+        </Link>
+      )}
+    </Popup>
+  );
 
   return (
     <div className="container animate-fade-in map-shell">
       <PageHeader eyebrow={t('map')} title={t('map_title')} subtitle={t('map_subtitle')} showLogo />
 
+      {user && friendMembers.length > 0 && (
+        <div className="map-friends-strip card">
+          <h3 className="map-friends-strip-title">{t('map_friends_list')}</h3>
+          <ul className="map-friends-list">
+            {friendMembers.map((f) => (
+              <li key={f.id}>
+                <Link to={`/friends/chat/${f.id}`} className="map-friends-list-link">
+                  <ProfileAvatar src={f.avatarUrl} name={f.name} size={32} />
+                  <span>{f.name}</span>
+                  {f.online && <span className="map-friends-online-dot" />}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <Link to="/friends" className="btn btn-ghost btn-sm">
+            {t('friends_nav')}
+          </Link>
+        </div>
+      )}
+
       {loading && <p className="text-muted map-status">{t('map_loading')}</p>}
-      {!loading && members.length === 0 && (
+      {!loading && members.length === 0 && friendMembers.length === 0 && (
         <p className="text-muted map-status">{t('map_members_empty')}</p>
       )}
+
+      <div className="map-legend">
+        <span className="map-legend-item map-legend-item--friend">{t('map_legend_friend')}</span>
+        <span className="map-legend-item">{t('map_legend_member')}</span>
+      </div>
 
       <div className="card map-frame p-0 overflow-hidden">
         <MapContainer center={[20, 0]} zoom={2} style={{ height: '100%', width: '100%', minHeight: '420px' }}>
@@ -111,6 +189,22 @@ const MapPage = () => {
             url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
           />
+
+          {friendMembers.map((member) => (
+            <Marker
+              key={`friend-${member.id}`}
+              position={member.location}
+              zIndexOffset={500}
+              icon={createAvatarMarkerIcon({
+                avatarUrl: member.avatarUrl,
+                name: member.name,
+                isFriend: true,
+                online: member.online,
+              })}
+            >
+              {renderPopup(member)}
+            </Marker>
+          ))}
 
           {members.map((member) => (
             <Marker
@@ -121,15 +215,7 @@ const MapPage = () => {
                 name: member.name,
               })}
             >
-              <Popup>
-                <div className="map-popup-avatar">
-                  <ProfileAvatar src={member.avatarUrl} name={member.name} size={36} />
-                  <div className="map-popup-meta">
-                    <strong>{member.name}</strong>
-                    <span>{member.country}</span>
-                  </div>
-                </div>
-              </Popup>
+              {renderPopup(member)}
             </Marker>
           ))}
 

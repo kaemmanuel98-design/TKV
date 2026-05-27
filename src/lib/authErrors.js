@@ -1,7 +1,27 @@
+/** Erreur réseau navigateur (fetch vers Supabase impossible). */
+export function isAuthNetworkError(error) {
+  const msg = (error?.message || '').toLowerCase();
+  const name = (error?.name || '').toLowerCase();
+  return (
+    name === 'typeerror' ||
+    msg.includes('load failed') ||
+    msg.includes('failed to fetch') ||
+    msg.includes('networkerror') ||
+    msg.includes('network request failed') ||
+    msg.includes('fetch failed') ||
+    msg.includes('err_connection') ||
+    msg.includes('err_name_not_resolved')
+  );
+}
+
 /** Mappe les erreurs Supabase Auth vers des clés i18n. */
 export function getAuthErrorKey(error) {
   const code = error?.code || '';
   const msg = (error?.message || '').toLowerCase();
+
+  if (isAuthNetworkError(error)) {
+    return 'auth_error_network';
+  }
 
   if (code === 'over_email_send_rate_limit' || msg.includes('email rate limit')) {
     return 'auth_error_email_rate_limit';

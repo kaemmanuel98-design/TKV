@@ -31,17 +31,32 @@ Ajoutez pour **Production**, **Preview** et **Development** :
 | `SUPABASE_SERVICE_ROLE_KEY` | clé service role (secrète) |
 | `OPENAI_API_KEY` | votre clé OpenAI |
 | `OPENAI_CHAT_MODEL` | `gpt-4o-mini` (optionnel) |
+| `JITSI_DOMAIN` | domaine Jitsi sans protocole (ex. `meet.votredomaine.org`) |
+| `JITSI_PUBLIC_URL` | URL publique Jitsi (ex. `https://meet.votredomaine.org`) |
+| `JITSI_JWT_SUB` | claim `sub` JWT (souvent même valeur que `JITSI_DOMAIN`) |
+| `JITSI_APP_ID` | `JWT_APP_ID` configuré côté Prosody |
+| `JITSI_APP_SECRET` | secret JWT côté Prosody |
+| `JITSI_ROOM_SECRET` | longue clé aléatoire pour noms de salles |
+| `CORS_ORIGINS` | URL prod exacte (ex. `https://tkv-app.vercel.app`) — limite les appels API |
 
 **Ne définissez pas** `VITE_API_URL` en production : l’API est sur le même domaine (`/api/...`).
+
+**Important auth (évite « Load failed »)** : les variables `VITE_SUPABASE_*` sont injectées **au moment du build**. Si vous les ajoutez après coup, faites un **Redeploy** complet. Sans elles, la connexion échoue avec une erreur réseau.
+
+**Important (visio prod)** :
+- ne mettez jamais `localhost` dans `JITSI_DOMAIN` / `JITSI_PUBLIC_URL` en production ;
+- ne définissez pas `JITSI_ALLOW_PUBLIC_FALLBACK=true` en production.
 
 ## 4. Supabase — URLs autorisées
 
 Dans **Supabase → Authentication → URL Configuration** :
 
-- **Site URL** : `https://votre-projet.vercel.app`
+- **Site URL** : `https://votre-projet.vercel.app` (ou votre domaine custom)
 - **Redirect URLs** : ajoutez  
   `https://votre-projet.vercel.app/**`  
   et chaque URL de preview Vercel si besoin (`https://*-votre-equipe.vercel.app/**`)
+
+Vérifiez aussi **Project Settings → API** : copiez l’URL et la clé **anon public** dans `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` (pas la clé `service_role` côté frontend).
 
 ## 5. Déployer
 
@@ -71,7 +86,15 @@ Ouvrez dans le navigateur :
 
 `https://votre-projet.vercel.app/api/health`
 
-Réponse attendue : `{"ok":true,"openai":true,"chunks":…,"supabase":true}`
+Réponse attendue : `{"ok":true,"openai":true,"chunks":…,"supabase":true,...}`
+
+Vérifiez aussi la visio :
+
+`https://votre-projet.vercel.app/api/jitsi/status`
+
+Réponse attendue en production sécurisée :
+
+`{"available":true,"mode":"secured","publicUrl":"https://meet.votredomaine.org"}`
 
 ## 8. Déploiement en ligne de commande (optionnel)
 

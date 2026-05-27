@@ -1,0 +1,130 @@
+.friends-page {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding-bottom: 2rem;
+}
+
+.friends-section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1rem;
+  margin: 0 0 0.75rem;
+}
+
+.friends-notify-prefs,
+.friends-search,
+.friends-section {
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+}
+
+.friends-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+}
+
+.friends-list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.friends-list-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.friends-list-name {
+  font-weight: 500;
+  min-width: 0;
+}
+
+.friends-list-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.friends-notify-hint {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+}
+
+.friends-list-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.friends-badge {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-subtle);
+}
+
+.friends-badge--ok {
+  color: var(--gold-bright);
+  border-color: var(--border-gold);
+}
+
+.friends-muted {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  margin: 0.5rem 0 0;
+}
+
+.friends-error {
+  color: var(--danger, #e57373);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.friends-login-prompt {
+  padding: 2rem;
+  text-align: center;
+}
+
+.friends-online-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  margin-left: 0.35rem;
+  vertical-align: middle;
+}
+
+.friends-online-dot--on {
+  background: #66bb6a;
+  box-shadow: 0 0 6px rgba(102, 187, 106, 0.6);
+}
+
+.friends-online-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.friends-page .spin {
+  animation: friends-spin 0.8s linear infinite;
+}
+
+@keyframes friends-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

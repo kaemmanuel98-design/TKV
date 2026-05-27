@@ -50,6 +50,14 @@ export const useAgentStore = create(
         set({ perspectivesCount: get().perspectivesCount + 1 });
       },
     }),
-    { name: 'tkv_agent_usage' }
+    {
+      name: 'tkv_agent_usage',
+      partialize: (state) => ({
+        date: state.date,
+        chatCount: state.chatCount,
+        perspectivesCount: state.perspectivesCount,
+        messages: state.messages.slice(-40),
+      }),
+    }
   )
 );

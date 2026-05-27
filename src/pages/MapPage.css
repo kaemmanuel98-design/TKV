@@ -43,3 +43,90 @@
   font-size: 0.8125rem;
   color: #555;
 }
+
+.map-avatar-marker--friend {
+  border-width: 3px;
+  border-color: var(--violet, #6b5b95);
+  box-shadow: 0 0 0 2px rgba(201, 169, 98, 0.35), 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.map-avatar-marker--friend-online {
+  border-color: #66bb6a;
+  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.35), 0 2px 12px rgba(0, 0, 0, 0.5);
+}
+
+.map-friends-strip {
+  margin-bottom: 1rem;
+  padding: 1rem 1.25rem;
+}
+
+.map-friends-strip-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.9375rem;
+}
+
+.map-friends-list {
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.map-friends-list-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-gold);
+  text-decoration: none;
+  color: inherit;
+  font-size: 0.8125rem;
+}
+
+.map-friends-online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #66bb6a;
+}
+
+.map-legend {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.map-legend-item--friend::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.35rem;
+  vertical-align: middle;
+  background: var(--violet, #6b5b95);
+  border: 2px solid var(--gold);
+}
+
+.map-popup-friend-badge {
+  display: block;
+  font-size: 0.6875rem;
+  margin-top: 0.15rem;
+  color: var(--violet, #6b5b95);
+  font-weight: 600;
+}
+
+.map-popup-friend-badge--on {
+  color: #2e7d32;
+}
+
+.map-popup-chat-btn {
+  margin-top: 0.5rem;
+  width: 100%;
+  justify-content: center;
+}

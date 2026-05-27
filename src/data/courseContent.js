@@ -168,5 +168,50 @@ export const COURSE_CONTENT = {
         ],
       },
     },
+    4: {
+      titleKey: 'module_a4_title',
+      sections: {
+        fr: [
+          'La fiabilité des Écritures repose sur des milliers de manuscrits, une transmission soignée et une cohérence thématique remarquable sur des siècles et des auteurs variés.',
+          'L\'archéologie ne « prouve » pas chaque verset, mais elle éclaire souvent les contextes bibliques et renforce la crédibilité historique de nombreux récits.',
+          'En apologétique : distinguez faits historiques, interprétation théologique et application personnelle. Invitez votre interlocuteur à lire un évangile avec vous.',
+        ],
+        en: [
+          'Scripture\'s reliability rests on thousands of manuscripts, careful transmission, and striking thematic coherence across centuries and diverse authors.',
+          'Archaeology does not "prove" every verse, but it often illuminates biblical contexts and strengthens the historical credibility of many accounts.',
+          'In apologetics: distinguish historical facts, theological interpretation, and personal application. Invite your conversation partner to read a Gospel with you.',
+        ],
+      },
+    },
+    5: {
+      titleKey: 'module_a5_title',
+      sections: {
+        fr: [
+          'Le dialogue interreligieux exige respect et vérité : reconnaître la sincérité d\'autrui sans nier l\'unicité de Christ telle que l\'Évangile la présente.',
+          'Évitez les comparaisons caricaturales. Cherchez ce que l\'autre cherche (paix, sens, pardon) et montrez comment le Christ y répond — sans mépris.',
+          'Pratique : une question ouverte (« Qu\'est-ce qui vous a le plus marqué dans votre chemin spirituel ? ») vaut mieux qu\'un monologue de conviction.',
+        ],
+        en: [
+          'Interfaith dialogue requires respect and truth: honor others\' sincerity without denying the uniqueness of Christ as the Gospel presents it.',
+          'Avoid caricatured comparisons. Discover what the other person seeks (peace, meaning, forgiveness) and show how Christ answers — without contempt.',
+          'Practice: one open question ("What has marked you most on your spiritual path?") beats a one-sided lecture on belief.',
+        ],
+      },
+    },
+    6: {
+      titleKey: 'module_a6_title',
+      sections: {
+        fr: [
+          'Partager sa foi commence souvent par une vie cohérente et une écoute attentive, plus qu\'avec un discours parfait.',
+          'Votre témoignage personnel (avant / après la rencontre avec Christ) est irremplaçable : personne d\'autre ne peut raconter ce que Dieu a fait pour vous.',
+          'Clôture du parcours apologétique : choisissez une personne, priez pour elle, et proposez un café ou une lecture commune de Marc — sans pression, avec respect.',
+        ],
+        en: [
+          'Sharing faith often starts with a coherent life and attentive listening more than a flawless speech.',
+          'Your personal testimony (before / after meeting Christ) is irreplaceable: no one else can tell what God has done for you.',
+          'Apologetics path closing: choose one person, pray for them, and offer coffee or reading Mark together — without pressure, with respect.',
+        ],
+      },
+    },
   },
 };

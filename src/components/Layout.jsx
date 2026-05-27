@@ -1,18 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Home,
-  Sparkles,
-  Library,
-  Users,
-  User,
-  Heart,
-  Globe,
-  Book,
-  Clock,
-  Map,
-} from 'lucide-react';
+import { Heart, Globe, Book, Clock, Map, UserPlus } from 'lucide-react';
+import { MimshackNavIcon } from './MimshackLogo';
+import { HomeNavIcon, LibraryNavIcon, CommunityNavIcon, ProfileNavIcon } from './SectionLogos';
+import FriendPresenceToasts from './FriendPresenceToasts';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
 import { LogoMark } from './Logo';
@@ -23,11 +15,11 @@ import './Layout.css';
 
 /** Navigation principale — CdC v3 §2.1 (5 onglets) */
 const mainNavItems = [
-  { to: '/', icon: Home, labelKey: 'tab_home', end: true },
-  { to: '/agent', icon: Sparkles, labelKey: 'tab_agent' },
-  { to: '/library', icon: Library, labelKey: 'tab_library' },
-  { to: '/community', icon: Users, labelKey: 'tab_community' },
-  { to: '/profile', icon: User, labelKey: 'tab_profile' },
+  { to: '/', icon: HomeNavIcon, labelKey: 'tab_home', end: true },
+  { to: '/agent', icon: MimshackNavIcon, labelKey: 'tab_agent' },
+  { to: '/library', icon: LibraryNavIcon, labelKey: 'tab_library' },
+  { to: '/community', icon: CommunityNavIcon, labelKey: 'tab_community' },
+  { to: '/profile', icon: ProfileNavIcon, labelKey: 'tab_profile' },
 ];
 
 const mobileNavItems = [
@@ -41,6 +33,7 @@ const mobileNavItems = [
 const toolLinks = [
   { to: '/bible', icon: Book, labelKey: 'nav_bible' },
   { to: '/heritage', icon: Clock, labelKey: 'nav_heritage' },
+  { to: '/friends', icon: UserPlus, labelKey: 'friends_nav' },
   { to: '/map', icon: Map, labelKey: 'map' },
 ];
 
@@ -69,6 +62,7 @@ const Layout = () => {
 
   return (
     <div className="layout-container">
+      {user && <FriendPresenceToasts />}
       <header className={`header ${scrolled ? 'header-scrolled' : ''}`}>
         <Link to="/" className="logo">
           <div className="logo-mark">
@@ -156,7 +150,7 @@ const Layout = () => {
             </Link>
           ) : (
             <Link to="/auth" className="btn btn-outline btn-sm">
-              <User size={16} />
+              <ProfileNavIcon size={16} />
               <span className="hide-mobile">{t('layout_login')}</span>
             </Link>
           )}

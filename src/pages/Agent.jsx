@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Send, Sparkles, Scale, Loader2 } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
+import { Send, Scale, Loader2 } from 'lucide-react';
+import MimshackLogo from '../components/MimshackLogo';
 import PaywallModal from '../components/PaywallModal';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
 import { useAgentStore } from '../store/useAgentStore';
 import { useGamificationStore } from '../store/useGamificationStore';
 import { postAgentChat, postAgentPerspectives } from '../lib/agentApi';
+import '../components/MimshackLogo.css';
 import './Agent.css';
 
 const Agent = () => {
@@ -104,7 +105,13 @@ const Agent = () => {
 
   return (
     <div className="container agent-page animate-fade-in">
-      <PageHeader eyebrow="TKV · IA" title={t('agent_title')} subtitle={t('agent_subtitle')} />
+      <header className="agent-header-brand">
+        <MimshackLogo size={56} showWordmark title="Mimshack" />
+        <div className="agent-header-brand-copy">
+          <h1>{t('agent_title')}</h1>
+          <p>{t('agent_subtitle')}</p>
+        </div>
+      </header>
 
       <div className="agent-tabs">
         <button
@@ -112,7 +119,7 @@ const Agent = () => {
           className={`agent-tab ${tab === 'chat' ? 'active' : ''}`}
           onClick={() => setTab('chat')}
         >
-          <Sparkles size={18} />
+          <MimshackLogo size={18} />
           {t('agent_tab_chat')}
         </button>
         <button

@@ -1,214 +1,176 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Volume2,
-  Book,
-  Clock,
-  Library,
-  Users,
-  Map,
-  ArrowRight,
-  Compass,
-  Flame,
-  Sparkles,
-  Radio,
-  TrendingUp,
-} from 'lucide-react';
-import { LogoMark } from '../components/Logo';
+import { Volume2, ArrowRight, Compass, BookOpen, Landmark } from 'lucide-react';
 import { getVerseOfDay } from '../data/dailyVerses';
-import { useGamificationStore } from '../store/useGamificationStore';
 import { useAuthStore } from '../store/useAuthStore';
-import { useProfileStore } from '../store/useProfileStore';
 import { useSpeak } from '../hooks/useSpeak';
+import MimshackLogo from '../components/MimshackLogo';
+import { LibraryLogo, CommunityLogo } from '../components/SectionLogos';
 import './Home.css';
 
-const features = [
-  { to: '/bible', icon: Book, titleKey: 'bible', descKey: 'home_bible_desc', large: true },
-  { to: '/heritage', icon: Clock, titleKey: 'heritage', descKey: 'home_heritage_desc' },
-  { to: '/library', icon: Library, titleKey: 'library', descKey: 'home_library_desc' },
-  { to: '/cells', icon: Users, titleKey: 'cells', descKey: 'home_cells_desc' },
-  { to: '/map', icon: Map, titleKey: 'map', descKey: 'home_map_desc' },
+const HOME_MARKS = {
+  library: LibraryLogo,
+  community: CommunityLogo,
+};
+
+const pillarPaths = [
+  {
+    to: '/bible',
+    icon: BookOpen,
+    titleKey: 'bible',
+    descKey: 'home_bible_desc',
+    pillar: true,
+  },
+  {
+    to: '/heritage',
+    icon: Landmark,
+    titleKey: 'heritage',
+    descKey: 'home_heritage_desc',
+    pillar: true,
+  },
+];
+
+const startPaths = [
+  {
+    to: '/library',
+    mark: 'library',
+    titleKey: 'home_path_library_title',
+    descKey: 'home_path_library_desc',
+    featured: true,
+  },
+  {
+    to: '/agent',
+    mimshack: true,
+    titleKey: 'home_path_mimshack_title',
+    descKey: 'home_path_mimshack_desc',
+  },
+  {
+    to: '/community',
+    mark: 'community',
+    titleKey: 'home_path_community_title',
+    descKey: 'home_path_community_desc',
+  },
 ];
 
 const Home = () => {
   const { t, i18n } = useTranslation();
   const verse = getVerseOfDay(i18n.language);
-  const streakCurrent = useGamificationStore((s) => s.streakCurrent);
-  const streakBest = useGamificationStore((s) => s.streakBest);
-  const readingProgress = useGamificationStore((s) => s.readingProgress);
-  const hasCheckedInToday = useGamificationStore((s) => s.hasCheckedInToday);
-  const checkInToday = useGamificationStore((s) => s.checkInToday);
   const { user } = useAuthStore();
-  const updateProfile = useProfileStore((s) => s.updateProfile);
   const { speak } = useSpeak();
 
-  const handleCheckIn = async () => {
-    const didCheckIn = checkInToday();
-    if (didCheckIn && user?.id) {
-      const { streakCurrent, streakBest, lastCheckIn } = useGamificationStore.getState();
-      await updateProfile(user.id, {
-        streak_current: streakCurrent,
-        streak_best: streakBest,
-        last_active_date: lastCheckIn,
-      });
-    }
-  };
+  const renderPathCard = ({ to, icon: Icon, titleKey, descKey, featured, mimshack, mark, pillar }) => {
+    const MarkComponent = mark ? HOME_MARKS[mark] : null;
+    const customMark = mimshack || MarkComponent;
 
-  const streakLabel =
-    streakCurrent === 1
-      ? t('dashboard_streak_days', { count: streakCurrent })
-      : t('dashboard_streak_days_plural', { count: streakCurrent });
+    return (
+    <Link
+      key={to}
+      to={to}
+      className={`home-path card ${featured ? 'home-path--featured' : ''} ${pillar ? 'home-path--pillar' : ''}`}
+    >
+      <div
+        className={`home-path-icon ${customMark ? 'home-path-icon--mark' : ''}`}
+        aria-hidden="true"
+      >
+        {mimshack ? (
+          <MimshackLogo size={44} title="Mimshack" />
+        ) : MarkComponent ? (
+          <MarkComponent size={44} title={t(titleKey)} />
+        ) : (
+          <Icon size={24} strokeWidth={1.5} />
+        )}
+      </div>
+      <h3 className="home-path-title">{t(titleKey)}</h3>
+      <p className="home-path-desc">{t(descKey)}</p>
+      <span className="home-path-link">
+        {t('home_discover')}
+        <ArrowRight size={16} aria-hidden="true" />
+      </span>
+    </Link>
+    );
+  };
 
   return (
     <div className="home animate-fade-in">
-      <section className="dashboard container">
-        <div className="dashboard-grid">
-          <article className="card dashboard-verse">
-            <p className="dashboard-label">{t('dashboard_verse_label')}</p>
-            <blockquote className="dashboard-verse-text">&ldquo;{verse.text}&rdquo;</blockquote>
-            <cite className="dashboard-verse-ref">{verse.ref}</cite>
+      <section className="home-hero">
+        <div className="home-hero-orb home-hero-orb-1" aria-hidden="true" />
+        <div className="home-hero-orb home-hero-orb-2" aria-hidden="true" />
+
+        <div className="container home-hero-inner">
+          <p className="home-hero-eyebrow">
+            <span className="home-hero-eyebrow-dot" aria-hidden="true" />
+            {t('home_hero_eyebrow')}
+          </p>
+
+          <h1 className="home-hero-title">{t('home_hero_title')}</h1>
+          <p className="home-hero-lead">{t('home_hero_lead')}</p>
+
+          <div className="home-hero-actions">
+            <Link to="/library" className="btn btn-primary btn-lg home-hero-cta">
+              {t('home_hero_cta_primary')}
+              <ArrowRight size={20} aria-hidden="true" />
+            </Link>
+            <Link to="/agent" className="btn btn-outline btn-lg home-hero-mimshack-btn">
+              <MimshackLogo size={22} />
+              {t('home_hero_cta_secondary')}
+            </Link>
+          </div>
+
+          {!user && (
+            <p className="home-hero-guest">
+              {t('home_hero_guest')}{' '}
+              <Link to="/auth" className="home-hero-guest-link">
+                {t('layout_login')}
+              </Link>
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="container home-verse-section" aria-labelledby="home-verse-heading">
+        <article className="home-verse card">
+          <header className="home-verse-header">
+            <p id="home-verse-heading" className="home-verse-label">
+              {t('dashboard_verse_label')}
+            </p>
             <button
               type="button"
-              className="btn btn-ghost btn-sm dashboard-verse-listen"
+              className="btn btn-ghost btn-sm home-verse-listen"
               onClick={() => speak(verse.text)}
             >
-              <Volume2 size={16} />
+              <Volume2 size={16} aria-hidden="true" />
               {t('listen')}
             </button>
-          </article>
-
-          <article className="card dashboard-streak">
-            <p className="dashboard-label">
-              <Flame size={16} />
-              {t('dashboard_streak_label')}
-            </p>
-            <p className="dashboard-streak-value">{streakLabel}</p>
-            <p className="dashboard-streak-record">
-              {t('dashboard_streak_record', { count: streakBest })}
-            </p>
-            <button
-              type="button"
-              className="btn btn-primary btn-sm"
-              onClick={handleCheckIn}
-              disabled={hasCheckedInToday()}
-            >
-              {hasCheckedInToday() ? t('dashboard_checkin_done') : t('dashboard_checkin')}
-            </button>
-          </article>
-
-          <article className="card dashboard-progress">
-            <p className="dashboard-label">
-              <TrendingUp size={16} />
-              {t('dashboard_progress_label')}
-            </p>
-            <div className="dashboard-progress-bar">
-              <div className="dashboard-progress-fill" style={{ width: `${readingProgress}%` }} />
-            </div>
-            <p className="dashboard-progress-value">
-              {t('dashboard_progress_value', { percent: readingProgress })}
-            </p>
-          </article>
-        </div>
-
-        <div className="dashboard-banners">
-          <div className="card dashboard-live">
-            <span className="dashboard-live-badge">{t('dashboard_live_badge')}</span>
-            <Radio size={20} />
-            <div>
-              <h3>{t('dashboard_live_title')}</h3>
-              <p>{t('dashboard_live_desc')}</p>
-            </div>
-          </div>
-          <Link to="/agent" className="card dashboard-ia">
-            <Sparkles size={22} />
-            <div>
-              <h3>{t('dashboard_ia_title')}</h3>
-              <p>{t('dashboard_ia_desc')}</p>
-              <span className="dashboard-ia-cta">
-                {t('dashboard_ia_cta')}
-                <ArrowRight size={14} />
-              </span>
-            </div>
-          </Link>
-        </div>
+          </header>
+          <blockquote className="home-verse-text">&ldquo;{verse.text}&rdquo;</blockquote>
+          <cite className="home-verse-ref">{verse.ref}</cite>
+        </article>
       </section>
 
-      <section className="hero container hero-compact">
-        <div className="hero-badge">
-          <span className="hero-badge-dot" />
-          {t('home_badge')}
-        </div>
-        <h1 className="hero-title hero-title-compact">{t('welcome')}</h1>
-        <p className="hero-subtitle">{t('home_subtitle')}</p>
-        <div className="hero-actions">
-          <Link to="/library" className="btn btn-primary btn-lg">
-            {t('home_cta_explore')}
-            <ArrowRight size={20} />
-          </Link>
-          <Link to="/agent" className="btn btn-outline btn-lg">
-            <Sparkles size={20} />
-            {t('dashboard_ia_cta')}
-          </Link>
-        </div>
-      </section>
-
-      <section className="section container">
-        <header className="section-header">
-          <p className="section-eyebrow">{t('dashboard_quick_title')}</p>
-          <h2 className="section-title">{t('home_section_title')}</h2>
+      <section className="container home-paths-section">
+        <header className="home-paths-header">
+          <p className="home-paths-eyebrow">{t('home_paths_eyebrow')}</p>
+          <h2 className="home-paths-title">{t('home_paths_title')}</h2>
+          <p className="home-paths-lead">{t('home_paths_lead')}</p>
         </header>
 
-        <div className="bento">
-          {features.map(({ to, icon: Icon, titleKey, descKey, large }) => (
-            <Link key={to} to={to} className={`bento-card ${large ? 'bento-card-large' : ''}`}>
-              <article className="card card-feature">
-                <div className="card-feature-icon">
-                  <Icon size={large ? 28 : 22} strokeWidth={1.5} />
-                </div>
-                <h3>{t(titleKey)}</h3>
-                <p>{t(descKey)}</p>
-                <span className="bento-arrow">
-                  {t('home_discover')}
-                  <ArrowRight size={16} />
-                </span>
-              </article>
-            </Link>
-          ))}
-        </div>
+        <div className="home-pillars-grid">{pillarPaths.map(renderPathCard)}</div>
+        <div className="home-paths-grid">{startPaths.map(renderPathCard)}</div>
+      </section>
 
-        <section className="home-mission" aria-labelledby="home-mission-title">
-          <div className="home-mission-panel">
-            <div className="home-mission-icon" aria-hidden="true">
-              <Compass size={28} strokeWidth={1.5} />
-            </div>
-            <div className="home-mission-content">
-              <p className="section-eyebrow">{t('home_about_eyebrow')}</p>
-              <h2 id="home-mission-title" className="home-mission-title">
-                {t('home_about_title')}
-              </h2>
-              <p className="home-mission-desc">{t('home_about_desc')}</p>
-            </div>
-            <div className="home-mission-action">
-              <Link to="/about" className="btn btn-outline home-mission-link">
-                {t('home_about_cta')}
-                <ArrowRight size={18} />
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        <div className="cta-band">
-          <div className="cta-logo-wrap">
-            <LogoMark size={48} />
-          </div>
-          <h2>{t('home_cta_title')}</h2>
-          <p>{t('home_cta_desc')}</p>
-          <Link to="/auth" className="btn btn-primary btn-lg">
-            {t('layout_login')}
-            <ArrowRight size={18} />
-          </Link>
-        </div>
+      <section className="container home-foot">
+        <Link to="/about" className="home-foot-about">
+          <Compass size={18} aria-hidden="true" />
+          <span>{t('home_about_cta')}</span>
+          <ArrowRight size={16} aria-hidden="true" />
+        </Link>
+        {user && (
+          <p className="home-foot-hint">
+            {t('home_profile_hint')}{' '}
+            <Link to="/profile">{t('tab_profile')}</Link>
+          </p>
+        )}
       </section>
     </div>
   );

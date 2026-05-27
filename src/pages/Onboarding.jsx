@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, Sparkles, Brain, Flame } from 'lucide-react';
 import { LogoMark } from '../components/Logo';
+import MimshackLogo from '../components/MimshackLogo';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
 import { ONBOARDING_KEY, PROFILE_TYPE_KEY } from '../store/useGamificationStore';
@@ -10,7 +11,7 @@ import './Onboarding.css';
 
 const slides = [
   { icon: Sparkles, titleKey: 'onboarding_slide1_title', descKey: 'onboarding_slide1_desc' },
-  { icon: Brain, titleKey: 'onboarding_slide2_title', descKey: 'onboarding_slide2_desc' },
+  { mimshack: true, titleKey: 'onboarding_slide2_title', descKey: 'onboarding_slide2_desc' },
   { icon: Flame, titleKey: 'onboarding_slide3_title', descKey: 'onboarding_slide3_desc' },
 ];
 
@@ -51,13 +52,17 @@ const Onboarding = () => {
 
         {!isProfileStep ? (
           <>
-            {slides.map(({ icon: Icon, titleKey, descKey }, i) => (
+            {slides.map(({ icon: Icon, mimshack, titleKey, descKey }, i) => (
               <div
                 key={titleKey}
                 className={`onboarding-slide ${i === step ? 'onboarding-slide-active' : ''}`}
               >
                 <div className="onboarding-slide-icon">
-                  <Icon size={32} strokeWidth={1.5} />
+                  {mimshack ? (
+                    <MimshackLogo size={40} title="Mimshack" />
+                  ) : (
+                    <Icon size={32} strokeWidth={1.5} />
+                  )}
                 </div>
                 <h1>{t(titleKey)}</h1>
                 <p>{t(descKey)}</p>

@@ -14,7 +14,7 @@ const resources = {
       listen: 'Écouter à voix haute',
       home_badge: 'Curieux & croyants · 6 langues · La vérité en dialogue',
       home_subtitle:
-        'Que vous cherchiez, questionniez ou croyiez déjà — explorez la foi avec rigueur et bienveillance, en 6 langues.',
+        'Que vous cherchiez, questionniez ou croyiez déjà — explorez la foi avec clarté et bienveillance.',
       home_bible_desc:
         'Plongez dans les Écritures mot à mot : touchez un terme hébreu ou grec et laissez le sens original vous éclairer.',
       home_heritage_desc:
@@ -31,7 +31,7 @@ const resources = {
       home_stat_voice: 'Une seule Voix',
       home_section_eyebrow: 'Votre parcours',
       home_section_title: 'Tout ce dont votre foi a besoin',
-      home_discover: 'Entrer',
+      home_discover: 'Découvrir',
       home_cta_title: 'Faites partie de la famille',
       home_cta_desc:
         'Créez votre espace personnel : rejoignez une cellule, gardez vos lectures et soutenez une mission qui touche des vies.',
@@ -63,7 +63,7 @@ const resources = {
       auth_no_account: 'Première visite ?',
       auth_has_account: 'Déjà membre ?',
       auth_submitting: 'Un instant…',
-      auth_password_hint: 'Au moins 6 caractères.',
+      auth_password_hint: 'Au moins 8 caractères.',
       auth_confirm_email_title: 'Vérifiez votre boîte mail',
       auth_confirm_email_desc:
         'Nous avons envoyé un lien de confirmation à {{email}}. Cliquez dessus pour activer votre compte, puis connectez-vous.',
@@ -73,10 +73,12 @@ const resources = {
       auth_error_generic: 'Une erreur est survenue. Réessayez dans un instant.',
       auth_error_not_configured:
         'Connexion indisponible : configurez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans le fichier .env.',
+      auth_error_network:
+        'Impossible de joindre Supabase (réseau ou configuration). En local : vérifiez le fichier .env puis redémarrez `npm run dev`. Sur Vercel : ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY, puis redéployez.',
       auth_error_email_not_confirmed:
         'Confirmez d’abord votre adresse e-mail via le lien reçu, puis reconnectez-vous.',
       auth_error_user_exists: 'Un compte existe déjà avec cette adresse. Connectez-vous ou réinitialisez le mot de passe.',
-      auth_error_weak_password: 'Le mot de passe doit contenir au moins 6 caractères.',
+      auth_error_weak_password: 'Le mot de passe doit contenir au moins 8 caractères.',
       auth_error_invalid_credentials: 'E-mail ou mot de passe incorrect.',
       auth_error_invalid_email: 'Adresse e-mail invalide.',
       auth_error_email_rate_limit:
@@ -275,7 +277,7 @@ const resources = {
       listen: 'Listen aloud',
       home_badge: 'Seekers & believers · 6 languages · Truth in dialogue',
       home_subtitle:
-        'Whether you seek, question, or already believe — explore faith with rigor and kindness, in 6 languages.',
+        'Whether you seek, question, or already believe — explore faith with clarity and care.',
       home_bible_desc:
         'Dive into Scripture word by word: tap a Hebrew or Greek term and let the original meaning light your path.',
       home_heritage_desc:
@@ -292,7 +294,7 @@ const resources = {
       home_stat_voice: 'One Voice',
       home_section_eyebrow: 'Your journey',
       home_section_title: 'Everything your faith needs',
-      home_discover: 'Step in',
+      home_discover: 'Explore',
       home_cta_title: 'Become part of the family',
       home_cta_desc:
         'Create your personal space: join a cell, keep your reading progress, and support a mission that changes lives.',
@@ -324,7 +326,7 @@ const resources = {
       auth_no_account: 'First time here?',
       auth_has_account: 'Already a member?',
       auth_submitting: 'One moment…',
-      auth_password_hint: 'At least 6 characters.',
+      auth_password_hint: 'At least 8 characters.',
       auth_confirm_email_title: 'Check your inbox',
       auth_confirm_email_desc:
         'We sent a confirmation link to {{email}}. Click it to activate your account, then sign in.',
@@ -334,10 +336,12 @@ const resources = {
       auth_error_generic: 'Something went wrong. Please try again.',
       auth_error_not_configured:
         'Sign-in unavailable: set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in your .env file.',
+      auth_error_network:
+        'Cannot reach Supabase (network or configuration). Locally: check .env and restart `npm run dev`. On Vercel: set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY, then redeploy.',
       auth_error_email_not_confirmed:
         'Confirm your email using the link we sent, then sign in.',
       auth_error_user_exists: 'An account already exists with this email. Sign in or reset your password.',
-      auth_error_weak_password: 'Password must be at least 6 characters.',
+      auth_error_weak_password: 'Password must be at least 8 characters.',
       auth_error_invalid_credentials: 'Incorrect email or password.',
       auth_error_invalid_email: 'Invalid email address.',
       auth_error_email_rate_limit:
@@ -583,7 +587,7 @@ const resources = {
       auth_no_account: '¿Primera vez aquí?',
       auth_has_account: '¿Ya eres miembro?',
       auth_submitting: 'Un momento…',
-      auth_password_hint: 'Al menos 6 caracteres.',
+      auth_password_hint: 'Al menos 8 caracteres.',
       auth_confirm_email_title: 'Revisa tu correo',
       auth_confirm_email_desc:
         'Enviamos un enlace de confirmación a {{email}}. Actívalo y luego inicia sesión.',
@@ -593,10 +597,12 @@ const resources = {
       auth_error_generic: 'Ha ocurrido un error. Inténtalo de nuevo.',
       auth_error_not_configured:
         'Acceso no disponible: configura VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY en .env.',
+      auth_error_network:
+        'No se puede contactar Supabase (red o configuración). En local: revisa .env y reinicia `npm run dev`. En Vercel: configura VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY y vuelve a desplegar.',
       auth_error_email_not_confirmed:
         'Confirma tu correo con el enlace recibido y vuelve a entrar.',
       auth_error_user_exists: 'Ya existe una cuenta con este correo. Entra o restablece la contraseña.',
-      auth_error_weak_password: 'La contraseña debe tener al menos 6 caracteres.',
+      auth_error_weak_password: 'La contraseña debe tener al menos 8 caracteres.',
       auth_error_invalid_credentials: 'Correo o contraseña incorrectos.',
       auth_error_invalid_email: 'Correo electrónico no válido.',
       auth_error_email_rate_limit:
@@ -839,7 +845,7 @@ const resources = {
       auth_no_account: 'Eerste keer hier?',
       auth_has_account: 'Al lid?',
       auth_submitting: 'Even geduld…',
-      auth_password_hint: 'Minstens 6 tekens.',
+      auth_password_hint: 'Minstens 8 tekens.',
       auth_confirm_email_title: 'Controleer uw mailbox',
       auth_confirm_email_desc:
         'We hebben een bevestigingslink gestuurd naar {{email}}. Activeer uw account en log daarna in.',
@@ -849,10 +855,12 @@ const resources = {
       auth_error_generic: 'Er is iets misgegaan. Probeer het opnieuw.',
       auth_error_not_configured:
         'Inloggen niet beschikbaar: stel VITE_SUPABASE_URL en VITE_SUPABASE_ANON_KEY in .env in.',
+      auth_error_network:
+        'Supabase niet bereikbaar (netwerk of configuratie). Lokaal: controleer .env en herstart `npm run dev`. Op Vercel: stel VITE_SUPABASE_URL en VITE_SUPABASE_ANON_KEY in en deploy opnieuw.',
       auth_error_email_not_confirmed:
         'Bevestig eerst uw e-mail via de ontvangen link en log opnieuw in.',
       auth_error_user_exists: 'Er bestaat al een account met dit adres. Log in of stel het wachtwoord opnieuw in.',
-      auth_error_weak_password: 'Het wachtwoord moet minstens 6 tekens bevatten.',
+      auth_error_weak_password: 'Het wachtwoord moet minstens 8 tekens bevatten.',
       auth_error_invalid_credentials: 'Onjuist e-mailadres of wachtwoord.',
       auth_error_invalid_email: 'Ongeldig e-mailadres.',
       auth_error_email_rate_limit:
@@ -1095,7 +1103,7 @@ const resources = {
       auth_no_account: 'Primeira vez aqui?',
       auth_has_account: 'Já és membro?',
       auth_submitting: 'Um instante…',
-      auth_password_hint: 'Pelo menos 6 caracteres.',
+      auth_password_hint: 'Pelo menos 8 caracteres.',
       auth_confirm_email_title: 'Verifica o teu e-mail',
       auth_confirm_email_desc:
         'Enviámos um link de confirmação para {{email}}. Ativa a conta e depois entra.',
@@ -1105,10 +1113,12 @@ const resources = {
       auth_error_generic: 'Ocorreu um erro. Tenta novamente.',
       auth_error_not_configured:
         'Acesso indisponível: define VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no .env.',
+      auth_error_network:
+        'Não foi possível contactar o Supabase (rede ou configuração). Em local: verifica o .env e reinicia `npm run dev`. Na Vercel: define VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY e volta a fazer deploy.',
       auth_error_email_not_confirmed:
         'Confirma o e-mail pelo link recebido e volta a entrar.',
       auth_error_user_exists: 'Já existe uma conta com este e-mail. Entra ou repõe a palavra-passe.',
-      auth_error_weak_password: 'A palavra-passe deve ter pelo menos 6 caracteres.',
+      auth_error_weak_password: 'A palavra-passe deve ter pelo menos 8 caracteres.',
       auth_error_invalid_credentials: 'E-mail ou palavra-passe incorretos.',
       auth_error_invalid_email: 'E-mail inválido.',
       auth_error_email_rate_limit:
@@ -1351,7 +1361,7 @@ const resources = {
       auth_no_account: 'أول زيارة؟',
       auth_has_account: 'عضو بالفعل؟',
       auth_submitting: 'لحظة…',
-      auth_password_hint: '6 أحرف على الأقل.',
+      auth_password_hint: '8 أحرف على الأقل.',
       auth_confirm_email_title: 'تحقق من بريدك',
       auth_confirm_email_desc:
         'أرسلنا رابط تأكيد إلى {{email}}. فعّل حسابك ثم سجّل الدخول.',
@@ -1361,10 +1371,12 @@ const resources = {
       auth_error_generic: 'حدث خطأ. حاول مرة أخرى.',
       auth_error_not_configured:
         'تسجيل الدخول غير متاح: عيّن VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY في ملف .env.',
+      auth_error_network:
+        'تعذّر الاتصال بـ Supabase (شبكة أو إعدادات). محلياً: تحقق من .env وأعد تشغيل `npm run dev`. على Vercel: عيّن VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY ثم أعد النشر.',
       auth_error_email_not_confirmed:
         'أكّد بريدك عبر الرابط المرسل ثم سجّل الدخول مجدداً.',
       auth_error_user_exists: 'يوجد حساب بهذا البريد. سجّل الدخول أو أعد تعيين كلمة المرور.',
-      auth_error_weak_password: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.',
+      auth_error_weak_password: 'كلمة المرور يجب أن تكون 8 أحرف على الأقل.',
       auth_error_invalid_credentials: 'البريد أو كلمة المرور غير صحيحة.',
       auth_error_invalid_email: 'عنوان بريد غير صالح.',
       auth_error_email_rate_limit:

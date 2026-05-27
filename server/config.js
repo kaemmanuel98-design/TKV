@@ -39,6 +39,17 @@ export const config = {
   jitsiAllowPublicFallback:
     process.env.JITSI_ALLOW_PUBLIC_FALLBACK === 'true' ||
     (!isProduction && process.env.JITSI_ALLOW_PUBLIC_FALLBACK !== 'false'),
+  /** URL publique de l’app (liens e-mail amis) */
+  appPublicUrl:
+    envTrim('APP_PUBLIC_URL') ||
+    (envTrim('VERCEL_URL') ? `https://${envTrim('VERCEL_URL')}` : ''),
+  resendApiKey: envTrim('RESEND_API_KEY'),
+  emailFrom: envTrim('EMAIL_FROM') || 'TKV <onboarding@resend.dev>',
+  /** Origines CORS autorisées (virgules). Vide = refléter l’Origin en dev uniquement. */
+  corsOrigins: envTrim('CORS_ORIGINS')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean),
 };
 
 export const PLAN_LIMITS = {

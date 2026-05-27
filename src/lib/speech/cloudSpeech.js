@@ -1,5 +1,15 @@
+import { supabase } from '../supabase';
+
 const API_BASE = import.meta.env.VITE_API_URL || '';
 const TTS_TIMEOUT_MS = 60000;
+
+async function authHeaders() {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
+}
 
 let currentAudio = null;
 
@@ -19,7 +29,7 @@ export async function checkCloudSpeechAvailable() {
     clearTimeout(timer);
     if (!res.ok) return false;
     const data = await res.json();
-    return Boolean(data.openai);
+    return Boolean(data.tts ?? data.openai);
   } catch {
     return false;
   }
@@ -88,7 +98,7 @@ export async function speakWithCloud(text, locale) {
   try {
     const res = await fetch(`${API_BASE}/api/tts`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await authHeaders(),
       body: JSON.stringify({
         text: text.slice(0, 4096),
         locale,
