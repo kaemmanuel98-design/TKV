@@ -5,7 +5,10 @@
   "framework": "vite",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    {
+      "source": "/((?!api/)(?!.*\\.[a-zA-Z0-9]+$).*)",
+      "destination": "/index.html"
+    }
   ],
   "headers": [
     {

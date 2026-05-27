@@ -1,4 +1,15 @@
-/** Contenu des modules de cours (FR / EN) — Phase 1d */
+/** Contenu des modules de cours — FR, EN, ES, NL, PT, AR */
+import { COURSE_SECTIONS_EXTENDED } from './courseContentExtended.js';
+
+function mergeExtendedSections() {
+  for (const courseId of Object.keys(COURSE_SECTIONS_EXTENDED)) {
+    for (const [modIdx, locales] of Object.entries(COURSE_SECTIONS_EXTENDED[courseId])) {
+      const mod = COURSE_CONTENT[courseId]?.[Number(modIdx)];
+      if (mod?.sections) Object.assign(mod.sections, locales);
+    }
+  }
+}
+
 export const COURSE_CONTENT = {
   foundations: {
     1: {
@@ -214,4 +225,98 @@ export const COURSE_CONTENT = {
       },
     },
   },
+  teleios: {
+    1: {
+      titleKey: 'module_t1_title',
+      sections: {
+        fr: [
+          'Teleios signifie « parvenu à la maturité ». Ce parcours s\'adresse à ceux qui veulent aller au-delà des bases et vivre une foi stable, profonde et transmissible.',
+          'La maturité biblique n\'est pas l\'âge ni le statut : c\'est la croissance en Christ, mesurée par l\'amour, la fidélité et le fruit de l\'Esprit.',
+          'Exercice : lisez Colossiens 1.28–29 et notez ce que Paul appelle « présenter chacun parfait (teleios) en Christ ».',
+        ],
+        en: [
+          'Teleios means "having reached maturity." This path is for those who want to go beyond basics and live a stable, deep, transmissible faith.',
+          'Biblical maturity is not age or status: it is growth in Christ, measured by love, faithfulness, and the fruit of the Spirit.',
+          'Exercise: read Colossians 1:28–29 and note what Paul calls "presenting everyone perfect (teleios) in Christ."',
+        ],
+      },
+    },
+    2: {
+      titleKey: 'module_t2_title',
+      sections: {
+        fr: [
+          'Le caractère christique se forme dans le quotidien : parole vraie, maîtrise de soi, générosité, paix intérieure.',
+          'Galates 5 liste le fruit de l\'Esprit comme preuve visible d\'une vie habitée par Dieu — pas comme performance religieuse.',
+          'Choisissez un fruit à cultiver cette semaine et une situation concrète où le pratiquer.',
+        ],
+        en: [
+          'Christlike character is formed in daily life: truthful speech, self-control, generosity, inner peace.',
+          'Galatians 5 lists the fruit of the Spirit as visible proof of a God-inhabited life — not religious performance.',
+          'Choose one fruit to grow this week and one concrete situation to practice it in.',
+        ],
+      },
+    },
+    3: {
+      titleKey: 'module_t3_title',
+      sections: {
+        fr: [
+          'Le discernement consiste à distinguer ce qui vient de Dieu, de soi, ou des pressions extérieures — avant de décider.',
+          'La sagesse pratique combine Écriture, prière et conseil de frères et sœurs matures.',
+          'Avant une décision importante, posez trois questions : Est-ce conforme à la Parole ? Est-ce motivé par l\'amour ? Est-ce confirmé dans la communauté ?',
+        ],
+        en: [
+          'Discernment means distinguishing what comes from God, self, or external pressure — before deciding.',
+          'Practical wisdom combines Scripture, prayer, and counsel from mature brothers and sisters.',
+          'Before a major decision, ask three questions: Is it aligned with the Word? Motivated by love? Confirmed in community?',
+        ],
+      },
+    },
+    4: {
+      titleKey: 'module_t4_title',
+      sections: {
+        fr: [
+          'La maturité se révèle aussi dans la capacité de servir et de transmettre : faire grandir d\'autres disciples, pas seulement soi-même.',
+          'Paul dit aux Corinthiens : « Devenez mes imitateurs, comme je le suis du Christ. » L\'imitation saine est un modèle de vie, pas un culte de personnalité.',
+          'Identifiez une personne que vous pouvez encourager cette semaine — par la Parole, la prière ou un accompagnement simple.',
+        ],
+        en: [
+          'Maturity also shows in serving and passing on: helping others grow as disciples, not only yourself.',
+          'Paul tells the Corinthians: "Imitate me as I imitate Christ." Healthy imitation is a life model, not personality worship.',
+          'Identify one person you can encourage this week — through the Word, prayer, or simple mentoring.',
+        ],
+      },
+    },
+    5: {
+      titleKey: 'module_t5_title',
+      sections: {
+        fr: [
+          'Les épreuves révèlent la profondeur de la racine. Teleios ne signifie pas l\'absence de lutte, mais la persévérance fidèle.',
+          'Jacques 1 invite à considérer les épreuves comme laboratoire de patience et de maturité.',
+          'Si vous traversez une saison difficile, partagez-la avec un accompagnateur spirituel de confiance.',
+        ],
+        en: [
+          'Trials reveal root depth. Teleios does not mean absence of struggle, but faithful perseverance.',
+          'James 1 invites us to see trials as a laboratory for patience and maturity.',
+          'If you are in a hard season, share it with a trusted spiritual mentor.',
+        ],
+      },
+    },
+    6: {
+      titleKey: 'module_t6_title',
+      sections: {
+        fr: [
+          'Vivre Teleios au quotidien, c\'est unir adoration, Parole, service et mission dans une vie cohérente.',
+          'La maturité n\'est pas un diplôme : c\'est une marche continue vers la ressemblance du Christ.',
+          'Clôture du parcours Teleios : écrivez une prière de consécration et un engagement concret pour les trois prochains mois.',
+        ],
+        en: [
+          'Living Teleios daily means joining worship, Word, service, and mission in a coherent life.',
+          'Maturity is not a diploma: it is an ongoing walk toward Christlikeness.',
+          'Teleios path closing: write a prayer of consecration and one concrete commitment for the next three months.',
+        ],
+      },
+    },
+  },
 };
+
+mergeExtendedSections();

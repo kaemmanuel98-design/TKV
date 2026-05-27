@@ -9,7 +9,8 @@ import { useProfileStore } from '../store/useProfileStore';
 
 const books = [
   { id: 1, slug: 'essence-foi', title: "L'Essence de la Foi", author: 'A.E.K.', isPremium: false, coverUrl: 'https://placehold.co/300x440/121214/c9a962?text=Essence' },
-  { id: 2, slug: 'gynosko', title: 'GYNOSKO', author: 'Ange Emmanuel Kouamé', isPremium: false, coverUrl: 'https://placehold.co/300x440/121214/c9a962?text=GYNOSKO' },
+  { id: 2, slug: 'gynosko', title: 'GYNOSKO', author: 'Ange Emmanuel Kouamé', isPremium: false, coverUrl: '/covers/gynosko-cover.png' },
+  { id: 4, slug: 'eido', title: 'EIDO', author: 'Ange Emmanuel Kouamé', isPremium: false, coverUrl: '/covers/eido-cover.png' },
   { id: 3, slug: 'masque-foi', title: 'Le Masque de la Foi', author: 'Ange Emmanuel Kouamé', isPremium: true, coverUrl: 'https://placehold.co/300x440/121214/c9a962?text=Masque' },
 ];
 

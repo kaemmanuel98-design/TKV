@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Heart, Globe, Book, Clock, Map, UserPlus } from 'lucide-react';
+import { Heart, Globe, Map, UserPlus } from 'lucide-react';
+import { BibleNavIcon, HeritageNavIcon } from './SectionLogos';
 import { MimshackNavIcon } from './MimshackLogo';
 import { HomeNavIcon, LibraryNavIcon, CommunityNavIcon, ProfileNavIcon } from './SectionLogos';
 import FriendPresenceToasts from './FriendPresenceToasts';
@@ -31,8 +32,8 @@ const mobileNavItems = [
 ];
 
 const toolLinks = [
-  { to: '/bible', icon: Book, labelKey: 'nav_bible' },
-  { to: '/heritage', icon: Clock, labelKey: 'nav_heritage' },
+  { to: '/bible', icon: BibleNavIcon, labelKey: 'nav_bible' },
+  { to: '/heritage', icon: HeritageNavIcon, labelKey: 'nav_heritage' },
   { to: '/friends', icon: UserPlus, labelKey: 'friends_nav' },
   { to: '/map', icon: Map, labelKey: 'map' },
 ];

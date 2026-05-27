@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" role="img" aria-label="Personnage">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1a1520"/>
+      <stop offset="100%" stop-color="#0d0a10"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8c547"/>
+      <stop offset="100%" stop-color="#8a6420"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <circle cx="400" cy="180" r="75" fill="#2a2430" stroke="url(#gold)" stroke-width="3"/>
+  <path d="M280 420 Q400 300 520 420" fill="#2a2430" stroke="url(#gold)" stroke-width="2"/>
+  <text x="400" y="470" text-anchor="middle" fill="#c9a227" font-family="Georgia, serif" font-size="22">Personnage marquant</text>
+</svg>

@@ -130,6 +130,107 @@ export const HomeLogo = ({ size = 40, className = '', title }) => {
   );
 };
 
+/** Bible Strong — Écritures ouvertes, traits hébreu stylisé. */
+export const BibleLogo = ({ size = 40, className = '', title }) => {
+  const id = useId().replace(/:/g, '');
+  return (
+    <MarkShell size={size} className={className} title={title} id={id}>
+      {({ gold, accent }) => (
+        <>
+          <path
+            d="M22 48V24c0-1 1-2 2.2-2.2l7.8-1.8 7.8 1.8c1.2.2 2.2 1.2 2.2 2.2v24"
+            stroke={`url(#${gold})`}
+            strokeWidth="1.2"
+            fill={`url(#${accent})`}
+            fillOpacity="0.18"
+          />
+          <path
+            d="M24 26c3 4 5 9 6 15M40 26c-3 4-5 9-6 15"
+            stroke={`url(#${gold})`}
+            strokeWidth="2"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <path d="M32 22v26" stroke={`url(#${gold})`} strokeWidth="1.2" strokeOpacity="0.4" />
+          <path
+            d="M28 20h8"
+            stroke={`url(#${gold})`}
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeOpacity="0.5"
+          />
+          <path
+            d="M29 17c1.5-1 4.5-1 6 0"
+            stroke="#9B7ED9"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            fill="none"
+            strokeOpacity="0.6"
+          />
+          <path
+            d="M18 48.5h28"
+            stroke={`url(#${gold})`}
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeOpacity="0.22"
+          />
+        </>
+      )}
+    </MarkShell>
+  );
+};
+
+/** Héritage — colonne, bouclier et fil du temps. */
+export const HeritageLogo = ({ size = 40, className = '', title }) => {
+  const id = useId().replace(/:/g, '');
+  return (
+    <MarkShell size={size} className={className} title={title} id={id}>
+      {({ gold, accent }) => (
+        <>
+          <path
+            d="M14 36c4-10 10-14 18-14s14 4 18 14"
+            stroke={`url(#${gold})`}
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            fill="none"
+            strokeOpacity="0.35"
+          />
+          <path
+            d="M26 46V28l6-3 6 3v18"
+            stroke={`url(#${gold})`}
+            strokeWidth="2"
+            strokeLinejoin="round"
+            fill={`url(#${accent})`}
+            fillOpacity="0.15"
+          />
+          <path
+            d="M28 34h8M28 38h8M28 42h6"
+            stroke={`url(#${gold})`}
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeOpacity="0.45"
+          />
+          <path
+            d="M38 22c4 2 6 5 6 9s-2 7-6 9"
+            stroke={`url(#${gold})`}
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            fill="none"
+          />
+          <circle cx="44" cy="20" r="2.5" fill={`url(#${gold})`} fillOpacity="0.7" />
+          <path
+            d="M18 48.5h28"
+            stroke={`url(#${gold})`}
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeOpacity="0.22"
+          />
+        </>
+      )}
+    </MarkShell>
+  );
+};
+
 /** Bibliothèque — livre ouvert, tranche dorée, signet. */
 export const LibraryLogo = ({ size = 40, className = '', title }) => {
   const id = useId().replace(/:/g, '');
@@ -318,6 +419,14 @@ export const ProfileLogo = ({ size = 40, className = '', title }) => {
 
 export const HomeNavIcon = ({ size = 18, className = '' }) => (
   <HomeLogo size={size} className={`tkv-mark-nav ${className}`.trim()} />
+);
+
+export const BibleNavIcon = ({ size = 18, className = '' }) => (
+  <BibleLogo size={size} className={`tkv-mark-nav ${className}`.trim()} />
+);
+
+export const HeritageNavIcon = ({ size = 18, className = '' }) => (
+  <HeritageLogo size={size} className={`tkv-mark-nav ${className}`.trim()} />
 );
 
 export const LibraryNavIcon = ({ size = 18, className = '' }) => (

@@ -20,14 +20,14 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",
+    "@vitalets/google-translate-api": "^9.2.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
-    "openai": "^4.77.0",
-    "@vitalets/google-translate-api": "^9.2.1",
     "i18next": "^26.0.9",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.14.0",
+    "openai": "^4.77.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-i18next": "^17.0.6",
@@ -45,6 +45,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
+    "pdf-parse": "^2.4.5",
     "sharp": "^0.34.5",
     "vite": "^8.0.10"
   }

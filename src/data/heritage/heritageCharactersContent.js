@@ -1,0 +1,328 @@
+/** Personnages marquants — biographies détaillées */
+
+export const HERITAGE_CHARACTERS_CONTENT = {
+  peter: {
+    titleKey: 'heritage_char_peter_title',
+    roleKey: 'heritage_char_peter_role',
+    eraKey: 'heritage_char_peter_era',
+    portraitAltKey: 'heritage_char_peter_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'Simon, surnommé Pierre (« le roc ») par Jésus, est pêcheur de Galilée. Impulsif et passionné, il confesse que Jésus est le Christ (Matthieu 16) puis le renie trois fois la nuit de la Passion — pour être restauré après la résurrection (Jean 21).' },
+        { type: 'h2', text: 'Apôtre des Juifs et des nations' },
+        { type: 'p', text: 'À la Pentecôte, Pierre prêche avec audace. Il ouvre la porte aux non-Juifs chez Corneille (Actes 10). Emprisonné, libéré par un ange, il participe au premier concile de Jérusalem. Tradition ancienne : martyre à Rome, crucifié la tête en bas.' },
+        { type: 'quote', text: '« Tu es le Christ, le Fils du Dieu vivant. »', source: 'Matthieu 16,16' },
+        { type: 'img', altKey: 'heritage_char_peter_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'Simon, nicknamed Peter ("the rock") by Jesus, is a Galilean fisherman. Impulsive and passionate, he confesses Jesus as Christ (Matthew 16) then denies him three times on the night of the Passion — to be restored after the resurrection (John 21).' },
+        { type: 'h2', text: 'Apostle to Jews and nations' },
+        { type: 'p', text: 'At Pentecost Peter preaches boldly. He opens the door to Gentiles at Cornelius\'s house (Acts 10). Imprisoned, freed by an angel, he joins the first Jerusalem council. Ancient tradition: martyrdom in Rome, crucified upside down.' },
+        { type: 'quote', text: '"You are the Christ, the Son of the living God."', source: 'Matthew 16:16' },
+        { type: 'img', altKey: 'heritage_char_peter_img_alt' },
+      ],
+    },
+  },
+  paul: {
+    titleKey: 'heritage_char_paul_title',
+    roleKey: 'heritage_char_paul_role',
+    eraKey: 'heritage_char_paul_era',
+    portraitAltKey: 'heritage_char_paul_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'Saul de Tarse, pharisien formé à Jérusalem, persécute l\'Église — jusqu\'à sa rencontre avec le Christ ressuscité sur le chemin de Damas (vers 34 apr. J.-C.). Devenu Paul, il devient l\'apôtre des païens par excellence.' },
+        { type: 'h2', text: 'Trois voyages missionnaires' },
+        { type: 'p', text: 'Il fonde des Églises en Asie Mineure, Grèce, et peut-être Rome. Ses lettres (Romains, Corinthiens, Galates, Éphésiens…) forment le fondement théologique du christianisme : justification par la foi, unité du corps du Christ, vie dans l\'Esprit.' },
+        { type: 'list', items: [
+          '13 ou 14 lettres dans le Nouveau Testament',
+          'Citoyen romain — stratégie missionnaire intelligente',
+          'Tradition : martyre à Rome sous Néron',
+        ]},
+        { type: 'quote', text: '« J\'ai combattu le bon combat, j\'ai achevé la course, j\'ai gardé la foi. »', source: '2 Timothée 4,7' },
+        { type: 'img', altKey: 'heritage_char_paul_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'Saul of Tarsus, a Pharisee trained in Jerusalem, persecuted the Church — until he met the risen Christ on the Damascus road (c. AD 34). As Paul, he becomes the apostle to the Gentiles par excellence.' },
+        { type: 'h2', text: 'Three missionary journeys' },
+        { type: 'p', text: 'He plants churches in Asia Minor, Greece, and perhaps Rome. His letters (Romans, Corinthians, Galatians, Ephesians…) form core Christian theology: justification by faith, unity of Christ\'s body, life in the Spirit.' },
+        { type: 'list', items: [
+          '13 or 14 letters in the New Testament',
+          'Roman citizen — savvy missionary strategy',
+          'Tradition: martyrdom in Rome under Nero',
+        ]},
+        { type: 'quote', text: '"I have fought the good fight, finished the race, kept the faith."', source: '2 Timothy 4:7' },
+        { type: 'img', altKey: 'heritage_char_paul_img_alt' },
+      ],
+    },
+  },
+  'mary-magdalene': {
+    titleKey: 'heritage_char_mary_title',
+    roleKey: 'heritage_char_mary_role',
+    eraKey: 'heritage_char_mary_era',
+    portraitAltKey: 'heritage_char_mary_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'Marie de Magdala est l\'une des disciples les plus fidèles de Jésus. Les Évangiles la mentionnent parmi les femmes qui servent le groupe, assistent à la crucifixion et sont les premières témoins de la résurrection (Marc 16, Jean 20).' },
+        { type: 'h2', text: 'Apôtre de la résurrection' },
+        { type: 'p', text: 'Jésus lui apparaît près du tombeau : « Va trouver mes frères et dis-leur… ». Elle est « apôtre des apôtres » dans la tradition ancienne. Les légendes tardives confondent parfois son histoire avec celle de la « pécheresse » — les textes bibliques ne le disent pas.' },
+        { type: 'quote', text: '« Rabboni ! » (Mon Maître)', source: 'Jean 20,16' },
+        { type: 'img', altKey: 'heritage_char_mary_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'Mary of Magdala is among Jesus\' most faithful disciples. Gospels name her among women who supported the group, witnessed the crucifixion, and were first witnesses of the resurrection (Mark 16, John 20).' },
+        { type: 'h2', text: 'Apostle of the resurrection' },
+        { type: 'p', text: 'Jesus appears to her near the tomb: "Go to my brothers and tell them…" She is "apostle to the apostles" in ancient tradition. Later legends sometimes confuse her with the "sinful woman" — biblical texts do not say that.' },
+        { type: 'quote', text: '"Rabboni!" (My Teacher)', source: 'John 20:16' },
+        { type: 'img', altKey: 'heritage_char_mary_img_alt' },
+      ],
+    },
+  },
+  augustine: {
+    titleKey: 'heritage_char_augustine_title',
+    roleKey: 'heritage_char_augustine_role',
+    eraKey: 'heritage_char_augustine_era',
+    portraitAltKey: 'heritage_char_augustine_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'Augustin (354-430) naît en Afrique du Nord, cherche la vérité dans le manichéisme et la philosophie, puis se convertit à Milan sous l\'influence d\'Ambroise et d\'une lecture de Romains. Évêque d\'Hippone, il devient l\'un des plus grands penseurs chrétiens.' },
+        { type: 'h2', text: 'Œuvres majeures' },
+        { type: 'list', items: [
+          'Confessions — autobiographie spirituelle et louange à Dieu',
+          'La Cité de Dieu — réponse chrétienne à la chute de Rome',
+          'Doctrine de la grâce face au pélagianisme',
+        ]},
+        { type: 'p', text: 'Sa pensée influence catholicisme et protestantisme (Luther était augustinien). Phrase célèbre : « Tu nous as faits pour toi, et notre cœur est sans repos tant qu\'il ne repose en toi. »' },
+        { type: 'img', altKey: 'heritage_char_augustine_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'Augustine (354-430) is born in North Africa, seeks truth in Manichaeism and philosophy, then converts at Milan through Ambrose and reading Romans. Bishop of Hippo, he becomes one of the greatest Christian thinkers.' },
+        { type: 'h2', text: 'Major works' },
+        { type: 'list', items: [
+          'Confessions — spiritual autobiography and praise to God',
+          'City of God — Christian response to Rome\'s fall',
+          'Doctrine of grace against Pelagianism',
+        ]},
+        { type: 'p', text: 'His thought shapes Catholicism and Protestantism (Luther was Augustinian). Famous line: "You have made us for yourself, and our heart is restless until it rests in you."' },
+        { type: 'img', altKey: 'heritage_char_augustine_img_alt' },
+      ],
+    },
+  },
+  athanasius: {
+    titleKey: 'heritage_char_athanasius_title',
+    roleKey: 'heritage_char_athanasius_role',
+    eraKey: 'heritage_char_athanasius_era',
+    portraitAltKey: 'heritage_char_athanasius_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'Athanase d\'Alexandrie (vers 296-373) défend la divinité du Christ contre l\'arianisme pendant des décennies, malgré cinq exils. Sa formule résume la foi de Nicée : « Le Fils est de même substance que le Père ».' },
+        { type: 'h2', text: 'Pourquoi il compte' },
+        { type: 'p', text: 'Sans sa persévérance, le christianisme aurait pu devenir une religion où Jésus n\'est qu\'un prophète supérieur. Il écrit aussi sur l\'Incarnation : Dieu s\'est fait homme pour nous sauver.' },
+        { type: 'quote', text: '« Dieu s\'est fait homme afin que nous devenions dieu » (sens de participation à la vie divine).', source: 'De incarnatione' },
+        { type: 'img', altKey: 'heritage_char_athanasius_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'Athanasius of Alexandria (c. 296-373) defends Christ\'s divinity against Arianism for decades despite five exiles. His formula sums Nicene faith: "The Son is of one substance with the Father."' },
+        { type: 'h2', text: 'Why he matters' },
+        { type: 'p', text: 'Without his perseverance, Christianity might have become a religion where Jesus is only a superior prophet. He also writes on the Incarnation: God became man to save us.' },
+        { type: 'quote', text: '"God became man so that we might become god" (sense of sharing divine life).', source: 'On the Incarnation' },
+        { type: 'img', altKey: 'heritage_char_athanasius_img_alt' },
+      ],
+    },
+  },
+  polycarp: {
+    titleKey: 'heritage_char_polycarp_title',
+    roleKey: 'heritage_char_polycarp_role',
+    eraKey: 'heritage_char_polycarp_era',
+    portraitAltKey: 'heritage_char_polycarp_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'Polycarpe (vers 69-155), évêque de Smyrne (Izmir), est disciple de l\'apôtre Jean selon la tradition. Il transmet la foi des premiers témoins à la génération suivante — chaîne directe entre les Évangiles et l\'Église des Pères.' },
+        { type: 'h2', text: 'Martyre à 86 ans' },
+        { type: 'p', text: 'Arrêté sous Marc Aurèle, il refuse de maudire Christ : « Depuis quatre-vingt-six ans je le sers… comment pourrais-je renier mon Roi ? ». Brûlé vif, son témoignage inspire encore les chrétiens persécutés.' },
+        { type: 'p', text: 'Sa lettre aux Philippiens et le récit de son martyre sont des documents précieux sur l\'Église du IIe siècle.' },
+        { type: 'img', altKey: 'heritage_char_polycarp_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'Polycarp (c. 69-155), bishop of Smyrna (Izmir), is said to be a disciple of the apostle John. He passes eyewitness faith to the next generation — a direct link between the Gospels and the Church Fathers.' },
+        { type: 'h2', text: 'Martyrdom at 86' },
+        { type: 'p', text: 'Arrested under Marcus Aurelius, he refuses to curse Christ: "For eighty-six years I have served him… how can I deny my King?" Burned alive, his witness still inspires persecuted Christians.' },
+        { type: 'p', text: 'His letter to the Philippians and martyrdom account are precious documents of the 2nd-century Church.' },
+        { type: 'img', altKey: 'heritage_char_polycarp_img_alt' },
+      ],
+    },
+  },
+  luther: {
+    titleKey: 'heritage_char_luther_title',
+    roleKey: 'heritage_char_luther_role',
+    eraKey: 'heritage_char_luther_era',
+    portraitAltKey: 'heritage_char_luther_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'Martin Luther (1483-1546), moine augustinien et professeur de théologie à Wittenberg, redécouvre la justification par la foi en méditant Romains 1:17. Sa traduction allemande de la Bible démocratise l\'accès aux Écritures.' },
+        { type: 'h2', text: 'Héritage complexe' },
+        { type: 'p', text: 'Réformateur audacieux, Luther a aussi tenu des propos antisémites tardifs que l\'Église condamne aujourd\'hui. Son legs positif : la Parole au centre, la grâce gratuite, le chant congregational (cantiques).' },
+        { type: 'quote', text: '« Ici je me tiens ; je ne peux autrement. »', source: 'Diete de Worms, 1521' },
+        { type: 'img', altKey: 'heritage_char_luther_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'Martin Luther (1483-1546), Augustinian monk and theology professor at Wittenberg, rediscovers justification by faith meditating on Romans 1:17. His German Bible translation democratizes access to Scripture.' },
+        { type: 'h2', text: 'Complex legacy' },
+        { type: 'p', text: 'A bold reformer, Luther also wrote late antisemitic words the Church rejects today. His positive legacy: Scripture at the center, free grace, congregational song (hymns).' },
+        { type: 'quote', text: '"Here I stand; I can do no other."', source: 'Diet of Worms, 1521' },
+        { type: 'img', altKey: 'heritage_char_luther_img_alt' },
+      ],
+    },
+  },
+  seymour: {
+    titleKey: 'heritage_char_seymour_title',
+    roleKey: 'heritage_char_seymour_role',
+    eraKey: 'heritage_char_seymour_era',
+    portraitAltKey: 'heritage_char_seymour_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'William Joseph Seymour (1870-1922), fils d\'esclaves affranchis en Louisiane, devient pasteur pentecôtiste. En 1906, il dirige le réveil d\'Azusa Street où Noirs, Blancs, Latinos et Asiatiques prient ensemble — spectacle rare en Amérique ségrégationniste.' },
+        { type: 'h2', text: 'Vision spirituelle' },
+        { type: 'p', text: 'Seymour insiste sur la sanctification, le baptême dans l\'Esprit, les dons spirituels et la mission mondiale. Aveugle d\'un œil, il prêche souvent la tête dans une caisse en carton — symbole d\'humilité.' },
+        { type: 'p', text: 'Son héritage dépasse le pentecôtisme : il rappelle que le Saint-Esprit unit au-delà des frontières humaines.' },
+        { type: 'img', altKey: 'heritage_char_seymour_img_alt', captionKey: 'heritage_img_azusa_cap' },
+      ],
+      en: [
+        { type: 'p', text: 'William Joseph Seymour (1870-1922), son of freed slaves in Louisiana, becomes a Pentecostal pastor. In 1906 he leads the Azusa Street revival where Black, White, Latino, and Asian believers pray together — rare in segregated America.' },
+        { type: 'h2', text: 'Spiritual vision' },
+        { type: 'p', text: 'Seymour stresses sanctification, baptism in the Spirit, spiritual gifts, and world mission. Partially blind, he often preached with his head in a packing crate — a symbol of humility.' },
+        { type: 'p', text: 'His legacy reaches beyond Pentecostalism: the Holy Spirit unites across human boundaries.' },
+        { type: 'img', altKey: 'heritage_char_seymour_img_alt', captionKey: 'heritage_img_azusa_cap' },
+      ],
+    },
+  },
+  wesley: {
+    titleKey: 'heritage_char_wesley_title',
+    roleKey: 'heritage_char_wesley_role',
+    eraKey: 'heritage_char_wesley_era',
+    portraitAltKey: 'heritage_char_wesley_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'John Wesley (1703-1791), prêtre anglican, fonde avec son frère Charles le mouvement méthodiste. Converti en 1738 (« mon cœur fut étrangement réchauffé »), il prêche dans les champs pour atteindre les ouvriers exclus des églises établies.' },
+        { type: 'h2', text: 'Réveil et sanctification' },
+        { type: 'p', text: 'Wesley organise les fidèles en « classes » et en « sociétés » pour la croissance spirituelle. Il enseigne la sanctification par la foi — une vie transformée par l\'Esprit — et relie toujours piété et action sociale (prisons, pauvres, éducation).' },
+        { type: 'list', items: [
+          'Des millions de méthodistes dans le monde aujourd\'hui',
+          'Prédication itinérante — des milliers de kilomètres à cheval',
+          'Héritage direct sur le réveil du XIXe siècle et le pentecôtisme',
+        ]},
+        { type: 'quote', text: '« Le monde est mon paroisse. »', source: 'John Wesley' },
+        { type: 'img', altKey: 'heritage_char_wesley_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'John Wesley (1703-1791), an Anglican priest, co-founds Methodism with his brother Charles. Converted in 1738 ("my heart was strangely warmed"), he preaches in open fields to reach workers excluded from established churches.' },
+        { type: 'h2', text: 'Revival and holiness' },
+        { type: 'p', text: 'Wesley organizes believers in "classes" and "societies" for spiritual growth. He teaches sanctification by faith — life transformed by the Spirit — and always links piety with social action (prisons, poor, education).' },
+        { type: 'list', items: [
+          'Millions of Methodists worldwide today',
+          'Itinerant preaching — thousands of miles on horseback',
+          'Direct legacy on 19th-century revival and Pentecostalism',
+        ]},
+        { type: 'quote', text: '"The world is my parish."', source: 'John Wesley' },
+        { type: 'img', altKey: 'heritage_char_wesley_img_alt' },
+      ],
+    },
+  },
+  parham: {
+    titleKey: 'heritage_char_parham_title',
+    roleKey: 'heritage_char_parham_role',
+    eraKey: 'heritage_char_parham_era',
+    portraitAltKey: 'heritage_char_parham_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'Charles Fox Parham (1873-1929) ouvre en 1900 une école biblique à Topeka (Kansas). Le 1er janvier 1901, une étudiante parle en langues : pour Parham, c\'est la preuve que le baptême du Saint-Esprit s\'accompagne du parler en langues, comme à la Pentecôte (Actes 2).' },
+        { type: 'h2', text: 'Vers Azusa Street' },
+        { type: 'p', text: 'Il forme William Seymour, qui emmène cette théologie à Los Angeles. Parham prêche la guérison divine, la mission et la restauration des dons. S\'il reste controversé sur le plan racial et doctrinal, son rôle de précurseur du pentecôtisme du XXe siècle est reconnu par les historiens.' },
+        { type: 'img', altKey: 'heritage_char_parham_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'Charles Fox Parham (1873-1929) opens a Bible school in Topeka, Kansas in 1900. On January 1, 1901, a student speaks in tongues: for Parham, this proves Spirit baptism accompanies tongues as at Pentecost (Acts 2).' },
+        { type: 'h2', text: 'Toward Azusa Street' },
+        { type: 'p', text: 'He trains William Seymour, who carries this theology to Los Angeles. Parham preached divine healing, mission, and restoration of gifts. Though controversial on race and doctrine, historians credit him as a key precursor of 20th-century Pentecostalism.' },
+        { type: 'img', altKey: 'heritage_char_parham_img_alt' },
+      ],
+    },
+  },
+  wigglesworth: {
+    titleKey: 'heritage_char_wigglesworth_title',
+    roleKey: 'heritage_char_wigglesworth_role',
+    eraKey: 'heritage_char_wigglesworth_era',
+    portraitAltKey: 'heritage_char_wigglesworth_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'Smith Wigglesworth (1859-1947), plombier anglais converti dans un mouvement méthodiste, devient l\'un des évangélistes de guérison les plus connus de son temps. Il prêche en Europe, aux États-Unis et en Australie avec une foi simple et combatitive.' },
+        { type: 'h2', text: 'Foi et miracles' },
+        { type: 'p', text: 'Témoignages de guérisons, résurrections annoncées, délivrance : son ministère inspire des générations de croyants pentecôtistes. Il répétait que la Parole de Dieu doit être agie, pas seulement citée. Son livre « Un homme de foi et de puissance » circule encore mondialement.' },
+        { type: 'quote', text: '« Seule la Parole de Dieu est réelle ; tout le reste est illusion. »', source: 'Smith Wigglesworth' },
+        { type: 'img', altKey: 'heritage_char_wigglesworth_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'Smith Wigglesworth (1859-1947), an English plumber converted in a Methodist holiness circle, becomes one of the best-known healing evangelists of his era. He preached across Europe, America, and Australia with simple, combative faith.' },
+        { type: 'h2', text: 'Faith and miracles' },
+        { type: 'p', text: 'Reports of healings and deliverance marked his ministry and inspired generations of Pentecostal believers. He insisted God\'s Word must be acted on, not only quoted. His book "Ever Increasing Faith" still circulates worldwide.' },
+        { type: 'quote', text: '"Only the Word of God is real; all else is shadow."', source: 'Smith Wigglesworth' },
+        { type: 'img', altKey: 'heritage_char_wigglesworth_img_alt' },
+      ],
+    },
+  },
+  branham: {
+    titleKey: 'heritage_char_branham_title',
+    roleKey: 'heritage_char_branham_role',
+    eraKey: 'heritage_char_branham_era',
+    portraitAltKey: 'heritage_char_branham_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'William Marrion Branham (1909-1965), né dans une famille pauvre du Kentucky, affirme une vocation prophétique dès l\'enfance. Après des années de prédication discrète, une campagne de guérison en 1947 à Saint Louis déclenche un réveil qui traverse les États-Unis puis le monde.' },
+        { type: 'h2', text: 'Réveil de guérison' },
+        { type: 'p', text: 'Des foules immenses, des témoignages de guérisons, des enregistrements de sermons diffusés sur cassettes : Branham influence des leaders comme Oral Roberts, T.L. Osborn ou Gordon Lindsay. Il est considéré par beaucoup comme un catalyseur du mouvement charismatique postérieur à la Seconde Guerre mondiale.' },
+        { type: 'h2', text: 'Héritage et débats' },
+        { type: 'p', text: 'Son ministère de guérison et sa prédication prophétique ont marqué des millions de croyants, surtout en Afrique, Amérique latine et Inde. Certaines de ses déclarations théologiques tardives sont discutées aujourd\'hui entre Églises — TKV présente ici son rôle historique dans la continuité des réveils pentecôtistes.' },
+        { type: 'list', items: [
+          'Campagnes internationales (années 1947-1965)',
+          'Sermons enregistrés — archive parmi les plus écoutées',
+          'Lien avec la « pluie de l\'arrière-saison » dans l\'histoire pentecôtiste',
+        ]},
+        { type: 'img', altKey: 'heritage_char_branham_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'William Marrion Branham (1909-1965), born to a poor Kentucky family, claimed a prophetic calling from childhood. After quieter years of preaching, a 1947 healing campaign in St. Louis sparked a revival that spread across America and the world.' },
+        { type: 'h2', text: 'Healing revival' },
+        { type: 'p', text: 'Huge crowds, healing testimonies, and sermon recordings on tape: Branham influenced leaders such as Oral Roberts, T.L. Osborn, and Gordon Lindsay. Many see him as a catalyst of the post-WWII charismatic movement.' },
+        { type: 'h2', text: 'Legacy and debate' },
+        { type: 'p', text: 'His healing ministry and prophetic preaching marked millions, especially in Africa, Latin America, and India. Some later theological statements remain debated among churches — TKV presents his historical role in the continuity of Pentecostal revivals.' },
+        { type: 'list', items: [
+          'International campaigns (1947-1965)',
+          'Recorded sermons — among the most listened archives',
+          'Linked to "latter rain" streams in Pentecostal history',
+        ]},
+        { type: 'img', altKey: 'heritage_char_branham_img_alt' },
+      ],
+    },
+  },
+  roberts: {
+    titleKey: 'heritage_char_roberts_title',
+    roleKey: 'heritage_char_roberts_role',
+    eraKey: 'heritage_char_roberts_era',
+    portraitAltKey: 'heritage_char_roberts_img_alt',
+    blocks: {
+      fr: [
+        { type: 'p', text: 'Granville Oral Roberts (1918-2009), pasteur pentecôtiste d\'Oklahoma, construit l\'un des plus grands ministères médiatiques du XXe siècle. Converti et guéri dans sa jeunesse, il prêche d\'abord dans des tentes avant d\'utiliser la radio puis la télévision.' },
+        { type: 'h2', text: 'Foi, guérison, éducation' },
+        { type: 'p', text: 'Son slogan « Dieu est une bonne source » et ses campagnes de guérison touchent des millions. Il fonde l\'Oral Roberts University (1963) pour former pasteurs et laïcs. Il incarne le passage du réveil classique à l\'évangélisation de masse.' },
+        { type: 'p', text: 'Inspiré en partie par William Branham, Roberts popularise une foi audacieuse et accessible — héritage encore visible dans le christianisme mondial.' },
+        { type: 'img', altKey: 'heritage_char_roberts_img_alt' },
+      ],
+      en: [
+        { type: 'p', text: 'Granville Oral Roberts (1918-2009), a Pentecostal pastor from Oklahoma, built one of the 20th century\'s largest media ministries. Converted and healed in youth, he preached in tents before moving to radio and television.' },
+        { type: 'h2', text: 'Faith, healing, education' },
+        { type: 'p', text: 'His message "God is a good God" and healing campaigns reached millions. He founded Oral Roberts University (1963) to train pastors and laity — bridging classic revival and mass evangelism.' },
+        { type: 'p', text: 'Partly inspired by William Branham, Roberts popularized bold, accessible faith — a legacy still visible in global Christianity.' },
+        { type: 'img', altKey: 'heritage_char_roberts_img_alt' },
+      ],
+    },
+  },
+};

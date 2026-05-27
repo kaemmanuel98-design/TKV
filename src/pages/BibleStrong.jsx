@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useBibleStore } from '../store/useBibleStore';
 import { Volume2, VolumeX, BookOpen, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
+import { BibleLogo } from '../components/SectionLogos';
 import { BIBLE_BOOKS, getBookName } from '../data/bible/catalog';
 import { loadBibleChapter, isChapterAvailable } from '../data/bible/loadChapter';
 import {
@@ -159,6 +160,7 @@ const BibleStrong = () => {
         <div className="flex-1">
           <PageHeader
             eyebrow={t('bible')}
+            mark={<BibleLogo size={48} title={t('bible')} />}
             title={
               <span className="flex items-center gap-2" style={{ flexWrap: 'wrap' }}>
                 <BookOpen color="var(--gold)" size={26} />

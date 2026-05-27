@@ -76,6 +76,12 @@ function playAudioBlob(blob) {
 }
 
 async function parseTtsError(res) {
+  if (res.status === 401) {
+    const err = new Error('tts_login_required');
+    err.status = 401;
+    return err;
+  }
+
   let code = res.status === 503 ? 'tts_unavailable' : 'tts_failed';
   try {
     const data = await res.json();

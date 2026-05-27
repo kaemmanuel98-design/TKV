@@ -23,6 +23,14 @@ const courses = [
     free: false,
     progress: 0,
   },
+  {
+    id: 'teleios',
+    titleKey: 'course_teleios_title',
+    descKey: 'course_teleios_desc',
+    modules: 6,
+    free: false,
+    progress: 0,
+  },
 ];
 
 const Courses = () => {

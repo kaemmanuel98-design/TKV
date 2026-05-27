@@ -1,0 +1,141 @@
+﻿node.exe : npm warn Unknown env config "devdir". This will stop working in the next major version of npm. See `npm 
+help npmrc` for supported config options.
+Au caractère Ligne:1 : 1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn Unknow...config options.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+> tkv-app@0.0.0 prebuild
+> node scripts/prebuild.mjs
+
+Generating PWA icons from favicon.svg…
+  ✓ favicon-32.png (32px) — 0.4 KB
+  ✓ favicon-48.png (48px) — 0.7 KB
+  ✓ apple-touch-icon.png (180px) — 3.0 KB
+  ✓ pwa-192x192.png (192px) — 3.9 KB
+  ✓ pwa-512x512.png (512px) — 13.3 KB
+  ✓ pwa-512x512-maskable.png (512px) — 15.3 KB
+Done.
+TKV — build Bible Strong (66 livres)
+
+  ✓ genesis (50 ch.)
+  ✓ exodus (40 ch.)
+  ✓ leviticus (27 ch.)
+  ✓ numbers (36 ch.)
+  ✓ deuteronomy (34 ch.)
+  ✓ joshua (24 ch.)
+  ✓ judges (21 ch.)
+  ✓ ruth (4 ch.)
+  ✓ 1samuel (31 ch.)
+  ✓ 2samuel (24 ch.)
+  ✓ 1kings (22 ch.)
+  ✓ 2kings (25 ch.)
+  ✓ 1chronicles (29 ch.)
+  ✓ 2chronicles (36 ch.)
+  ✓ ezra (10 ch.)
+  ✓ nehemiah (13 ch.)
+  ✓ esther (10 ch.)
+  ✓ job (42 ch.)
+  ✓ psalms (150 ch.)
+  ✓ proverbs (31 ch.)
+  ✓ ecclesiastes (12 ch.)
+  ✓ songofsolomon (8 ch.)
+  ✓ isaiah (66 ch.)
+  ✓ jeremiah (52 ch.)
+  ✓ lamentations (5 ch.)
+  ✓ ezekiel (48 ch.)
+  ✓ daniel (12 ch.)
+  ✓ hosea (14 ch.)
+  ✓ joel (3 ch.)
+  ✓ amos (9 ch.)
+  ✓ obadiah (1 ch.)
+  ✓ jonah (4 ch.)
+  ✓ micah (7 ch.)
+  ✓ nahum (3 ch.)
+  ✓ habakkuk (3 ch.)
+  ✓ zephaniah (3 ch.)
+  ✓ haggai (2 ch.)
+  ✓ zechariah (14 ch.)
+  ✓ malachi (4 ch.)
+  ✓ matthew (28 ch.)
+  ✓ mark (16 ch.)
+  ✓ luke (24 ch.)
+  ✓ john (21 ch.)
+  ✓ acts (28 ch.)
+  ✓ romans (16 ch.)
+  ✓ 1corinthians (16 ch.)
+  ✓ 2corinthians (13 ch.)
+  ✓ galatians (6 ch.)
+  ✓ ephesians (6 ch.)
+  ✓ philippians (4 ch.)
+  ✓ colossians (4 ch.)
+  ✓ 1thessalonians (5 ch.)
+  ✓ 2thessalonians (3 ch.)
+  ✓ 1timothy (6 ch.)
+  ✓ 2timothy (4 ch.)
+  ✓ titus (3 ch.)
+  ✓ philemon (1 ch.)
+  ✓ hebrews (13 ch.)
+  ✓ james (5 ch.)
+  ✓ 1peter (5 ch.)
+  ✓ 2peter (3 ch.)
+  ✓ 1john (5 ch.)
+  ✓ 2john (1 ch.)
+  ✓ 3john (1 ch.)
+  ✓ jude (1 ch.)
+  ✓ revelation (22 ch.)
+
+Enrichissement lexique Strong (définitions originales)…
+  Lexique Strong enrichi : 14197 entrées Open Scriptures
+
+Terminé : 1189 chapitres → public/bible/
+Lexique : 13771 entrées Strong
+
+> tkv-app@0.0.0 build
+> vite build
+
+vite v8.0.10 building client environment for production...
+[2K
+transforming...✓ 1959 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/registerSW.js                      0.13 kB
+dist/manifest.webmanifest               0.60 kB
+dist/index.html                         1.06 kB │ gzip:   0.52 kB
+dist/assets/index-CRh-sIvj.css         79.45 kB │ gzip:  18.83 kB
+dist/assets/gynosko_en-Bq9W_uJG.js     39.49 kB │ gzip:  14.87 kB
+dist/assets/gynosko_ar-ClJaqYi6.js     43.02 kB │ gzip:  15.09 kB
+dist/assets/gynosko_es-CPH_oFPo.js     43.02 kB │ gzip:  15.09 kB
+dist/assets/gynosko_nl-BSFdIFtF.js     43.02 kB │ gzip:  15.09 kB
+dist/assets/gynosko_pt-DvHNwwNP.js     43.02 kB │ gzip:  15.09 kB
+dist/assets/gynosko_fr-CYkiPySQ.js     43.02 kB │ gzip:  15.10 kB
+dist/assets/index-CRikk3TE.js       1,017.59 kB │ gzip: 300.04 kB
+
+[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: 
+https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[33m[PLUGIN_TIMINGS] Warning:[0m Your build spent significant time in plugins. Here is a breakdown:
+  - vite:css (64%)
+  - vite:prepare-out-dir (15%)
+  - vite:css-post (11%)
+  - rolldown:vite-resolve (6%)
+See https://rolldown.rs/options/checks#plugintimings for more details.
+
+✓ built in 7.58s
+
+PWA v1.3.0
+mode      generateSW
+precache  20 entries (1321.16 KiB)
+files generated
+  dist/sw.js
+  dist/workbox-9c191d2f.js
+npm notice
+npm notice New minor version of npm available! 11.12.1 -> 11.15.0
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.15.0
+npm notice To update run: npm install -g npm@11.15.0
+npm notice

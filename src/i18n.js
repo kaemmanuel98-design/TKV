@@ -1,6 +1,10 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { cdcKeys } from './i18n/cdcKeys';
+import { heritageI18nKeys } from './i18n/heritageI18nKeys';
+import { heritageI18nKeysExpansion } from './i18n/heritageI18nKeysExpansion';
+import { heritageI18nKeysCharactersExtra } from './i18n/heritageI18nKeysCharactersExtra';
+import { gynoskoReaderKeys } from './i18n/gynoskoReaderKeys';
 
 const resources = {
   fr: {
@@ -108,6 +112,10 @@ const resources = {
       book_prev: 'Chapitre précédent',
       book_next: 'Chapitre suivant',
       book_loading: 'Nous préparons votre lecture…',
+      content_translating: 'Traduction automatique en cours…',
+      content_translate_error:
+        'Traduction indisponible pour le moment — texte affiché dans la langue source.',
+      course_listen_module: 'Écouter ce module',
       book_progress: '{{current}} sur {{total}}',
       chat_auth_required: 'Connectez-vous pour partager avec la cellule — on vous attend.',
       chat_error_send: 'Le message n’a pas pu partir :',
@@ -371,6 +379,10 @@ const resources = {
       book_prev: 'Previous chapter',
       book_next: 'Next chapter',
       book_loading: 'Preparing your reading…',
+      content_translating: 'Automatic translation in progress…',
+      content_translate_error:
+        'Translation unavailable for now — showing the source language.',
+      course_listen_module: 'Listen to this module',
       book_progress: '{{current}} of {{total}}',
       chat_auth_required: 'Sign in to share with your cell — we\'re waiting for you.',
       chat_error_send: 'Your message couldn\'t be sent:',
@@ -632,6 +644,10 @@ const resources = {
       book_prev: 'Capítulo anterior',
       book_next: 'Capítulo siguiente',
       book_loading: 'Preparando tu lectura…',
+      content_translating: 'Traducción automática en curso…',
+      content_translate_error:
+        'Traducción no disponible por ahora — texto en idioma original.',
+      course_listen_module: 'Escuchar este módulo',
       book_progress: '{{current}} de {{total}}',
       chat_auth_required: 'Inicia sesión para compartir con tu célula — te esperamos.',
       chat_error_send: 'No se pudo enviar el mensaje:',
@@ -890,6 +906,10 @@ const resources = {
       book_prev: 'Vorig hoofdstuk',
       book_next: 'Volgend hoofdstuk',
       book_loading: 'Uw lectuur wordt klaargezet…',
+      content_translating: 'Automatische vertaling bezig…',
+      content_translate_error:
+        'Vertaling tijdelijk niet beschikbaar — brontaal wordt getoond.',
+      course_listen_module: 'Luister naar deze module',
       book_progress: '{{current}} van {{total}}',
       chat_auth_required: 'Log in om met uw cel te delen — we wachten op u.',
       chat_error_send: 'Bericht kon niet worden verzonden:',
@@ -1148,6 +1168,10 @@ const resources = {
       book_prev: 'Capítulo anterior',
       book_next: 'Capítulo seguinte',
       book_loading: 'A preparar a tua leitura…',
+      content_translating: 'Tradução automática em curso…',
+      content_translate_error:
+        'Tradução indisponível por agora — texto na língua de origem.',
+      course_listen_module: 'Ouvir este módulo',
       book_progress: '{{current}} de {{total}}',
       chat_auth_required: 'Inicia sessão para partilhar com a tua célula — estamos à tua espera.',
       chat_error_send: 'Não foi possível enviar a mensagem:',
@@ -1406,6 +1430,9 @@ const resources = {
       book_prev: 'الفصل السابق',
       book_next: 'الفصل التالي',
       book_loading: 'جاري تحضير قراءتك…',
+      content_translating: 'الترجمة التلقائية جارية…',
+      content_translate_error: 'الترجمة غير متاحة حالياً — يُعرض النص بلغة المصدر.',
+      course_listen_module: 'استمع إلى هذه الوحدة',
       book_progress: '{{current}} من {{total}}',
       chat_auth_required: 'سجّل الدخول لتشارك خليتك — نحن بانتظارك.',
       chat_error_send: 'تعذّر إرسال الرسالة:',
@@ -1564,6 +1591,28 @@ const resources = {
 Object.keys(cdcKeys).forEach((lang) => {
   if (resources[lang]?.translation) {
     Object.assign(resources[lang].translation, cdcKeys[lang]);
+  }
+});
+
+Object.keys(heritageI18nKeys).forEach((lang) => {
+  if (resources[lang]?.translation) {
+    Object.assign(resources[lang].translation, heritageI18nKeys[lang]);
+  }
+});
+
+Object.keys(heritageI18nKeysExpansion).forEach((lang) => {
+  if (resources[lang]?.translation) {
+    Object.assign(resources[lang].translation, heritageI18nKeysExpansion[lang]);
+  }
+});
+Object.keys(heritageI18nKeysCharactersExtra).forEach((lang) => {
+  if (resources[lang]?.translation) {
+    Object.assign(resources[lang].translation, heritageI18nKeysCharactersExtra[lang]);
+  }
+});
+Object.keys(gynoskoReaderKeys).forEach((lang) => {
+  if (resources[lang]?.translation) {
+    Object.assign(resources[lang].translation, gynoskoReaderKeys[lang]);
   }
 });
 

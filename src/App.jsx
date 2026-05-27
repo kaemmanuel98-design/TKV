@@ -6,6 +6,8 @@ import { useGamificationStore } from './store/useGamificationStore';
 import Layout from './components/Layout';
 import LoadingScreen from './components/LoadingScreen';
 import ErrorBoundary from './components/ErrorBoundary';
+import RequireAuth from './components/RequireAuth';
+import MimshackLogo from './components/MimshackLogo';
 import Onboarding from './pages/Onboarding';
 import AuthPage from './pages/AuthPage';
 import Home from './pages/Home';
@@ -24,6 +26,8 @@ const Cells = lazy(() => import('./pages/Cells'));
 const MapPage = lazy(() => import('./pages/MapPage'));
 const BookReader = lazy(() => import('./pages/BookReader'));
 const HeritageArticle = lazy(() => import('./pages/HeritageArticle'));
+const HeritageEvent = lazy(() => import('./pages/HeritageEvent'));
+const HeritageCharacter = lazy(() => import('./pages/HeritageCharacter'));
 const CourseModule = lazy(() => import('./pages/CourseModule'));
 const About = lazy(() => import('./pages/About'));
 const Friends = lazy(() => import('./pages/Friends'));
@@ -66,9 +70,11 @@ function App() {
             <Route
               path="agent"
               element={
-                <Suspense fallback={<PageFallback />}>
-                  <Agent />
-                </Suspense>
+                <RequireAuth icon={MimshackLogo}>
+                  <Suspense fallback={<PageFallback />}>
+                    <Agent />
+                  </Suspense>
+                </RequireAuth>
               }
             />
             <Route
@@ -82,17 +88,21 @@ function App() {
             <Route
               path="friends"
               element={
-                <Suspense fallback={<PageFallback />}>
-                  <Friends />
-                </Suspense>
+                <RequireAuth>
+                  <Suspense fallback={<PageFallback />}>
+                    <Friends />
+                  </Suspense>
+                </RequireAuth>
               }
             />
             <Route
               path="friends/chat/:friendId"
               element={
-                <Suspense fallback={<PageFallback />}>
-                  <FriendChat />
-                </Suspense>
+                <RequireAuth>
+                  <Suspense fallback={<PageFallback />}>
+                    <FriendChat />
+                  </Suspense>
+                </RequireAuth>
               }
             />
             <Route
@@ -172,6 +182,22 @@ function App() {
               element={
                 <Suspense fallback={<PageFallback />}>
                   <HeritageArticle />
+                </Suspense>
+              }
+            />
+            <Route
+              path="heritage/event/:slug"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <HeritageEvent />
+                </Suspense>
+              }
+            />
+            <Route
+              path="heritage/character/:slug"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <HeritageCharacter />
                 </Suspense>
               }
             />

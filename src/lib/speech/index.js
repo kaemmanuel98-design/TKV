@@ -80,11 +80,15 @@ export async function speakText(text, { language = 'fr', locale, prepared = fals
       } catch (cloudErr) {
         cloudFailed = true;
         console.warn('[TKV TTS] cloud failed:', cloudErr?.message || cloudErr);
+        const authBlocked = cloudErr?.status === 401;
         if (cloudErr?.message === 'tts_quota_exceeded') {
           store.setCloudAvailable(false);
         }
         if (store.engine === 'cloud' && !('speechSynthesis' in window)) {
           throw cloudErr;
+        }
+        if (authBlocked && !('speechSynthesis' in window)) {
+          throw new Error('tts_login_required');
         }
       }
     }

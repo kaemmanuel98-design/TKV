@@ -1,30 +1,32 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Volume2, ArrowRight, Compass, BookOpen, Landmark } from 'lucide-react';
+import { Volume2, ArrowRight, Compass } from 'lucide-react';
 import { getVerseOfDay } from '../data/dailyVerses';
 import { useAuthStore } from '../store/useAuthStore';
 import { useSpeak } from '../hooks/useSpeak';
 import MimshackLogo from '../components/MimshackLogo';
-import { LibraryLogo, CommunityLogo } from '../components/SectionLogos';
+import { LibraryLogo, CommunityLogo, BibleLogo, HeritageLogo } from '../components/SectionLogos';
 import './Home.css';
 
 const HOME_MARKS = {
   library: LibraryLogo,
   community: CommunityLogo,
+  bible: BibleLogo,
+  heritage: HeritageLogo,
 };
 
 const pillarPaths = [
   {
     to: '/bible',
-    icon: BookOpen,
+    mark: 'bible',
     titleKey: 'bible',
     descKey: 'home_bible_desc',
     pillar: true,
   },
   {
     to: '/heritage',
-    icon: Landmark,
+    mark: 'heritage',
     titleKey: 'heritage',
     descKey: 'home_heritage_desc',
     pillar: true,

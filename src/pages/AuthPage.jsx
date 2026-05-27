@@ -10,6 +10,12 @@ import { getResendCooldownMs, setResendCooldown } from '../lib/authCooldown';
 const MIN_PASSWORD_LENGTH = 8;
 const PENDING_EMAIL_KEY = 'tkv_pending_confirm_email';
 
+function resolveRedirectPath(searchParams) {
+  const raw = searchParams.get('redirect');
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/';
+  return raw;
+}
+
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -145,7 +151,7 @@ const AuthPage = () => {
       await updatePassword(newPassword);
       setRecoveryMode(false);
       setNewPassword('');
-      navigate('/');
+      navigate(resolveRedirectPath(searchParams));
     } catch (err) {
       setError(resolveErrorMessage(err));
     } finally {
@@ -195,7 +201,7 @@ const AuthPage = () => {
       }
 
       localStorage.removeItem(PENDING_EMAIL_KEY);
-      navigate('/');
+      navigate(resolveRedirectPath(searchParams));
     } catch (err) {
       const key = getAuthErrorKey(err);
       if (key === 'auth_error_email_rate_limit' && pendingEmail) {

@@ -6,6 +6,7 @@ import { checkAndIncrementUsage } from './lib/quota.js';
 import { handleChat, handlePerspectives } from './lib/agentService.js';
 import { loadChunks } from './lib/vectorStore.js';
 import { synthesizeSpeech } from './lib/tts.js';
+import { translateTexts } from './lib/translateService.js';
 import { exportUserData, deleteUserData } from './lib/userData.js';
 import { resolveJitsiJoin } from './lib/jitsiToken.js';
 import { recordFriendPresence } from './lib/friendsService.js';
@@ -58,7 +59,7 @@ function requireUser(req, res) {
 
 app.get('/api/health', (_req, res) => {
   if (config.isProduction) {
-    return res.json({ ok: true, tts: Boolean(config.openaiKey) });
+    return res.json({ ok: true, tts: Boolean(config.openaiKey), translate: true });
   }
   const jitsiConfigured = Boolean(
     config.jitsiDomain && config.jitsiAppId && config.jitsiAppSecret
@@ -66,6 +67,7 @@ app.get('/api/health', (_req, res) => {
   res.json({
     ok: true,
     openai: Boolean(config.openaiKey),
+    translate: true,
     chunks: loadChunks().length,
     supabase: Boolean(config.supabaseUrl),
     jitsi: {
@@ -202,9 +204,55 @@ const ttsRateLimit = rateLimit({
   keyPrefix: 'tts',
 });
 
+const translateRateLimit = rateLimit({
+  windowMs: 60_000,
+  max: config.isProduction ? 25 : 80,
+  keyPrefix: 'translate',
+});
+
+app.post('/api/translate', translateRateLimit, async (req, res) => {
+  try {
+    const { texts, to, from = 'fr' } = req.body || {};
+    const target = String(to || '')
+      .split('-')[0]
+      .toLowerCase();
+    const source = String(from || 'fr')
+      .split('-')[0]
+      .toLowerCase();
+    const allowed = ['fr', 'en', 'es', 'nl', 'pt', 'ar'];
+
+    if (!allowed.includes(target)) {
+      return res.status(400).json({ error: 'invalid_target' });
+    }
+    if (!allowed.includes(source)) {
+      return res.status(400).json({ error: 'invalid_source' });
+    }
+
+    const list = Array.isArray(texts) ? texts : texts != null ? [texts] : [];
+    if (!list.length || list.length > 24) {
+      return res.status(400).json({ error: 'texts_required' });
+    }
+
+    const totalChars = list.reduce((n, t) => n + String(t || '').length, 0);
+    if (totalChars > 120_000) {
+      return res.status(413).json({ error: 'payload_too_large' });
+    }
+
+    const translations = await translateTexts(list, { from: source, to: target });
+    res.json({ translations, from: source, to: target });
+  } catch (err) {
+    console.error('translate error', err);
+    const msg = err.message || '';
+    const status = /too many requests/i.test(msg) ? 429 : 500;
+    res.status(status).json({
+      error: status === 429 ? 'translate_rate_limited' : 'translate_error',
+      message: safeErrorMessage(err),
+    });
+  }
+});
+
 app.post('/api/tts', authMiddleware, ttsRateLimit, async (req, res) => {
   try {
-    if (!requireUser(req, res)) return;
     const { text, locale = 'fr-FR' } = req.body || {};
     if (!text?.trim()) {
       return res.status(400).json({ error: 'text_required' });

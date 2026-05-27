@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Histoire de l'�glise">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1520"/>
+      <stop offset="100%" stop-color="#0d0a12"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8c547"/>
+      <stop offset="100%" stop-color="#a67c2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <circle cx="400" cy="200" r="90" fill="none" stroke="url(#gold)" stroke-width="3" opacity="0.5"/>
+  <path d="M400 120 L430 230 L370 230 Z" fill="url(#gold)" opacity="0.85"/>
+  <rect x="320" y="250" width="160" height="12" rx="4" fill="url(#gold)" opacity="0.4"/>
+  <rect x="280" y="280" width="240" height="8" rx="3" fill="#fff" opacity="0.15"/>
+  <text x="400" y="380" text-anchor="middle" fill="#c9a227" font-family="Georgia, serif" font-size="22">�v�nement historique</text>
+</svg>

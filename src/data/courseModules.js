@@ -23,4 +23,15 @@ export const COURSE_MODULES = {
       { index: 6, titleKey: 'module_a6_title', descKey: 'module_a6_desc', free: false },
     ],
   },
+  teleios: {
+    titleKey: 'course_teleios_title',
+    modules: [
+      { index: 1, titleKey: 'module_t1_title', descKey: 'module_t1_desc', free: false },
+      { index: 2, titleKey: 'module_t2_title', descKey: 'module_t2_desc', free: false },
+      { index: 3, titleKey: 'module_t3_title', descKey: 'module_t3_desc', free: false },
+      { index: 4, titleKey: 'module_t4_title', descKey: 'module_t4_desc', free: false },
+      { index: 5, titleKey: 'module_t5_title', descKey: 'module_t5_desc', free: false },
+      { index: 6, titleKey: 'module_t6_title', descKey: 'module_t6_desc', free: false },
+    ],
+  },
 };

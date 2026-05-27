@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Persecution">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1a1018"/>
+      <stop offset="100%" stop-color="#080508"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c9a227"/>
+      <stop offset="100%" stop-color="#6a4a18"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <path d="M400 90 L440 280 L360 280 Z" fill="url(#gold)" opacity="0.2"/>
+  <circle cx="400" cy="200" r="50" fill="none" stroke="url(#gold)" stroke-width="2" opacity="0.6"/>
+  <text x="400" y="360" text-anchor="middle" fill="#c9a227" font-family="Georgia, serif" font-size="20">Temoin et persecution</text>
+</svg>

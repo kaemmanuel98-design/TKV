@@ -56,7 +56,9 @@ const Agent = () => {
       });
       sendMessage('assistant', data.reply, data.sources);
     } catch (err) {
-      if (err.status === 402) {
+      if (err.status === 401) {
+        setError(t('auth_login_required'));
+      } else if (err.status === 402) {
         setPaywallOpen(true);
         sendMessage('assistant', t('agent_quota_exceeded'));
       } else {
@@ -88,7 +90,9 @@ const Agent = () => {
         sources: data.sources,
       });
     } catch (err) {
-      if (err.status === 402) {
+      if (err.status === 401) {
+        setError(t('auth_login_required'));
+      } else if (err.status === 402) {
         setPaywallOpen(true);
       } else {
         setError(t('agent_error'));

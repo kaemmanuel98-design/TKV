@@ -1,13 +1,16 @@
 /** Prépare un texte biblique pour une lecture vocale plus naturelle */
-export function prepareSpeechText(text, { locale } = {}) {
+export function prepareSpeechText(text, { locale, keepReferences = false } = {}) {
   if (!text) return '';
 
   let t = String(text)
     .replace(/\u00a0/g, ' ')
     .replace(/\s+/g, ' ')
     .replace(/\[[^\]]*]/g, '')
-    .replace(/\([^)]*cited[^)]*\)/gi, '')
-    .replace(/\d+:\d+[^a-zA-Z\u00C0-\u024F\u0600-\u06FF]*/g, '')
+    .replace(/\([^)]*cited[^)]*\)/gi, '');
+  if (!keepReferences) {
+    t = t.replace(/\d+:\d+[^a-zA-Z\u00C0-\u024F\u0600-\u06FF]*/g, '');
+  }
+  t = t
     .replace(/[“”]/g, '"')
     .trim();
 

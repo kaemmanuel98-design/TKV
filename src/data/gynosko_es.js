@@ -1,79 +1,79 @@
 export const BOOK_DATA = {
   "title": "GYNOSKO",
-  "subtitle": "Connaître Dieu, au-delà de la lettre",
+  "subtitle": "Conociendo a Dios, más allá de la letra",
   "author": "Ange Emmanuel Kouamé",
   "chapters": [
     {
-      "title": "Introduction : Le Souffle de la Révélation",
-      "content": "« La vie éternelle, c’est qu’ils te connaissent, toi, le seul vrai Dieu, et celui que tu as envoyé, Jésus-Christ. » — Jean 17:3\n\nIl y a dans le cœur de chaque croyant une soif silencieuse : celle de connaître Dieu. Pas seulement avec l’intelligence, mais avec l’esprit, avec le cœur, avec toute sa vie. GYNOSKO naît de cette soif. Il ne s’agit pas simplement d’un livre d’enseignement, mais d’un chemin de révélation, d’un voyage intérieur vers la personne vivante de Dieu.\n\nCe livre est ce que j’aurais aimé avoir entre les mains lorsque j’ai reçu Christ. Quand je me suis engagé sur ce chemin spirituel, plein de questions, plein de doutes, avec peu de réponses. C’est un recueil de vérités simples mais profondes, de révélations essentielles que j’aurais voulu entendre dès mes premiers pas dans la foi.\n\nÀ travers ces pages, je prie que tu entres dans une connaissance plus profonde de Dieu — une connaissance vivante, expérimentale, celle qui transforme, éclaire, guérit, et fortifie.\n\nMais ce voyage, je ne l’ai pas fait seul. Et je ne peux commencer ce livre sans dire merci.\n\nMerci à mon père, qui a toujours cru en moi, qui a été un pilier de force et d’amour dans chaque étape.\n\nMerci à maman Lili N’zola et maman Dordette, qui ont été des lumières dans mes ténèbres. Dans mes moments les plus douloureux, elles ont su me relever, me rappeler que Dieu ne m’avait pas abandonné, et qu’il croyait encore en moi.\n\nMerci au pasteur Marc Cheyns, pour sa confiance, pour l’opportunité qu’il m’a donnée de révéler ce que Dieu avait déposé en moi. Par son regard bienveillant, il a été un déclencheur dans cette mission.\n\nMerci à mon frère Jordy Voluzolo — plus qu’un ami, un véritable compagnon de combat, un frère donné par Dieu pour marcher à mes côtés dans les hauts comme dans les creux.\n\nMerci à Anne Hermance Tacka et Hien Emmanuel Watil. Vous avez été des frères et sœurs véritables dès mes débuts. Vous m’avez soutenu, inspiré, et encouragé. Votre amour et votre foi m’ont accompagné quand je n’étais qu’un enfant spirituel, et vous êtes devenus des compagnons pour la vie.\n\nMerci aussi à Mamane Doumbia. Tu es pour moi un cadeau de Dieu, une personne exceptionnelle, précieuse, extraordinaire. Ton soutien, ta présence, ton cœur ont été pour moi un témoignage vivant de l’amour de Dieu. Tu fais partie de ces personnes rares que le Seigneur place sur notre chemin pour nous rappeler que nous ne sommes jamais seuls. Merci d’exister.\n\nMerci enfin à un ministère qui m’a profondément marqué et façonné : Christ Embassy, le ministère du pasteur Chris Oyakhilome. À travers ses enseignements, j’ai été formé, réveillé, conduit à un amour plus profond pour la Parole et la présence de Dieu.\n\nJe suis Ange Emmanuel Kouamé, un homme que la grâce de Dieu a saisi, relevé, façonné. Et si ce livre peut t’emmener, toi aussi, plus près de son cœur, alors il aura accompli son but.\n\nMarche avec moi, lecteur. Non derrière moi. Mais à côté, sur ce sentier où la connaissance de Dieu devient vie, lumière et feu intérieur.",
+      "title": "Introducción: El aliento de la revelación",
+      "content": "“Esta es la vida eterna: que te conozcan a ti, el único Dios verdadero, y a Jesucristo, a quien tú has enviado. » — Juan 17:3\n\nHay en el corazón de todo creyente una sed silenciosa: la de conocer a Dios. No sólo con la inteligencia, sino con la mente, con el corazón, con toda la vida. De esta sed nace GYNOSKO. No es simplemente un libro de enseñanza, sino un camino de revelación, un camino interior hacia la persona viva de Dios.\n\nEste libro es lo que desearía tener en mis manos cuando recibí a Cristo. Cuando me embarqué en este camino espiritual, lleno de preguntas, lleno de dudas, con pocas respuestas. Es una colección de verdades simples pero profundas, de revelaciones esenciales que hubiera querido escuchar desde mis primeros pasos en la fe.\n\nA través de estas páginas, oro para que usted entre en un conocimiento más profundo de Dios: un conocimiento vivo y experiencial que transforma, ilumina, sana y fortalece.\n\nPero no hice este viaje solo. Y no puedo empezar este libro sin decir gracias.\n\nGracias a mi padre, que siempre creyó en mí, que fue un pilar de fortaleza y amor en cada paso del camino.\n\nGracias a mamá Lili N'zola y mamá Dordette, quienes fueron luces en mi oscuridad. En mis momentos más dolorosos, pudieron levantarme, recordarme que Dios no me había abandonado y que todavía creía en mí.\n\nGracias al Pastor Marc Cheyns, por su confianza, por la oportunidad que me dio de revelar lo que Dios había puesto en mí. A través de su mirada bondadosa, fue el detonante de esta misión.\n\nGracias a mi hermano Jordy Voluzolo, más que un amigo, un verdadero compañero de batalla, un hermano dado por Dios para caminar junto a mí en los altibajos.\n\nGracias a Anne Hermance Tacka y Hien Emmanuel Watil. Habéis sido verdaderos hermanos y hermanas desde mis inicios. Me apoyaste, me inspiraste y me animaste. Tu amor y tu fe me acompañaron cuando era apenas un niño espiritual y ustedes se convirtieron en compañeros para toda la vida.\n\nGracias también a Mamane Doumbia. Eres para mí un regalo de Dios, una persona excepcional, preciosa, extraordinaria. Tu apoyo, tu presencia, tu corazón fueron para mí un testimonio vivo del amor de Dios. Eres una de esas pocas personas que el Señor pone en nuestro camino para recordarnos que nunca estamos solos. Gracias por existir.\n\nFinalmente, gracias a un ministerio que me ha impactado y formado profundamente: Christ Embassy, el ministerio del pastor Chris Oyakhilome. A través de sus enseñanzas, fui formado, despertado y conducido a un amor más profundo por la Palabra y la presencia de Dios.\n\nSoy Ange Emmanuel Kouamé, un hombre a quien la gracia de Dios ha tomado, levantado, moldeado. Y si este libro puede acercarte también a su corazón, entonces habrá logrado su objetivo.\n\nCamina conmigo, lector. No detrás de mí. Pero al lado, en este camino donde el conocimiento de Dios se hace vida, luz y fuego interior.",
       "quiz": []
     },
     {
-      "title": "Le Christianisme et l’Essence de la Parole",
-      "content": "« Si vous demeurez dans ma parole, vous êtes vraiment mes disciples ; vous connaîtrez la vérité, et la vérité vous rendra libres. » – Jean 8:31-32\n\n1. Qu’est-ce que le christianisme… vraiment ?\n\nLe mot “christianisme” est souvent mal compris.\nCertains pensent que c’est une religion parmi d’autres.\nD’autres l’associent à une culture, à des bâtiments d’église, à des croix, à des rites ou à l’histoire de l’Europe.\nMais en réalité, le christianisme n’a pas été inventé par les hommes. Ce n’est pas une tradition.\nC’est une révélation divine, née d’un être vivant : Jésus-Christ.\n\nÀ l’origine, il n’y avait qu’un message : \nChrist est vivant.\n\nJésus, le Fils de Dieu manifesté en chair, est venu révéler le cœur du Père, et nous faire entrer dans une relation directe avec Dieu.\n\n2. Le cœur du message : une relation, pas une religion\n\nLe mot “christianisme” vient du mot “Christ”, qui signifie “oint”, “envoyé de Dieu” et du mot « Isme » qui signifie idéologie, message, enseignement ou doctrine.\nLe christianisme est  l’idéologie ou le message de Christ.\nÊtre chrétien, c’est donc suivre Christ, penser comme Lui, aimer comme Lui, vivre comme Lui.\n\nCe n’est pas une question d’étiquette, mais de nature transformée.\n\nUn chrétien authentique n’est pas quelqu’un qui va simplement à l’église.\nC’est quelqu’un qui connaît Jésus personnellement, qui demeure dans sa parole, et qui vit par elle.\n\n3. Demeurer dans la Parole : qu’est-ce que cela veut dire ?\n\nJésus dit dans Jean 8:31 :\n\n« Si vous demeurez dans ma parole, vous êtes vraiment mes disciples. »\n\n“Demeurer”, c’est :\n    • Rester connecté à ses paroles dans la vie de tous les jours ;\n    • Méditer, comprendre et appliquer ce qu’Il a enseigné ;\n    • Faire de ses paroles une fondation, un refuge, une lumière.\n\nEn d’autres mots : vivre immergé dans l’Évangile.\n\nEt Jésus continue :\n\n« Vous connaîtrez la vérité, et la vérité vous rendra libres. »\n\n4. La vérité libère : mais de quoi ?\n\nBeaucoup croient que la liberté signifie “faire ce qu’on veut”.\nMais selon Jésus, la vraie liberté, c’est la capacité de vivre dans la lumière, hors du mensonge, hors de l’esclavage du péché, de la peur, du doute, de l’ignorance.\n\nQuand tu demeures dans sa Parole :\n    • Tu vois la vie comme Dieu la voit ;\n    • Tu comprends qui tu es réellement ;\n    • Tu es libéré intérieurement.\n\n5. Une Parole vivante, pas seulement écrite\n\nLa Parole de Dieu, ce n’est pas juste un texte.\nC’est une voix vivante, un esprit, une force divine.\n\nElle a trois dimensions :\n    1. Écrite (logos) – Ce que tu lis dans la Bible ;\n    2. Révélée (rhema) – Ce que Dieu te montre dans un moment précis ;\n    3. Vivante (Christ) – Jésus lui-même, la Parole incarnée.\n\n6. Le rôle de l’Esprit Saint\n\nLa Bible n’est pas un manuel intellectuel :\n\nSans le Saint-Esprit, tu peux lire sans jamais entendre Dieu.\n\nC’est l’Esprit qui :\n    • Donne la compréhension ;\n    • Ouvre les yeux du cœur ;\n    • Transforme ce que tu lis en une vérité vivante.\n\n7. Pourquoi il faut être enseigné\n\nDieu utilise des hommes et femmes oints (enseignants, pasteurs, prophètes…) pour :\n    • T’aider à mieux comprendre la Parole ;\n    • T’éviter les erreurs, les confusions ;\n    • T’amener plus haut dans la connaissance de Dieu.\n\nMais surtout, c’est l’Esprit qui confirme tout dans ton cœur.",
+      "title": "El cristianismo y la esencia de la palabra",
+      "content": "“Si permanecéis en mi palabra, seréis verdaderamente mis discípulos; conoceréis la verdad, y la verdad os hará libres.» – Juan 8:31-32\n\n1. ¿Qué es el cristianismo... realmente?\n\nLa palabra \"cristianismo\" a menudo se malinterpreta.\nAlgunos piensan que es una religión entre otras.\nOtros lo asocian con una cultura, con iglesias, con cruces, con ritos o con la historia de Europa.\nPero en realidad el cristianismo no fue inventado por los hombres. No es una tradición.\nEs una revelación divina, nacida de un ser vivo: Jesucristo.\n\nOriginalmente solo había un mensaje: \nCristo está vivo.\n\nJesús, el Hijo de Dios manifestado en carne, vino a revelar el corazón del Padre y a llevarnos a una relación directa con Dios.\n\n2. El corazón del mensaje: una relación, no una religión\n\nLa palabra “cristianismo” proviene de la palabra “Cristo”, que significa “ungido”, “enviado de Dios” y del sufijo “-ismo”, que designa una ideología, un mensaje o una doctrina.\nEl cristianismo es la ideología o mensaje de Cristo.\nSer cristiano es, por tanto, seguir a Cristo, pensar como Él, amar como Él, vivir como Él.\n\nNo es una cuestión de etiqueta, sino de naturaleza transformada.\n\nUn cristiano genuino no es alguien que simplemente va a la iglesia.\nEs alguien que conoce a Jesús personalmente, que permanece en su palabra y que vive según ella.\n\n3. Permanecer en la Palabra: ¿qué significa eso?\n\nJesús dice en Juan 8:31:\n\n“Si permanecéis en mi palabra, seréis verdaderamente mis discípulos. »\n\n“Permanecer” es:\n    • Manténgase conectado con sus palabras en la vida cotidiana;\n    • Meditar, comprender y aplicar lo que Él enseñó;\n    • Haz de sus palabras un fundamento, un refugio, una luz.\n\nEn otras palabras: vivir inmersos en el Evangelio.\n\nY Jesús continúa:\n\n“Conoceréis la verdad y la verdad os hará libres.»\n\n4. La verdad libera: ¿pero de qué?\n\nMuchos creen que la libertad significa \"hacer lo que quieras\".\nPero según Jesús, la verdadera libertad es la capacidad de vivir en la luz, fuera de la mentira, fuera de la esclavitud del pecado, del miedo, de la duda, de la ignorancia.\n\nCuando permaneces en su Palabra:\n    • Ves la vida como la ve Dios;\n    • Entiendes quién eres realmente;\n    • Estás liberado internamente.\n\n5. Una Palabra viva, no sólo escrita\n\nLa Palabra de Dios no es sólo un texto.\nEs una voz viva, un espíritu, una fuerza divina.\n\nTiene tres dimensiones:\n    1. Escrito (logos) – Lo que lees en la Biblia;\n    2. Revelado (rhema) – Lo que Dios te muestra en un momento específico;\n    3. Vivir (Cristo) – Jesús mismo, el Verbo encarnado.\n\n6. El papel del Espíritu Santo\n\nLa Biblia no es un manual intelectual:\n\nSin el Espíritu Santo, puedes leer sin escuchar a Dios.\n\nEs el Espíritu quien:\n    • Da comprensión;\n    • Abre los ojos del corazón;\n    • Transforma lo que lees en una verdad viva.\n\n7. Por qué necesitas que te enseñen\n\nDios usa hombres y mujeres ungidos (maestros, pastores, profetas, etc.) para:\n    • Ayudarle a comprender mejor la Palabra;\n    • Evite errores y confusiones;\n    • Llevarte más alto en el conocimiento de Dios.\n\nPero, sobre todo, es el Espíritu quien confirma todo en vuestro corazón.",
       "quiz": [
         {
-          "question": "Que signifie “demeurer dans la Parole” selon Jean 8:31 ?",
+          "question": "¿Qué significa “permanecer en la Palabra” según Juan 8:31?",
           "options": [
             {
               "label": "a)",
-              "text": "Lire la Bible chaque dimanche"
+              "text": "Lee la Biblia todos los domingos."
             },
             {
               "label": "b)",
-              "text": "Mémoriser sans vivre"
+              "text": "Memorizar sin vivir"
             },
             {
               "label": "c)",
-              "text": "Vivre connecté à l’enseignement de Jésus dans le quotidien"
+              "text": "Vivir conectados a las enseñanzas de Jesús en la vida cotidiana"
             },
             {
               "label": "d)",
-              "text": "Connaître beaucoup de versets"
+              "text": "Conoce muchos versos"
             }
           ],
           "answer": "c"
         },
         {
-          "question": "Quelle est la liberté que Jésus promet ?",
+          "question": "¿Cuál es la libertad que promete Jesús?",
           "options": [
             {
               "label": "a)",
-              "text": "Vivre sans règles"
+              "text": "Vivir sin reglas"
             },
             {
               "label": "b)",
-              "text": "Être délivré du péché, de la peur et du mensonge"
+              "text": "Sé libre del pecado, el miedo y la mentira."
             },
             {
               "label": "c)",
-              "text": "Pouvoir faire tout ce qu’on veut"
+              "text": "Poder hacer lo que quieras"
             },
             {
               "label": "d)",
-              "text": "Quitter l’église"
+              "text": "salir de la iglesia"
             }
           ],
           "answer": "b"
         },
         {
-          "question": "Pourquoi avons-nous besoin du Saint-Esprit pour lire la Bible ?",
+          "question": "¿Por qué necesitamos el Espíritu Santo para leer la Biblia?",
           "options": [
             {
               "label": "a)",
-              "text": "Pour avoir des visions étranges"
+              "text": "Tener visiones extrañas"
             },
             {
               "label": "b)",
-              "text": "Parce que seul l’Esprit rend la Parole vivante et compréhensible"
+              "text": "Porque sólo el Espíritu hace viva y comprensible la Palabra"
             },
             {
               "label": "c)",
-              "text": "Pour devenir prophète"
+              "text": "Para convertirse en profeta"
             },
             {
               "label": "d)",
-              "text": "Pour apprendre à prier fort"
+              "text": "Para aprender a orar en voz alta"
             }
           ],
           "answer": "b"
@@ -81,71 +81,71 @@ export const BOOK_DATA = {
       ]
     },
     {
-      "title": "L'Architecture Spirituelle de la Parole",
-      "content": "« Car là où il y a un testament, il faut que la mort de celui qui a fait le testament soit constatée. » — Hébreux 9:16-17\n\n1. La Bible : plus qu’un livre, un édifice divin\n\nLa Bible n’est pas un livre ordinaire. Elle est un monument spirituel, une architecture céleste.\nMais pour la comprendre, il ne faut pas la lire comme un simple roman. Il faut discerner sa structure intérieure, comme on explore un temple sacré.\n\nLa Bible est divisée en deux grandes parties :\n    • L’Ancien Testament\n    • Le Nouveau Testament\n\nCes deux parties ne s’opposent pas, elles s’accomplissent l’une dans l’autre.\nMais elles ne fonctionnent pas de la même manière.\n\n2. Ancienne et Nouvelle Alliance : deux saisons, un seul Dieu\n\nDans la Bible, Dieu parle par alliances.\n\nL’Ancienne Alliance\n    • Elle a été établie entre Dieu et le peuple d’Israël.\n    • Elle reposait sur la Loi, donnée à Moïse : des commandements, des règles, des sacrifices à suivre pour rester en relation avec Dieu.\n    • C’était une alliance basée sur l’obéissance.\n\nLa Nouvelle Alliance\n    • Elle a été inaugurée par Jésus-Christ.\n    • Elle repose sur la grâce, la foi, et l’action du Saint-Esprit.\n    • C’est une alliance de transformation intérieure.\n\n3. Le testament spirituel : ce que dit Hébreux 9\n\nL’auteur de l’épître aux Hébreux utilise une comparaison très puissante :\n\nUne alliance fonctionne comme un testament.\n\nImagine un testament écrit par un père pour ses enfants.\nTant que le père est vivant, le testament n’est pas actif.\nCe n’est qu’à sa mort que l’héritage devient disponible.\n\nDe même, la Nouvelle Alliance est entrée en vigueur après la mort de Jésus, pas avant.\n\nAvant la croix, même si Jésus était déjà présent, le système religieux en place était encore celui de l’ancienne alliance.\n\n4. Jésus : le point de bascule entre les deux alliances\n\n« Mais, lorsque les temps ont été accomplis, Dieu a envoyé son Fils, né d’une femme, né sous la loi, afin qu’il rachetât ceux qui étaient sous la loi, afin que nous reçussions l’adoption. » Galates 4:4-5 \n\nJésus est venu au cœur de l’Ancienne Alliance, pour l’accomplir, et non la rejeter.\nIl est né sous la loi, mais c’est par sa mort et sa résurrection qu’il a ouvert la porte d’une alliance nouvelle.\n\nC’est à la croix que tout change :\n    • L’ancien système de sacrifices est terminé.\n    • Le rideau du Temple se déchire.\n    • L’accès à Dieu devient personnel, libre, et direct.\n\n5. Le sang : clé des deux alliances\n\nDans l’ancienne alliance :\n    • Les prêtres offraient du sang d’animaux pour le pardon temporaire des péchés.\n    • Ces sacrifices devaient être répétés chaque année.\n\n« Car la vie de la chair est dans le sang… il sert à l’expiation. » — Lévitique 17:11\n\nDans la nouvelle alliance :\n    • Un seul sang a été versé : celui de Jésus-Christ.\n    • Il a été offert une fois pour toutes, éternellement.\n\n« Ceci est mon sang… versé pour la rémission des péchés. » — Matthieu 26:28\n\nLe sang de Jésus ne couvre pas les fautes, il les efface.\n\n6. Pourquoi comprendre la structure est essentiel\n\nSi tu lis la Bible sans comprendre cette transition entre les deux alliances, tu risques de :\n    • Mélanger les commandements donnés à Israël avec la grâce en Christ ;\n    • Te sentir écrasé par des lois que Jésus a déjà accomplies ;\n    • Passer à côté de la liberté et de la vie nouvelle que Dieu offre aujourd’hui.\n\nComprendre la structure, c’est marcher dans la bonne saison avec Dieu.\n\nExemple simple :\n\nUn héritier qui continue à vivre comme un esclave, alors que le testament est déjà en vigueur.",
+      "title": "La arquitectura espiritual de la palabra",
+      "content": "“Porque donde hay testamento, debe constar la muerte del que lo hizo.» — Hebreos 9:16-17\n\n1. La Biblia: más que un libro, un edificio divino\n\nLa Biblia no es un libro cualquiera. Es un monumento espiritual, una arquitectura celestial.\nPero para entenderla no hay que leerla como una simple novela. Debemos discernir su estructura interior, mientras exploramos un templo sagrado.\n\nLa Biblia se divide en dos partes principales:\n    • El Antiguo Testamento\n    • El Nuevo Testamento\n\nEstas dos partes no se oponen, se complementan.\nPero no funcionan de la misma manera.\n\n2. Antiguo y Nuevo Pacto: dos tiempos, un solo Dios\n\nEn la Biblia, Dios habla mediante pactos.\n\nEl Antiguo Pacto\n    • Se estableció entre Dios y el pueblo de Israel.\n    • Se basó en la Ley, dada a Moisés: mandamientos, reglas, sacrificios a seguir para permanecer en relación con Dios.\n    • Era un pacto basado en la obediencia.\n\nEl nuevo pacto\n    • Fue inaugurado por Jesucristo.\n    • Se basa en la gracia, la fe y la acción del Espíritu Santo.\n    • Es una alianza de transformación interior.\n\n3. El testamento espiritual: lo que dice Hebreos 9\n\nEl autor de Hebreos utiliza una comparación muy poderosa:\n\nUn pacto funciona como un testamento.\n\nImaginemos un testamento escrito por un padre para sus hijos.\nMientras el padre esté vivo, el testamento no está activo.\nSólo después de su muerte la herencia queda disponible.\n\nAsimismo, el Nuevo Pacto entró en vigor después de la muerte de Jesús, no antes.\n\nAntes de la cruz, aunque Jesús ya estaba presente, el sistema religioso vigente todavía era el del antiguo pacto.\n\n4. Jesús: el punto de inflexión entre las dos alianzas\n\n“Pero cuando se cumplió el tiempo, Dios envió a su Hijo, nacido de mujer, nacido bajo la ley, para redimir a los que estaban bajo la ley, a fin de que recibiéramos la adopción. » Gálatas 4:4-5 \n\nJesús vino al corazón del Antiguo Pacto, para cumplirlo, no para rechazarlo.\nNació bajo la ley, pero fue a través de su muerte y resurrección que abrió la puerta a un nuevo pacto.\n\nEs en la cruz donde todo cambia:\n    • Se acabó el antiguo sistema de sacrificios.\n    • El velo del Templo se rasga.\n    • El acceso a Dios se vuelve personal, libre y directo.\n\n5. Sangre: clave para ambas alianzas\n\nEn el antiguo pacto:\n    • Los sacerdotes ofrecían sangre animal para el perdón temporal de los pecados.\n    • Estos sacrificios debían repetirse cada año.\n\n“Porque la vida de la carne está en la sangre... sirve para la expiación. » — Levítico 17:11\n\nEn la nueva alianza:\n    • Sólo se derramó una sangre: la de Jesucristo.\n    • Fue ofrecido de una vez por todas, para siempre.\n\n“Esta es mi sangre… derramada para remisión de los pecados. » — Mateo 26:28\n\nLa sangre de Jesús no cubre las faltas, las borra.\n\n6. Por qué es esencial comprender la estructura\n\nSi lees la Biblia sin entender esta transición entre los dos pactos, corres el riesgo de:\n    • Mezclar los mandamientos dados a Israel con la gracia en Cristo;\n    • Sentirse aplastados por leyes que Jesús ya cumplió;\n    • Perder la libertad y la nueva vida que Dios ofrece hoy.\n\nComprender la estructura significa caminar en el momento adecuado con Dios.\n\nEjemplo sencillo:\n\nUn heredero que sigue viviendo como un esclavo, aunque el testamento ya esté vigente.",
       "quiz": [
         {
-          "question": "Selon Hébreux 9:16-17, quand une alliance (ou testament) devient-elle active ?",
+          "question": "Según Hebreos 9:16-17, ¿cuándo se activa un pacto (o voluntad)?",
           "options": [
             {
               "label": "a)",
-              "text": "Dès qu’elle est écrite"
+              "text": "Tan pronto como esté escrito"
             },
             {
               "label": "b)",
-              "text": "À la naissance du testateur"
+              "text": "En el nacimiento del testador."
             },
             {
               "label": "c)",
-              "text": "Après la mort de celui qui l’a faite"
+              "text": "Después de la muerte de quien lo hizo."
             },
             {
               "label": "d)",
-              "text": "Quand les prophètes l’annoncent"
+              "text": "Cuando los profetas lo anuncian"
             }
           ],
           "answer": "c"
         },
         {
-          "question": "Quelle est la différence majeure entre les deux alliances ?",
+          "question": "¿Cuál es la principal diferencia entre las dos alianzas?",
           "options": [
             {
               "label": "a)",
-              "text": "L’Ancienne est pour les anges, la Nouvelle pour les hommes"
+              "text": "Lo Viejo es para los ángeles, lo Nuevo para los hombres."
             },
             {
               "label": "b)",
-              "text": "L’Ancienne repose sur la loi, la Nouvelle sur la grâce et l’Esprit"
+              "text": "Lo antiguo se basa en la ley, lo nuevo en la gracia y el Espíritu."
             },
             {
               "label": "c)",
-              "text": "L’Ancienne était spirituelle, la Nouvelle est physique"
+              "text": "Lo Viejo era espiritual, lo Nuevo es físico."
             },
             {
               "label": "d)",
-              "text": "Il n’y a pas de différence"
+              "text": "no hay diferencia"
             }
           ],
           "answer": "b"
         },
         {
-          "question": "Quel rôle joue le sang dans les deux alliances ?",
+          "question": "¿Qué papel juega la sangre en las dos alianzas?",
           "options": [
             {
               "label": "a)",
-              "text": "Un symbole de guerre"
+              "text": "Un símbolo de guerra"
             },
             {
               "label": "b)",
-              "text": "Il permet l’expiation : dans l’Ancienne, par les animaux ; dans la Nouvelle, par Jésus"
+              "text": "Permite la expiación: en los Antiguos, por los animales; en las noticias, por Jesús"
             },
             {
               "label": "c)",
-              "text": "Il sert uniquement à purifier les objets"
+              "text": "Sólo se utiliza para purificar objetos."
             },
             {
               "label": "d)",
-              "text": "Il ne joue aucun rôle particulier"
+              "text": "No juega ningún papel particular."
             }
           ],
           "answer": "b"
@@ -153,111 +153,27 @@ export const BOOK_DATA = {
       ]
     },
     {
-      "title": "Le Chemin de la Lumière : Principes de Lecture",
-      "content": "« L’homme ne vivra pas de pain seulement, mais de toute parole qui sort de la bouche de Dieu. » — Matthieu 4:4\n\n1. Une lecture stratégique pour une révélation profonde\n\nLa Bible est un livre vivant.\nMais elle est aussi spirituelle, profonde et codée. Elle ne se lit pas comme un roman.\n\nC’est pourquoi il est essentiel de savoir par où commencer, surtout lorsqu’on est nouveau dans la foi.\n\n2. Pourquoi le Nouveau Testament commence-t-il réellement dans Actes chapitre 2 ?\n\nBeaucoup pensent que le Nouveau Testament commence à Matthieu chapitre 1, parce que c’est là que l’éditeur l’a placé dans nos Bibles.\n\nMais selon la révélation biblique, le Nouveau Testament ne commence réellement qu’à Actes chapitre 2, pour une raison très précise :\nC’est là que la Nouvelle Alliance devient vivante.\n\n3. La vraie naissance du Nouveau Testament\n\n« Voici la coupe de la nouvelle alliance en mon sang, qui est répandu pour vous. » — Luc 22:20\n« Après cela, je répandrai de mon Esprit sur toute chair… » — Joël 2:28\n« Car la vie de la chair est dans le sang… » — Lévitique 17:11\n\n    A. Une erreur classique : croire que le Nouveau Testament commence à Matthieu\n\nDans la plupart des Bibles, la page du Nouveau Testament s’ouvre à Matthieu chapitre 1.\nMais selon la révélation spirituelle et l’ordre divin, le Nouveau Testament commence réellement à Actes chapitre 2.\n\nPourquoi ? Parce que le Nouveau Testament n’est pas un titre d’édition,\nmais une Alliance spirituelle, scellée par le sang, et accomplie par le Saint-Esprit.\n\n    B. Le sang marque le début de la Nouvelle Alliance\n\n« Cette coupe est la nouvelle alliance en mon sang, qui est répandu pour vous. » — Luc 22:20\n\nJésus ne dit pas seulement : « Voici le vin »,\nmais : « Voici le sang de la Nouvelle Alliance, qui sera répandu pour vous. »\n\nLe mot « répandu » est crucial ici. Il exprime un acte total, donné, versé, offert.\n\nEt selon Lévitique 17:11, Dieu avait déjà dit :\n\n« Car la vie de la chair est dans le sang… »\n\nAutrement dit :\n    • Sang = Vie\n\nEt Jésus dit aussi :\n\n« C’est l’Esprit qui vivifie » — Jean 6:63\nDonc :\n\n    • Vie = Esprit\n\nEn résumé :\n    • Sang = Vie = Esprit\n\n    C. La prophétie de Joël et son accomplissement dans Actes\n\n« Après cela, je répandrai de mon Esprit sur toute chair… » — Joël 2:28\n\nTu remarques ? Le même mot revient : « je répandrai ».\n    • Jésus dit : « mon sang répandu »\n    • Dieu dit : « mon Esprit répandu »\n\nC’est le même acte divin, dans deux dimensions :\n    - Le sang versé (Luc 22:20)\n    - L’Esprit versé (Joël 2:28 → Actes 2)\n\nEt c’est dans Actes chapitre 2, à la Pentecôte, que cette parole s’accomplit :\n\n« Ceci est ce qui a été annoncé par le prophète Joël… » — Actes 2:16\n\n    D. Le véritable début du Nouveau Testament\n\nLe Nouveau Testament, ou Nouvelle Alliance, commence là où le sang est effectivement répandu, et là où la vie (l’Esprit) est déversée.\n\nCe n’est pas à la naissance de Jésus (Matthieu 1),\nce n’est pas au baptême,\nce n’est même pas à la croix…\n\nC’est au moment où le sang devient Esprit,\nau moment où la vie divine entre dans l’homme par l’Esprit,\nle jour de la Pentecôte, dans Actes chapitre 2.\n\nConclusion spirituelle\n\nLe Nouveau Testament, ce n’est pas une page imprimée.\nC’est une réalité vivante :\n    • Le sang répandu = la vie donnée\n    • La vie donnée = l’Esprit envoyé\n    • L’Esprit envoyé = l’homme régénéré\n    • L’homme régénéré = le début de la Nouvelle Alliance\n\nVoilà pourquoi le vrai commencement du Nouveau Testament est Actes 2.\n\n4. Par où commencer à lire la Bible ?\n\nVoici l’erreur commune :\nBeaucoup commencent par l’Ancien Testament, et se perdent dans les images, les lois, les généalogies…\n\nMais il faut commencer par la réalité avant de comprendre l’ombre.\n\n« L’Ancien Testament est l’ombre, le Nouveau Testament est le corps. »\n\n5. Pourquoi commencer par le Nouveau Testament ?\n\nParce que :\n    • L’Ancien Testament est un mystère.\n    • Le Nouveau Testament est l’interprétation du mystère.\n\nTu ne peux pas connaître une personne à partir de son ombre.\nMais si tu connais la personne, tu peux ensuite comprendre l’ombre.\n\nL’Ancien Testament ce sont les paraboles.\nLe Nouveau Testament c’est l’explication des paraboles.\n\nL’Ancien Testament ce sont les métaphores.\nLe Nouveau Testament en est l’accomplissement et la révélation.\n\n6. Structure de lecture recommandée pour tout croyant\n\nVoici l’ordre de lecture stratégique pour découvrir la Parole avec lumière et croissance :\n    a. Les Épîtres (Romains à Jude)\nC’est là que tu découvres qui tu es en Christ, comment vivre la foi, comment résister, aimer, marcher dans l’Esprit.\n    b. Les Évangiles (Matthieu, Marc, Luc, Jean)\nTu rencontres Jésus. Tu vois Dieu incarné.\n    c. Les Actes des Apôtres\nTu découvres comment l’Église est née, comment le Saint-Esprit agit dans les croyants.\n    d. L’Ancien Testament (Genèse à Malachie)\nTu comprends la promesse, les symboles, les figures qui annonçaient Christ.\n    e. L’Apocalypse (Révélation)\nTu reçois la vision finale, la gloire, la victoire éternelle, le triomphe du Royaume.\n\nÀ retenir :\n    • Tu ne commences pas par l’ombre.\n    • Tu commences par la lumière.\n    • Tu ne commences pas par le mystère, tu commences par la révélation.\n\nC’est la lumière du Nouveau Testament qui projette l’ombre de l’Ancien.\n\nSi tu veux grandir dans la vérité, commence là où la vie commence : par l’Esprit.",
+      "title": "El Camino de la Luz: Principios de la Lectura",
+      "content": "“No sólo de pan vivirá el hombre, sino de toda palabra que sale de la boca de Dios.» — Mateo 4:4\n\n1. Lectura estratégica para una revelación profunda\n\nLa Biblia es un libro vivo.\nPero también es espiritual, profunda y codificada. No se lee como una novela.\n\nPor eso es esencial saber por dónde empezar, especialmente cuando eres nuevo en la fe.\n\n2. ¿Por qué el Nuevo Testamento en realidad comienza en Hechos capítulo 2?\n\nMuchos piensan que el Nuevo Testamento comienza en el capítulo 1 de Mateo, porque ahí es donde el editor lo colocó en nuestras Biblias.\n\nPero según la revelación bíblica, el Nuevo Testamento realmente no comienza hasta Hechos capítulo 2, por una razón muy específica:\nAquí es donde el Nuevo Pacto cobra vida.\n\n3. El verdadero nacimiento del Nuevo Testamento\n\n“Ésta es la copa del nuevo pacto en mi sangre, que por vosotros es derramada. » — Lucas 22:20\n“Después de esto derramaré mi Espíritu sobre toda carne…” (Joel 2:28).\n“Porque la vida de la carne está en la sangre…” – Levítico 17:11\n\n    A. Un error clásico: creer que el Nuevo Testamento comienza con Mateo\n\nEn la mayoría de las Biblias, la página del Nuevo Testamento se abre en el capítulo 1 de Mateo.\nPero según la revelación espiritual y el mandato divino, el Nuevo Testamento en realidad comienza en el capítulo 2 de Hechos.\n\n¿Por qué? Debido a que el Nuevo Testamento no es un título de publicación,\nsino un Pacto espiritual, sellado con sangre y cumplido por el Espíritu Santo.\n\n    B. La sangre marca el comienzo del Nuevo Pacto\n\n“Esta copa es el nuevo pacto en mi sangre, que por vosotros es derramada.» — Lucas 22:20\n\nJesús no sólo dice: “Aquí está el vino”,\nsino: “Esta es la sangre del Nuevo Pacto, que será derramada por vosotros. »\n\nLa palabra “generalizado” es crucial aquí. Expresa un acto total, dado, vertido, ofrecido.\n\nY según Levítico 17:11, Dios ya había dicho:\n\n“Porque la vida de la carne está en la sangre…”\n\nEn otras palabras:\n    • Sangre = Vida\n\nY Jesús también dice:\n\n“Es el Espíritu el que da vida” – Juan 6:63\nEntonces:\n\n    • Vida = Espíritu\n\nEn resumen:\n    • Sangre = Vida = Espíritu\n\n    C. La profecía de Joel y su cumplimiento en Hechos\n\n“Después de esto derramaré mi Espíritu sobre toda carne…” (Joel 2:28).\n\n¿Te das cuenta? Vuelve la misma palabra: “Voy a difundir”.\n    • Jesús dice: “mi sangre derramada”\n    • Dios dice: “mi Espíritu se derramó”\n\nEs el mismo acto divino, en dos dimensiones:\n    - Sangre derramada (Lucas 22:20)\n    - El Espíritu derramado (Joel 2:28 → Hechos 2)\n\nY es en Hechos capítulo 2, en Pentecostés, donde se cumple esta palabra:\n\n“Esto es lo que dijo el profeta Joel…” – Hechos 2:16\n\n    D. El verdadero comienzo del Nuevo Testamento\n\nEl Nuevo Testamento, o Nuevo Pacto, comienza donde realmente se derrama la sangre y donde se derrama la vida (el Espíritu).\n\nNo es en el nacimiento de Jesús (Mateo 1),\nno es en el bautismo,\nni siquiera está en la cruz...\n\nEs en el momento en que la sangre se convierte en Espíritu,\nen el momento en que la vida divina entra en el hombre por el Espíritu,\nel día de Pentecostés, en Hechos capítulo 2.\n\nConclusión espiritual\n\nEl Nuevo Testamento no es una página impresa.\nEs una realidad viva:\n    • Sangre derramada = vida dada\n    • Vida dada = Espíritu enviado\n    • El Espíritu enviado = el hombre regenerado\n    • El hombre regenerado = el comienzo del Nuevo Pacto\n\nPor eso el verdadero comienzo del Nuevo Testamento es Hechos 2.\n\n4. ¿Dónde empezar a leer la Biblia?\n\nAquí está el error común:\nMuchos comienzan con el Antiguo Testamento, y se pierden en imágenes, leyes, genealogías...\n\nPero debemos empezar por la realidad antes de comprender la sombra.\n\n“El Antiguo Testamento es la sombra, el Nuevo Testamento es el cuerpo. »\n\n5. ¿Por qué empezar con el Nuevo Testamento?\n\nPorque:\n    • El Antiguo Testamento es un misterio.\n    • El Nuevo Testamento es la interpretación del misterio.\n\nNo se puede distinguir a una persona por su sombra.\nPero si conoces a la persona, entonces podrás comprender la sombra.\n\nEl Antiguo Testamento son las parábolas.\nEl Nuevo Testamento es la explicación de las parábolas.\n\nEl Antiguo Testamento son metáforas.\nEl Nuevo Testamento es su cumplimiento y revelación.\n\n6. Estructura de lectura recomendada para cada creyente\n\nAquí está el orden estratégico de lectura para descubrir la Palabra con luz y crecimiento:\n    un. Las Epístolas (Romanos a Judas)\nAquí es donde descubres quién eres en Cristo, cómo vivir la fe, cómo resistir, amar, caminar en el Espíritu.\n    B. Los evangelios (Mateo, Marcos, Lucas, Juan)\nTe encuentras con Jesús. Ves a Dios encarnado.\n    c. Los Hechos de los Apóstoles\nDescubres cómo nació la Iglesia, cómo actúa el Espíritu Santo en los creyentes.\n    d. El Antiguo Testamento (Génesis a Malaquías)\nEntiendes la promesa, los símbolos, las figuras que anunciaron a Cristo.\n    e. El Apocalipsis (Revelación)\nRecibes la visión final, la gloria, la victoria eterna, el triunfo del Reino.\n\nPara recordar:\n    • No se empieza con la sombra.\n    • Empiezas con la luz.\n    • No se empieza con el misterio, se empieza con la revelación.\n\nEs la luz del Nuevo Testamento la que proyecta la sombra del Antiguo.\n\nSi quieres crecer en verdad, empieza donde empieza la vida: con el Espíritu.",
       "quiz": [
         {
-          "question": "Selon la révélation biblique, pourquoi le Nouveau Testament commence-t-il réellement à Actes chapitre 2, et non à Matthieu chapitre 1 ?",
+          "question": "Según la revelación bíblica, ¿por qué el Nuevo Testamento en realidad comienza en el capítulo 2 de Hechos y no en el capítulo 1 de Mateo?",
           "options": [
             {
               "label": "a)",
-              "text": "Parce que c’est à ce moment que les apôtres prêchent"
+              "text": "Porque aquí es cuando los apóstoles predican."
             },
             {
               "label": "b)",
-              "text": "Parce que c’est la date de la résurrection de Jésus"
+              "text": "Porque es la fecha de la resurrección de Jesús"
             },
             {
               "label": "c)",
-              "text": "Parce que le sang (la vie) a été répandu et que l’Esprit a été donné"
+              "text": "Porque la sangre (vida) fue derramada y el Espíritu fue dado"
             },
             {
               "label": "d)",
-              "text": "Parce que c’est le début du ministère de Paul"
-            }
-          ],
-          "answer": "c"
-        }
-      ]
-    },
-    {
-      "title": "La Parole : Entre la Lettre et l'Esprit",
-      "content": "« Car la lettre tue, mais l’Esprit vivifie. » — 2 Corinthiens 3:6\n\n1. La Bible : un livre unique… mais mystérieux\n\nLa Bible est le livre le plus lu de l’histoire humaine.\nElle a traversé les siècles, traduit dans des milliers de langues, copiée, méditée, prêchée dans tous les coins du monde.\n\nMais voici une vérité étonnante :\n\nTu peux lire la Bible sans jamais rencontrer Dieu.\n\nOui, tu peux lire ses mots, connaître ses histoires, mémoriser ses versets… sans jamais expérimenter la vie qu’elle contient.\n\nPourquoi ? Parce que la lettre seule ne suffit pas.\n\n2. La lettre tue : qu’est-ce que cela veut dire ?\n\nL’apôtre Paul dit :\n\n« La lettre tue, mais l’Esprit vivifie. »\n\n“La lettre” :\n    • Ce sont les mots, les lois, les commandements, les textes écrits dans leur forme brute.\n    • Elle peut être apprise intellectuellement, sans transformation intérieure.\n\n“Mais l’Esprit” :\n    • C’est la présence de Dieu qui donne vie au texte ;\n    • Il révèle, il éclaire, il fait brûler le cœur quand tu lis ;\n    • Il transforme l’information en révélation vivante.\n\nSans l’Esprit, la Bible peut devenir un outil religieux froid, ou même une arme pour juger, condamner, contrôler.\n\n3. La Parole n’est pas un code magique\n\nCertains croient que la Bible fonctionne comme un code divin : il suffirait de prononcer un verset pour qu’un miracle arrive.\nMais ce n’est pas un grimoire ou une formule secrète.\nC’est un témoignage vivant, une voix qui parle à ceux qui écoutent avec le cœur.\n\nLa différence n’est pas dans les mots, mais dans la posture du lecteur :\n    • Un cœur humble reçoit la vie.\n    • Un esprit religieux reçoit juste des règles.\n\n4. L’Ancien Testament : une ombre qui annonce\n\nDans l’Ancien Testament, Dieu parlait souvent par :\n    • Des symboles (le serpent d’airain, le tabernacle…) ;\n    • Des images (l’agneau, la manne, la colonne de feu…) ;\n    • Des gestes prophétiques (Noé, Moïse, David…).\n\nTous ces éléments étaient des ombres, des illustrations temporaires qui pointaient vers une réalité future : Jésus-Christ.\n\nCe qui était voilé dans l’Ancien, est révélé dans le Nouveau.\n\n5. Dans le Nouveau Testament : le voile est levé\n\nJésus vient accomplir ce que l’Ancien annonçait.\nIl est :\n    • L’agneau de Dieu ;\n    • Le pain de vie ;\n    • Le temple véritable ;\n    • La Parole faite chair.\n\nEt c’est par le Saint-Esprit que tout cela devient clair dans ton cœur.\n\n6. Le rôle indispensable du Saint-Esprit\n\nTu peux avoir une bibliothèque pleine de Bibles et pourtant ne jamais entendre Dieu si l’Esprit ne te parle pas.\n\nL’Esprit Saint :\n    • Ouvre les yeux spirituels ;\n    • Rend la Parole personnelle ;\n    • Révèle la profondeur derrière chaque verset.\n\n“Quand Il viendra, l’Esprit de vérité, Il vous conduira dans toute la vérité.” — Jean 16:13\n\n7. Lire avec l’Esprit, pas seulement avec les yeux\n\nVoici une clé simple, mais puissante :\n\nAvant d’ouvrir ta Bible, invoque le Saint-Esprit.\n\nDis-lui simplement :\n« Esprit de Dieu, parle-moi. Ouvre mon cœur. Montre-moi Jésus dans ces pages. »\n\nCar la lettre seule peut t’endurcir, mais l’Esprit rend la Parole vivante, tranchante, douce et puissante.",
-      "quiz": [
-        {
-          "question": "Que signifie “la lettre tue” dans 2 Corinthiens 3:6 ?",
-          "options": [
-            {
-              "label": "a)",
-              "text": "Que la Bible est mauvaise"
-            },
-            {
-              "label": "b)",
-              "text": "Que sans l’Esprit, la lecture peut devenir rigide, stérile ou légaliste"
-            },
-            {
-              "label": "c)",
-              "text": "Que seuls les pasteurs doivent lire la Bible"
-            },
-            {
-              "label": "d)",
-              "text": "Que la Bible est dépassée"
-            }
-          ],
-          "answer": "b"
-        }
-      ]
-    },
-    {
-      "title": "La Parole Vivante : Source de Transformation",
-      "content": "« Ta parole est une lampe à mes pieds, et une lumière sur mon sentier. » — Psaume 119:105\n\n1. Plus qu’un texte : une énergie divine\n\nLa Parole de Dieu n’est pas seulement de l’information.\nC’est une force créatrice.\nDieu a créé l’univers par Sa Parole. Et Il recrée ta vie par Sa Parole.\n\n2. Les trois dimensions de la Parole (Logos, Rhema, Christ)\n\n    • Logos : La Parole écrite, stable, éternelle. C’est la Bible.\n    • Rhema : La Parole révélée, celle que Dieu te dit maintenant, dans ton cœur. Elle devient vivante pour toi.\n    • Christ : La Parole incarnée. Jésus est la manifestation parfaite de tout ce que Dieu a dit.\n\n3. Comment la Parole transforme-t-elle ?\n\nLa transformation ne vient pas de la lecture rapide.\nElle vient de la méditation.\n\n« Méditer », en hébreu (Hagah), signifie murmurer, ruminer, parler à voix basse.\nC’est faire passer la Parole de tes yeux à ton cœur, et de ton cœur à ta bouche.\n\n4. Les étapes de la transformation :\n    1. Information : Tu lis.\n    2. Révélation : Tu comprends par l’Esprit.\n    3. Conviction : La vérité te saisit.\n    4. Manifestation : Ta vie change.\n\n5. La puissance de la déclaration\n\nDieu dit, et cela arrive.\nEn tant qu’enfant de Dieu, tu es appelé à déclarer ce que Dieu dit sur ta vie.\n\nQuand tu déclares la Parole :\n    • Tu chasses les ténèbres ;\n    • Tu installes la vérité ;\n    • Tu transformes ton atmosphère.\n\n6. La Parole comme nourriture\n\nJésus dit : « L’homme ne vivra pas de pain seulement… »\nTon esprit a besoin de manger chaque jour.\nSi tu ne lis pas, ton esprit s’affaiblit.\nSi tu médites, ton esprit devient fort, inébranlable.\n\n7. Conclusion du chapitre\n\nLa Parole est ton arme, ton pain, ta lumière.\nNe la traite pas avec légèreté.\nFais d’elle ta priorité, et elle fera de toi un géant spirituel.",
-      "quiz": [
-        {
-          "question": "Quelle est la différence entre Logos et Rhema ?",
-          "options": [
-            {
-              "label": "a)",
-              "text": "Aucune, ce sont des mots grecs pour “livre”"
-            },
-            {
-              "label": "b)",
-              "text": "Logos est la Parole écrite générale, Rhema est la Parole révélée personnellement par l’Esprit"
-            },
-            {
-              "label": "c)",
-              "text": "Logos est pour l’Ancien Testament, Rhema pour le Nouveau"
-            },
-            {
-              "label": "d)",
-              "text": "Logos est pour les pasteurs, Rhema pour les fidèles"
-            }
-          ],
-          "answer": "b"
-        }
-      ]
-    },
-    {
-      "title": "La Parole de Dieu : Autorité et Puissance",
-      "content": "« Car la parole de Dieu est vivante et efficace, plus tranchante qu'une épée quelconque à deux tranchants… » — Hébreux 4:12\n\n1. L’Autorité Suprême\n\nDans un royaume, la parole du roi fait loi.\nDans le Royaume de Dieu, Sa Parole est l’autorité suprême. Elle est au-dessus des circonstances, au-dessus des sentiments, au-dessus des avis humains.\n\n2. Vivante et Efficace\n\nLa Parole n’est pas morte. Elle agit.\nQuand elle entre dans une situation, elle commence à travailler.\nElle guérit les cœurs, elle brise les chaînes, elle éclaire les choix.\n\n3. L’Épée de l’Esprit\n\nDans l’armure de Dieu (Éphésiens 6), la Parole est la seule arme offensive.\nC’est avec elle que tu repousses l’ennemi.\nJésus a vaincu Satan dans le désert en disant : « Il est écrit ».\n\n4. L’Infaillibilité de la Parole\n\nLe ciel et la terre passeront, mais Sa Parole ne passera pas.\nDieu n’est pas un homme pour mentir.\nS’Il l’a dit, Il le fera.\n\n5. La Soumission à la Parole\n\nL’autorité de la Parole ne fonctionne dans ta vie que si tu t’y soumets.\nObéir à la Parole, c’est bâtir sur le roc.\nIgnorer la Parole, c’est bâtir sur le sable.\n\n6. La Puissance de la Foi\n\nLa Parole produit la foi. « La foi vient de ce qu’on entend… »\nPlus tu t’imprègnes de la Parole, plus ta foi grandit.\nEt avec la foi, tu déplaces les montagnes.\n\n7. Conclusion\n\nNe discute pas la Parole, proclame-la.\nNe l’analyse pas seulement, vis-la.\nElle est ta force et ta victoire.",
-      "quiz": [
-        {
-          "question": "Quelle est la seule arme offensive dans l’armure de Dieu ?",
-          "options": [
-            {
-              "label": "a)",
-              "text": "Le bouclier de la foi"
-            },
-            {
-              "label": "b)",
-              "text": "Le casque du salut"
-            },
-            {
-              "label": "c)",
-              "text": "L’épée de l’Esprit, qui est la Parole de Dieu"
-            },
-            {
-              "label": "d)",
-              "text": "La ceinture de vérité"
+              "text": "Porque este es el comienzo del ministerio de Pablo."
             }
           ],
           "answer": "c"
@@ -265,8 +181,92 @@ export const BOOK_DATA = {
       ]
     },
     {
-      "title": "La Parole : Semence et Pain de Vie",
-      "content": "« Vous avez été régénérés, non par une semence corruptible, mais par une semence incorruptible, par la parole de Dieu, qui vit et qui demeure éternellement. » — 1 Pierre 1:23\n\n1. La Semence Incorruptible\n\nTa nouvelle naissance ne vient pas d’un effort humain.\nElle vient de la Parole reçue dans ton cœur comme une semence.\nUne semence contient toute la vie de la plante.\nLa Parole contient toute la vie de Dieu.\n\n2. Le Terrain de ton Cœur\n\nJésus a enseigné la parabole du semeur.\nLa Parole est la même pour tous, mais le résultat dépend du sol.\n    • Le bord du chemin (indifférence)\n    • Le sol pierreux (manque de profondeur)\n    • Les épines (soucis du monde)\n    • La bonne terre (cœur ouvert et obéissant)\n\n3. Le Pain de Vie\n\nLa Parole est ta nourriture quotidienne.\nOn ne mange pas une fois pour toute la vie.\nOn mange chaque jour pour avoir de la force.\n\n4. La Croissance Spirituelle\n\nComme un bébé a besoin de lait, le nouveau chrétien a besoin du lait spirituel de la Parole.\nPuis, il grandit vers la nourriture solide.\nSans Parole, il n’y a pas de croissance.\n\n5. La Parole qui Demeure\n\nTout ce qui est physique vieillit et meurt.\nMais ce que Dieu a dit reste vrai pour toujours.\nAttache-toi à l’éternel.\n\n6. Porter du Fruit\n\nLe but d’une semence est de porter du fruit.\nLa Parole en toi doit produire l’amour, la joie, la paix, la sainteté.\n\n7. Conclusion\n\nPrends soin de la semence dans ton cœur.\nNourris-toi du pain du ciel.\nEt tu verras une récolte magnifique dans ta vie.",
+      "title": "La Palabra: Entre la Letra y el Espíritu",
+      "content": "“Porque la letra mata, pero el Espíritu vivifica. » —2 Corintios 3:6\n\n1. La Biblia: un libro único… pero misterioso\n\nLa Biblia es el libro más leído en la historia de la humanidad.\nHa atravesado los siglos, traducido a miles de idiomas, copiado, meditado, predicado en todos los rincones del mundo.\n\nPero aquí hay una verdad sorprendente:\n\nPuedes leer la Biblia sin siquiera conocer a Dios.\n\nSí, puedes leer sus palabras, conocer sus historias, memorizar sus versos... sin experimentar nunca la vida que contiene.\n\n¿Para qué? Porque la carta por sí sola no basta.\n\n2. La carta mata: ¿qué significa?\n\nEl apóstol Pablo dice:\n\n“La letra mata, pero el Espíritu vivifica. »\n\n“La carta”:\n    • Estas son las palabras, las leyes, los mandamientos, los textos escritos en su forma cruda.\n    • Se puede aprender intelectualmente, sin transformación interior.\n\n“Pero el Espíritu”:\n    • Es la presencia de Dios la que da vida al texto;\n    • Revela, ilumina, hace arder el corazón cuando se lee;\n    • Transforma la información en revelación viva.\n\nSin el Espíritu, la Biblia puede convertirse en una fría herramienta religiosa, o incluso en un arma para juzgar, condenar y controlar.\n\n3. La Palabra no es un código mágico\n\nAlgunos creen que la Biblia funciona como un código divino: bastaría pronunciar un versículo para que se produjera un milagro.\nPero no es un grimorio ni una fórmula secreta.\nEs un testimonio vivo, una voz que habla a quien escucha con el corazón.\n\nLa diferencia no está en las palabras, sino en la postura del lector:\n    • Un corazón humilde recibe vida.\n    • A una mente religiosa sólo se le dan reglas.\n\n4. El Antiguo Testamento: una sombra que anuncia\n\nEn el Antiguo Testamento, Dios habló a menudo a través de:\n    • Símbolos (la serpiente de bronce, el tabernáculo, etc.);\n    • Imágenes (el cordero, el maná, la columna de fuego, etc.);\n    • Gestos proféticos (Noé, Moisés, David, etc.).\n\nTodas ellas eran sombras, ilustraciones temporales que apuntaban a una realidad futura: Jesucristo.\n\nLo que estaba velado en lo Viejo se revela en lo Nuevo.\n\n5. En el Nuevo Testamento: se levanta el velo\n\nJesús viene a cumplir lo que anunció el Anciano.\nÉl es:\n    • El Cordero de Dios;\n    • El pan de vida;\n    • El verdadero templo;\n    • El Verbo hecho carne.\n\nY es a través del Espíritu Santo que todo esto se aclara en vuestro corazón.\n\n6. El papel indispensable del Espíritu Santo\n\nPuedes tener una biblioteca llena de Biblias y aun así nunca escuchar de Dios si el Espíritu no te habla.\n\nEl Espíritu Santo:\n    • Abre tus ojos espirituales;\n    • Hace que la Palabra sea personal;\n    • Revela la profundidad detrás de cada verso.\n\n“Cuando venga él, el Espíritu de verdad, él os guiará a toda la verdad”. —Juan 16:13\n\n7. Lee con el Espíritu, no sólo con los ojos.\n\nAquí hay una clave simple pero poderosa:\n\nAntes de abrir tu Biblia, invoca al Espíritu Santo.\n\nSólo dile:\n\"Espíritu de Dios, háblame. Abre mi corazón. Muéstrame a Jesús en estas páginas. »\n\nPorque sólo la letra puede endurecerte, pero el Espíritu hace que la Palabra sea viva, aguda, gentil y poderosa.",
+      "quiz": [
+        {
+          "question": "¿Qué significa “la letra mata” en 2 Corintios 3:6?",
+          "options": [
+            {
+              "label": "a)",
+              "text": "que la biblia es mala"
+            },
+            {
+              "label": "b)",
+              "text": "Que sin el Espíritu la lectura puede volverse rígida, estéril o legalista"
+            },
+            {
+              "label": "c)",
+              "text": "Que sólo los pastores deben leer la Biblia"
+            },
+            {
+              "label": "d)",
+              "text": "Que la Biblia está desactualizada"
+            }
+          ],
+          "answer": "b"
+        }
+      ]
+    },
+    {
+      "title": "La Palabra Viva: Fuente de Transformación",
+      "content": "“Lámpara es a mis pies tu palabra, y lumbrera a mi camino.» —Salmo 119:105\n\n1. Más que un texto: energía divina\n\nLa Palabra de Dios no es sólo información.\nEs una fuerza creativa.\nDios creó el universo por Su Palabra. Y Él recrea tu vida a través de Su Palabra.\n\n2. Las tres dimensiones de la Palabra (Logos, Rema, Cristo)\n\n    • Logos: La Palabra escrita, estable y eterna. Es la Biblia.\n    • Rhema: La Palabra revelada, la que Dios te habla ahora, en tu corazón. Ella cobra vida para ti.\n    • Cristo: El Verbo Encarnado. Jesús es la manifestación perfecta de todo lo que Dios ha dicho.\n\n3. ¿Cómo se transforma la Palabra?\n\nLa transformación no proviene de la lectura rápida.\nProviene de la meditación.\n\n“Meditar”, en hebreo (Hagah), significa murmurar, rumiar, hablar en voz baja.\nEs llevar la Palabra de tus ojos a tu corazón y de tu corazón a tu boca.\n\n4. Las etapas de transformación:\n    1. Información: Tú lees.\n    2. Revelación: Por el Espíritu se entiende.\n    3. Convicción: La verdad te atrapa.\n    4. Manifestación: Tu vida cambia.\n\n5. El poder de la declaración\n\nDios dice y sucede.\nComo hijo de Dios, estás llamado a declarar lo que Dios dice sobre tu vida.\n\nCuando declaras la Palabra:\n    • Ahuyentas la oscuridad;\n    • Instalas la verdad;\n    • Transformas tu atmósfera.\n\n6. La Palabra como alimento\n\nJesús dijo: “No sólo de pan vivirá el hombre…”\nTu mente necesita comer todos los días.\nSi no lees, tu mente se debilita.\nSi meditas, tu mente se vuelve fuerte e inquebrantable.\n\n7. Conclusión del capítulo\n\nLa Palabra es tu arma, tu pan, tu luz.\nNo la trates a la ligera.\nHaz de ella tu prioridad y ella te convertirá en un gigante espiritual.",
+      "quiz": [
+        {
+          "question": "¿Cuál es la diferencia entre Logos y Rhema?",
+          "options": [
+            {
+              "label": "a)",
+              "text": "Ninguno, estas son palabras griegas para “libro”"
+            },
+            {
+              "label": "b)",
+              "text": "Logos es la Palabra general escrita, Rhema es la Palabra revelada personalmente por el Espíritu."
+            },
+            {
+              "label": "c)",
+              "text": "Logos es para el Antiguo Testamento, Rhema para el Nuevo"
+            },
+            {
+              "label": "d)",
+              "text": "Logos es para los pastores, Rhema para los fieles"
+            }
+          ],
+          "answer": "b"
+        }
+      ]
+    },
+    {
+      "title": "La Palabra de Dios: Autoridad y Poder",
+      "content": "“Porque la palabra de Dios es viva y eficaz, más cortante que cualquier espada de dos filos…” – Hebreos 4:12\n\n1. La Autoridad Suprema\n\nEn un reino, la palabra del rey es ley.\nEn el Reino de Dios, Su Palabra es la autoridad suprema. Está por encima de las circunstancias, por encima de los sentimientos, por encima de las opiniones humanas.\n\n2. Animado y eficaz\n\nLa Palabra no está muerta. Ella actúa.\nCuando se encuentra con una situación, comienza a trabajar.\nCura los corazones, rompe cadenas, ilumina las opciones.\n\n3. La Espada del Espíritu\n\nEn la armadura de Dios (Efesios 6), la Palabra es la única arma ofensiva.\nEs con él que repeles al enemigo.\nJesús derrotó a Satanás en el desierto diciendo: \"Escrito está\".\n\n4. La Infalibilidad de la Palabra\n\nEl cielo y la tierra pasarán, pero Su Palabra no pasará.\nDios no es hombre para mentir.\nSi Él lo dijo, lo hará.\n\n5. Sumisión a la Palabra\n\nLa autoridad de la Palabra sólo obra en tu vida si te sometes a ella.\nObedecer la Palabra es edificar sobre roca.\nIgnorar la Palabra es construir sobre arena.\n\n6. El poder de la fe\n\nLa Palabra produce fe. “La fe viene por el oír…”\nCuanto más te sumerges en la Palabra, más crece tu fe.\nY con fe mueves montañas.\n\n7. Conclusión\n\nNo discutas con la Palabra, proclamala.\nNo sólo lo analices, vívelo.\nElla es tu fuerza y ​​tu victoria.",
+      "quiz": [
+        {
+          "question": "¿Cuál es la única arma ofensiva en la armadura de Dios?",
+          "options": [
+            {
+              "label": "a)",
+              "text": "El escudo de la fe"
+            },
+            {
+              "label": "b)",
+              "text": "El casco de la salvación"
+            },
+            {
+              "label": "c)",
+              "text": "La espada del Espíritu, que es la Palabra de Dios."
+            },
+            {
+              "label": "d)",
+              "text": "El cinturón de la verdad"
+            }
+          ],
+          "answer": "c"
+        }
+      ]
+    },
+    {
+      "title": "La Palabra: Semilla y Pan de Vida",
+      "content": "“Habéis nacido de nuevo, no de semilla corruptible, sino de semilla incorruptible, por la palabra de Dios, que vive y permanece para siempre. » — 1 Pedro 1:23\n\n1. La Simiente Incorruptible\n\nVuestro nuevo nacimiento no proviene del esfuerzo humano.\nProviene de la Palabra recibida en vuestro corazón como una semilla.\nUna semilla contiene toda la vida de la planta.\nLa Palabra contiene toda la vida de Dios.\n\n2. La base de tu corazón\n\nJesús enseñó la parábola del sembrador.\nLa Palabra es la misma para todos, pero el resultado depende del suelo.\n    • Al costado del camino (indiferencia)\n    • Suelo pedregoso (falta de profundidad)\n    • Espinas (preocupaciones del mundo)\n    • La buena tierra (corazón abierto y obediente)\n\n3. El Pan de Vida\n\nLa Palabra es vuestro alimento diario.\nNo comes ni una sola vez en toda tu vida.\nComemos todos los días para tener fuerzas.\n\n4. Crecimiento espiritual\n\nAsí como un bebé necesita leche, el nuevo cristiano necesita la leche espiritual de la Palabra.\nLuego, creció hacia la comida sólida.\nSin Palabra no hay crecimiento.\n\n5. La palabra permanente\n\nTodo lo físico envejece y muere.\nPero lo que Dios dijo sigue siendo cierto para siempre.\nAférrate a lo eterno.\n\n6. Dar fruto\n\nEl propósito de una semilla es dar fruto.\nLa Palabra en ti debe producir amor, gozo, paz, santidad.\n\n7. Conclusión\n\nCuida la semilla en tu corazón.\nAliméntate del pan del cielo.\nY verás una magnífica cosecha en tu vida.",
       "quiz": [
         {
           "question": "Que représente la “bonne terre” dans la parabole du semeur ?",
