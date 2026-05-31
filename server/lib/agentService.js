@@ -3,15 +3,45 @@ import { getSupabaseAdmin } from './supabaseAdmin.js';
 import { embedText, buildSystemPrompt, chatCompletion, analyzePerspectives } from './openai.js';
 import { searchChunks, searchChunksText, loadChunks } from './vectorStore.js';
 import { synthesizeFromChunks } from './synthesize.js';
+import { rankChunks, formatChunkSourceLine } from './knowledgePriority.js';
+
+const RETRIEVE_POOL = Math.max(config.ragTopK * 3, 12);
 
 function buildContext(chunks) {
   if (!chunks.length) return 'Aucun extrait TKV indexé pour le moment.';
   return chunks
-    .map(
-      (c, i) =>
-        `[Source ${i + 1}: ${c.metadata?.title || 'TKV'} — ${c.metadata?.chapter || ''}]\n${c.chunk_text}`
-    )
+    .map((c, i) => `${formatChunkSourceLine(c, i)}\n${c.chunk_text}`)
     .join('\n\n---\n\n');
+}
+
+function extractStrongIds(message) {
+  const ids = new Set();
+  const re = /\b([GH]\d{1,5})\b/gi;
+  let m;
+  while ((m = re.exec(message)) !== null) {
+    ids.add(m[1].toUpperCase());
+  }
+  return [...ids];
+}
+
+function attachStrongChunks(chunks, message) {
+  const ids = extractStrongIds(message);
+  if (!ids.length) return chunks;
+
+  const pool = loadChunks().filter((c) => c.metadata?.content_type === 'bible_strong');
+  const byId = new Map(chunks.map((c) => [c.id, c]));
+  for (const sid of ids) {
+    const hit = pool.find(
+      (c) =>
+        c.metadata?.strong_id?.toUpperCase() === sid ||
+        c.id === `strong-${sid}` ||
+        c.chunk_text?.includes(`Strong ${sid}`)
+    );
+    if (hit && !byId.has(hit.id)) {
+      byId.set(hit.id, { ...hit, similarity: 1, _strongMatch: true });
+    }
+  }
+  return [...byId.values()];
 }
 
 function formatSources(chunks) {
@@ -29,7 +59,9 @@ function formatSources(chunks) {
 
   return unique.map((c) => ({
     title: c.metadata?.title || 'TKV',
-    chapter: c.metadata?.chapter || '',
+    chapter: c.metadata?.chapter || c.metadata?.strong_id || '',
+    sourceType: c.metadata?.content_type || 'tkv',
+    pastor: c.metadata?.pastor || '',
     excerpt: c.chunk_text.slice(0, 180) + (c.chunk_text.length > 180 ? '…' : ''),
     similarity: c.similarity,
   }));
@@ -48,19 +80,26 @@ async function retrieveChunks(admin, message, language) {
   }
 
   let chunks = [];
+  const searchOpts = { language, topK: RETRIEVE_POOL, threshold: 0.52 };
+
   if (embedding) {
-    chunks = await searchChunks(admin, embedding, { language, threshold: 0.55 });
+    chunks = await searchChunks(admin, embedding, searchOpts);
     if (chunks.length) mode = 'vector';
   }
 
   if (!chunks.length) {
-    chunks = await searchChunksText(admin, message, { language });
+    chunks = await searchChunksText(admin, message, searchOpts);
     mode = 'keyword';
   }
 
   if (!chunks.length) {
-    chunks = loadChunks().filter((c) => c.language === language).slice(0, config.ragTopK);
+    chunks = loadChunks()
+      .filter((c) => c.language === language || c.metadata?.content_type === 'bible_strong')
+      .slice(0, RETRIEVE_POOL);
   }
+
+  chunks = attachStrongChunks(chunks, message);
+  chunks = rankChunks(chunks, config.ragTopK);
 
   return { chunks, mode, openaiError };
 }

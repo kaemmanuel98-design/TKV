@@ -114,22 +114,43 @@ export async function loadFriendMapMembers(userId, t) {
 
   const { data: profiles, error } = await supabase
     .from('profiles')
-    .select('id, name, country, city, bio, avatar_url, last_seen_at')
-    .in('id', friendIds)
-    .not('country', 'is', null);
+    .select('id, name, country, city, bio, avatar_url, last_seen_at, map_address, latitude, longitude')
+    .in('id', friendIds);
 
-  if (error) throw error;
+  if (error) {
+    const fallback = await supabase
+      .from('profiles')
+      .select('id, name, country, city, bio, avatar_url, last_seen_at')
+      .in('id', friendIds)
+      .not('country', 'is', null);
+    if (fallback.error) throw fallback.error;
+    return (fallback.data || []).map((p) => ({
+      id: p.id,
+      name: p.name || t('community_author_anonymous'),
+      country: p.country,
+      city: p.city,
+      bio: p.bio,
+      avatarUrl: p.avatar_url,
+      lastSeenAt: p.last_seen_at,
+      isFriend: true,
+    }));
+  }
 
-  return (profiles || []).map((p) => ({
-    id: p.id,
-    name: p.name || t('community_author_anonymous'),
-    country: p.country,
-    city: p.city,
-    bio: p.bio,
-    avatarUrl: p.avatar_url,
-    lastSeenAt: p.last_seen_at,
-    isFriend: true,
-  }));
+  return (profiles || [])
+    .filter((p) => p.country?.trim() || (p.latitude != null && p.longitude != null))
+    .map((p) => ({
+      id: p.id,
+      name: p.name || t('community_author_anonymous'),
+      country: p.country,
+      city: p.city,
+      bio: p.bio,
+      avatarUrl: p.avatar_url,
+      map_address: p.map_address,
+      latitude: p.latitude,
+      longitude: p.longitude,
+      lastSeenAt: p.last_seen_at,
+      isFriend: true,
+    }));
 }
 
 export function relationWith(requests, myId, otherId) {

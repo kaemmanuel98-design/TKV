@@ -9,6 +9,12 @@ import { findCityByName, listCitiesForCountry } from '../data/cityCoords.js';
 
 export { normalizeCountryKey };
 
+function parseCoord(value) {
+  if (value == null || value === '') return null;
+  const n = typeof value === 'number' ? value : parseFloat(value);
+  return Number.isFinite(n) ? n : null;
+}
+
 function hashString(str) {
   let h = 0;
   for (let i = 0; i < str.length; i += 1) {
@@ -47,24 +53,49 @@ export function assignCityForMember(country, cityField, memberId) {
   };
 }
 
+function cityLabelFromRow(row) {
+  if (row.city?.trim()) return row.city.trim();
+  if (row.map_address?.trim()) {
+    const parts = row.map_address.split(',').map((s) => s.trim()).filter(Boolean);
+    if (parts.length >= 2) return parts[parts.length - 2];
+    return parts[0] || '';
+  }
+  return '';
+}
+
 export function enrichMapMember(row, t) {
   const country = row.country || '';
   const countryKey = resolveCountryKey(country) || normalizeCountryKey(country);
   const countryCoords = coordsForCountryOrFallback(country, row.id);
-  const city = assignCityForMember(country, row.city, row.id);
-  const cityCoords = city?.coords || countryCoords;
-  const houseLocation = cityCoords ? houseCoordsInCity(cityCoords, row.id) : null;
-  const worldLocation = countryCoords ? jitterCoords(countryCoords, row.id) : null;
+  const lat = parseCoord(row.latitude);
+  const lng = parseCoord(row.longitude);
+  const exactLocation = lat != null && lng != null ? [lat, lng] : null;
+
+  const city = exactLocation
+    ? {
+        id: `pin-${row.id}`,
+        name: cityLabelFromRow(row) || country || t('map_you_are_here'),
+        coords: exactLocation,
+        exact: true,
+      }
+    : assignCityForMember(country, row.city, row.id);
+
+  const cityCoords = exactLocation || city?.coords || countryCoords;
+  const houseLocation = exactLocation || (cityCoords ? houseCoordsInCity(cityCoords, row.id) : null);
+  const worldLocation = exactLocation || (countryCoords ? jitterCoords(countryCoords, row.id) : null);
 
   return {
     id: row.id,
     name: row.name || t('community_author_anonymous'),
-    country,
-    countryKey,
-    city: row.city || city?.name || '',
+    country: country || (exactLocation ? cityLabelFromRow(row) : ''),
+    countryKey: resolveCountryKey(country) || normalizeCountryKey(country) || 'monde',
+    city: cityLabelFromRow(row) || city?.name || '',
     cityData: city,
+    mapAddress: row.map_address || row.mapAddress || '',
     avatarUrl: row.avatar_url || row.avatarUrl || null,
     bio: row.bio || '',
+    hasExactCoords: Boolean(exactLocation),
+    exactLocation,
     worldLocation,
     cityCoords,
     houseLocation,

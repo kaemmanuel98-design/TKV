@@ -8,6 +8,7 @@ import {
 } from '../lib/speech';
 import { useSpeechStore } from '../store/useSpeechStore';
 import { resolveSpeechLocale } from '../lib/speech/locale';
+import { unlockSpeechPlayback } from '../lib/speech/unlockPlayback';
 
 export function useSpeak() {
   const { i18n, t } = useTranslation();
@@ -16,7 +17,10 @@ export function useSpeak() {
 
   const speak = useCallback(
     async (text, options = {}) => {
-      const locale = resolveSpeechLocale(i18n.language, options.locale, getAccent);
+      unlockSpeechPlayback();
+
+      const language = options.language ?? i18n.language;
+      const locale = resolveSpeechLocale(language, options.locale, getAccent);
       const trimmed = String(text || '').trim();
 
       if (!trimmed) {
@@ -34,7 +38,7 @@ export function useSpeak() {
 
       try {
         await speakText(trimmed, {
-          language: i18n.language,
+          language,
           locale,
           prepared: options.prepared ?? false,
         });
@@ -54,6 +58,18 @@ export function useSpeak() {
         }
         if (code === 'empty_text') {
           alert(t('speech_empty_text'));
+          return;
+        }
+        if (code === 'audio_autoplay_blocked') {
+          alert(t('speech_autoplay_blocked'));
+          return;
+        }
+        if (code === 'audio_playback' || code === 'audio_playback_timeout' || code === 'tts_invalid_response') {
+          alert(t('speech_error'));
+          return;
+        }
+        if (code === 'speech_not_started' || code === 'speech_error' || code === 'interrupted' || code === 'canceled') {
+          alert(t('speech_error'));
           return;
         }
         console.error('[TKV TTS]', err);

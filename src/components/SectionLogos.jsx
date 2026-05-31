@@ -371,6 +371,118 @@ export const CommunityLogo = ({ size = 40, className = '', title }) => {
   );
 };
 
+/** Cellules — globe et points de prière reliés. */
+export const CellsLogo = ({ size = 40, className = '', title }) => {
+  const id = useId().replace(/:/g, '');
+  return (
+    <MarkShell size={size} className={className} title={title} id={id}>
+      {({ gold, accent }) => (
+        <>
+          <ellipse cx="32" cy="34" rx="20" ry="11" fill={`url(#${accent})`} opacity="0.7" />
+          <circle cx="32" cy="30" r="14" stroke={`url(#${gold})`} strokeWidth="1.4" fill="none" strokeOpacity="0.45" />
+          <path
+            d="M18 30c0-7.7 6.3-14 14-14s14 6.3 14 14"
+            stroke={`url(#${gold})`}
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            fill="none"
+            strokeOpacity="0.35"
+          />
+          <circle cx="22" cy="24" r="2.2" fill="#C9A962" fillOpacity="0.85" />
+          <circle cx="42" cy="26" r="2" fill="#C9A962" fillOpacity="0.7" />
+          <circle cx="32" cy="18" r="2.4" fill="#C9A962" fillOpacity="0.9" />
+          <circle cx="26" cy="36" r="1.8" fill="#9B7ED9" fillOpacity="0.65" />
+          <circle cx="38" cy="38" r="1.6" fill="#9B7ED9" fillOpacity="0.55" />
+          <path
+            d="M22 24l10-4M42 26l-10 2M32 18v8"
+            stroke={`url(#${gold})`}
+            strokeWidth="0.9"
+            strokeLinecap="round"
+            strokeOpacity="0.4"
+          />
+        </>
+      )}
+    </MarkShell>
+  );
+};
+
+/** Amis — deux silhouettes reliées. */
+export const FriendsLogo = ({ size = 40, className = '', title }) => {
+  const id = useId().replace(/:/g, '');
+  return (
+    <MarkShell size={size} className={className} title={title} id={id}>
+      {({ gold, accent }) => (
+        <>
+          <ellipse cx="32" cy="36" rx="18" ry="10" fill={`url(#${accent})`} opacity="0.65" />
+          <path
+            d="M20 38c3-5 7-7 12-7s9 2 12 7"
+            stroke={`url(#${gold})`}
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            strokeOpacity="0.35"
+            fill="none"
+          />
+          <circle cx="22" cy="26" r="5" fill={`url(#${gold})`} fillOpacity="0.18" stroke={`url(#${gold})`} strokeWidth="1.7" />
+          <circle cx="42" cy="26" r="5" fill={`url(#${gold})`} fillOpacity="0.18" stroke={`url(#${gold})`} strokeWidth="1.7" />
+          <path
+            d="M27 26h10"
+            stroke={`url(#${gold})`}
+            strokeWidth="1.4"
+            strokeLinecap="round"
+            strokeOpacity="0.55"
+          />
+          <path
+            d="M24 30c4 2.5 12 2.5 16 0"
+            stroke="#C9A962"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            fill="none"
+            strokeOpacity="0.45"
+          />
+        </>
+      )}
+    </MarkShell>
+  );
+};
+
+/** Carte du Royaume — globe et marqueur. */
+export const MapLogo = ({ size = 40, className = '', title }) => {
+  const id = useId().replace(/:/g, '');
+  return (
+    <MarkShell size={size} className={className} title={title} id={id}>
+      {({ gold, accent }) => (
+        <>
+          <circle cx="32" cy="32" r="17" stroke={`url(#${gold})`} strokeWidth="1.3" fill={`url(#${accent})`} fillOpacity="0.12" strokeOpacity="0.45" />
+          <path
+            d="M15 32c0-9.4 7.6-17 17-17s17 7.6 17 17"
+            stroke={`url(#${gold})`}
+            strokeWidth="1"
+            strokeLinecap="round"
+            fill="none"
+            strokeOpacity="0.35"
+          />
+          <ellipse cx="32" cy="32" rx="17" ry="6.5" stroke={`url(#${gold})`} strokeWidth="0.9" fill="none" strokeOpacity="0.28" />
+          <path
+            d="M32 15v34M15 32h34"
+            stroke={`url(#${gold})`}
+            strokeWidth="0.7"
+            strokeOpacity="0.2"
+          />
+          <path
+            d="M32 22c-3 2.5-3 6.5 0 9.5s3 7 0 9.5"
+            stroke="#C9A962"
+            strokeWidth="1.1"
+            strokeLinecap="round"
+            fill="none"
+            strokeOpacity="0.55"
+          />
+          <circle cx="32" cy="32" r="2.2" fill="#C9A962" fillOpacity="0.9" />
+        </>
+      )}
+    </MarkShell>
+  );
+};
+
 /** Profil — silhouette et chemin personnel. */
 export const ProfileLogo = ({ size = 40, className = '', title }) => {
   const id = useId().replace(/:/g, '');

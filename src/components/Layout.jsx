@@ -10,6 +10,8 @@ import {
   Headphones,
   DoorClosed,
   HeartHandshake,
+  Info,
+  Users,
 } from 'lucide-react';
 import { BibleNavIcon, HeritageNavIcon } from './SectionLogos';
 import { MimshackNavIcon } from './MimshackLogo';
@@ -49,6 +51,15 @@ const toolLinks = [
   { to: '/podcasts', icon: Headphones, labelKey: 'podcast_page_title' },
   { to: '/friends', icon: UserPlus, labelKey: 'friends_nav' },
   { to: '/map', icon: Map, labelKey: 'map' },
+];
+
+const footerLinks = [
+  { to: '/about', icon: Info, labelKey: 'footer_link_about' },
+  { to: '/bible', icon: BibleNavIcon, labelKey: 'footer_link_bible' },
+  { to: '/heritage', icon: HeritageNavIcon, labelKey: 'footer_link_heritage' },
+  { to: '/courses', icon: GraduationCap, labelKey: 'footer_link_courses' },
+  { to: '/podcasts', icon: Headphones, labelKey: 'footer_link_podcasts' },
+  { to: '/cells', icon: Users, labelKey: 'footer_link_cells' },
 ];
 
 const Layout = () => {
@@ -194,29 +205,19 @@ const Layout = () => {
           </div>
           <p className="footer-tagline">{t('home_subtitle')}</p>
           <nav className="footer-nav" aria-label={t('footer_nav_label')}>
-            <Link to="/about" className="footer-nav-link">
-              {t('layout_about')}
-            </Link>
-            <span className="footer-nav-sep" aria-hidden="true" />
-            <Link to="/bible" className="footer-nav-link">
-              {t('bible')}
-            </Link>
-            <span className="footer-nav-sep" aria-hidden="true" />
-            <Link to="/heritage" className="footer-nav-link">
-              {t('heritage')}
-            </Link>
-            <span className="footer-nav-sep" aria-hidden="true" />
-            <Link to="/courses" className="footer-nav-link">
-              {t('course_page_title')}
-            </Link>
-            <span className="footer-nav-sep" aria-hidden="true" />
-            <Link to="/podcasts" className="footer-nav-link">
-              {t('podcast_page_title')}
-            </Link>
-            <span className="footer-nav-sep" aria-hidden="true" />
-            <Link to="/cells" className="footer-nav-link">
-              {t('cells')}
-            </Link>
+            <p className="footer-nav-title">{t('footer_nav_title')}</p>
+            <ul className="footer-nav-grid">
+              {footerLinks.map(({ to, icon: Icon, labelKey }) => (
+                <li key={to}>
+                  <Link to={to} className="footer-nav-item">
+                    <span className="footer-nav-icon" aria-hidden="true">
+                      <Icon size={18} strokeWidth={1.75} />
+                    </span>
+                    <span className="footer-nav-label">{t(labelKey)}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </nav>
           <p className="footer-copy">&copy; {new Date().getFullYear()} TKV. {t('footer_rights')}</p>
         </div>

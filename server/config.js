@@ -35,7 +35,7 @@ export const config = {
   jitsiAppSecret: envTrim('JITSI_APP_SECRET'),
   /** Claim JWT `sub` (souvent `meet.jitsi` en Docker, ou `localhost` en local) */
   jitsiJwtSub: envTrim('JITSI_JWT_SUB') || envTrim('JITSI_DOMAIN'),
-  /** E-mails autorisés à créer une visio même sans Premium+ (fondateur / admins) */
+  /** E-mails autorisés à créer une visio sans abonnement Premium (fondateur / admins) */
   jitsiHostEmails: envTrim('JITSI_HOST_EMAILS')
     .split(',')
     .map((e) => e.trim().toLowerCase())
@@ -80,6 +80,5 @@ export const config = {
 
 export const PLAN_LIMITS = {
   free: { chat: 3, perspectives: 0 },
-  premium: { chat: 30, perspectives: 2 },
-  premium_plus: { chat: 9999, perspectives: 9999 },
+  premium: { chat: 9999, perspectives: 9999 },
 };

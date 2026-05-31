@@ -1,19 +1,20 @@
 import { getSupabaseAdmin, getUserProfile } from './supabaseAdmin.js';
+import { enrichProfileWithFounderAccess } from './founderAccess.js';
 import { resolvePlan } from './quota.js';
 
 /** Quota Confessionnal — distinct de l''agent IA (CdC : accès bienveillant sans bloquer à 3 msgs agent). */
 export const CONFESSIONAL_LIMITS = {
   free: 15,
-  premium: 60,
-  premium_plus: 9999,
+  premium: 9999,
 };
 
 function todayKey() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export async function checkAndIncrementConfessionalUsage(userId) {
-  const profile = userId ? await getUserProfile(userId) : null;
+export async function checkAndIncrementConfessionalUsage(userId, userEmail = null) {
+  const rawProfile = userId ? await getUserProfile(userId) : null;
+  const profile = enrichProfileWithFounderAccess(rawProfile, userEmail);
   const plan = resolvePlan(profile);
   const limit = CONFESSIONAL_LIMITS[plan] ?? CONFESSIONAL_LIMITS.free;
   const admin = getSupabaseAdmin();

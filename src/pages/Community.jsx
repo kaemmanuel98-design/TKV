@@ -12,8 +12,8 @@ import {
   Quote,
   Trash2,
   Sparkles,
+  ChevronRight,
 } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
 import { CommunityLogo } from '../components/SectionLogos';
 import ProfileAvatar from '../components/ProfileAvatar';
 import { useAuthStore } from '../store/useAuthStore';
@@ -391,203 +391,245 @@ const Community = () => {
     (feedFilter === 'testimony' ? t('community_no_testimonies') : t('community_no_posts'));
 
   return (
-    <div className="container community-page animate-fade-in">
-      <PageHeader
-        title={t('community_title')}
-        subtitle={t('community_subtitle')}
-        mark={<CommunityLogo size={52} title={t('community_title')} />}
-      />
-
-      <div className="community-shortcuts">
-        {shortcuts.map(({ to, icon: Icon, labelKey }) => (
-          <Link key={to} to={to} className="community-shortcut card">
-            <Icon size={22} strokeWidth={1.5} />
-            <span>{t(labelKey)}</span>
-          </Link>
-        ))}
-      </div>
-
-      <div className="community-filter-row">
-        <button
-          type="button"
-          className={`community-filter-btn ${feedFilter === 'all' ? 'active' : ''}`}
-          onClick={() => setFeedFilter('all')}
-        >
-          {t('community_filter_all')}
-          {!loading && <span className="community-filter-count">{feedCounts.all}</span>}
-        </button>
-        <button
-          type="button"
-          className={`community-filter-btn ${feedFilter === 'testimony' ? 'active' : ''}`}
-          onClick={() => setFeedFilter('testimony')}
-        >
-          {t('community_filter_testimonies')}
-          {!loading && <span className="community-filter-count">{feedCounts.testimony}</span>}
-        </button>
-      </div>
-
-      <div className="community-compose card">
-        {user ? (
-          composing ? (
-            <form className="community-form" onSubmit={handleSubmit}>
-              {composeType === 'testimony' && (
-                <p className="community-compose-kind">
-                  <Quote size={16} />
-                  {t('community_badge_testimony')}
-                </p>
-              )}
-              <textarea
-                className="community-textarea"
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                placeholder={
-                  composeType === 'testimony'
-                    ? t('community_testimony_placeholder')
-                    : t('community_post_placeholder')
-                }
-                rows={4}
-                maxLength={2000}
-                required
-                autoFocus
-              />
-              <p className="community-char-count">{t('community_chars_count', { count: draft.length, max: 2000 })}</p>
-              <div className="community-form-actions">
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => {
-                    setComposing(false);
-                    setDraft('');
-                  }}
-                >
-                  {t('cancel')}
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary btn-sm"
-                  disabled={submitting || !draft.trim() || draft.trim().length < 8}
-                >
-                  {submitting ? <Loader2 size={16} className="spin" /> : null}
-                  {composeType === 'testimony'
-                    ? t('community_testimony_submit')
-                    : t('community_post_submit')}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="community-compose-actions">
-              <button type="button" className="btn btn-outline" onClick={() => openCompose('post')}>
-                <MessageCircle size={18} />
-                {t('community_create_post')}
-              </button>
-              <button type="button" className="btn btn-outline" onClick={() => openCompose('testimony')}>
-                <Quote size={18} />
-                {t('community_create_testimony')}
-              </button>
-            </div>
-          )
-        ) : (
-          <Link to="/auth" className="btn btn-primary">
-            {t('community_login_to_post')}
-          </Link>
-        )}
-      </div>
-
-      {success && <p className="community-success">{success}</p>}
-      {error && <p className="community-error">{error}</p>}
-
-      <div className="community-feed">
-        {loading ? (
-          <p className="text-muted community-loading">
-            <Loader2 size={20} className="spin" />
-            {t('community_loading')}
-          </p>
-        ) : posts.length === 0 ? (
-          <div className="card community-empty">
-            <Sparkles size={40} style={{ opacity: 0.5, margin: '0 auto 1rem' }} />
-            <p className="community-empty-title">{filteredEmpty}</p>
-            <p className="community-empty-desc">{t('community_empty_hint')}</p>
-            {user && (
-              <div className="community-empty-actions">
-                <button type="button" className="btn btn-primary btn-sm" onClick={() => openCompose('post')}>
-                  {t('community_create_post')}
-                </button>
-                <Link to="/cells" className="btn btn-outline btn-sm">
-                  {t('community_cells_cta')}
-                </Link>
-              </div>
-            )}
+    <div className="community-page animate-fade-in">
+      <header className="community-hero">
+        <div className="community-hero-glow" aria-hidden />
+        <div className="community-hero-inner container">
+          <div className="community-hero-mark">
+            <CommunityLogo size={44} title={t('community_title')} />
           </div>
-        ) : (
-          posts.map((post) => {
-            const reacted = reactedIds.has(post.id) || hasReacted(post.id);
-            const isMine = user?.id === post.user_id;
-            return (
-              <article
-                key={post.id}
-                className={`card community-post ${post.post_type === 'testimony' ? 'community-post--testimony' : ''}`}
-              >
-                <header className="community-post-header">
-                  <div className="community-post-author-row">
-                    <ProfileAvatar src={post.authorAvatar} name={post.authorName} size={40} />
-                    <div>
-                      <span className="community-post-author">{post.authorName}</span>
-                      {post.post_type === 'testimony' && (
-                        <span className="community-post-badge">{t('community_badge_testimony')}</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="community-post-meta">
-                    <time className="community-post-date" dateTime={post.created_at}>
-                      {formatRelativeTime(post.created_at, t)}
-                    </time>
-                    {isMine && (
-                      <button
-                        type="button"
-                        className="community-delete-btn"
-                        onClick={() => handleDelete(post)}
-                        disabled={deletingId === post.id}
-                        aria-label={t('community_delete_post')}
-                      >
-                        {deletingId === post.id ? (
-                          <Loader2 size={14} className="spin" />
-                        ) : (
-                          <Trash2 size={14} />
-                        )}
-                      </button>
-                    )}
-                  </div>
-                </header>
-                <p className="community-post-content">{post.content}</p>
-                <footer className="community-post-footer">
+          <div className="community-hero-copy">
+            <p className="community-hero-eyebrow">{t('home_section_eyebrow')}</p>
+            <h1 className="community-hero-title">{t('community_title')}</h1>
+            <p className="community-hero-subtitle">{t('community_subtitle')}</p>
+          </div>
+        </div>
+      </header>
+
+      <div className="container community-body">
+        <nav className="community-toolbar" aria-label={t('community_title')}>
+          {shortcuts.map(({ to, icon: Icon, labelKey }) => (
+            <Link key={to} to={to} className="community-toolbar-link">
+              <Icon size={20} strokeWidth={1.5} aria-hidden />
+              <span>{t(labelKey)}</span>
+            </Link>
+          ))}
+        </nav>
+
+        <div className="community-tabs" role="tablist" aria-label={t('community_filter_all')}>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={feedFilter === 'all'}
+            className={`community-tab ${feedFilter === 'all' ? 'is-active' : ''}`}
+            onClick={() => setFeedFilter('all')}
+          >
+            {t('community_filter_all')}
+            {!loading && (
+              <span className="community-tab-count">{feedCounts.all}</span>
+            )}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={feedFilter === 'testimony'}
+            className={`community-tab ${feedFilter === 'testimony' ? 'is-active' : ''}`}
+            onClick={() => setFeedFilter('testimony')}
+          >
+            {t('community_filter_testimonies')}
+            {!loading && (
+              <span className="community-tab-count">{feedCounts.testimony}</span>
+            )}
+          </button>
+        </div>
+
+        <section className="community-compose" aria-label={t('community_create_post')}>
+          {user ? (
+            composing ? (
+              <form className="community-form" onSubmit={handleSubmit}>
+                {composeType === 'testimony' && (
+                  <p className="community-compose-kind">
+                    <Quote size={16} aria-hidden />
+                    {t('community_badge_testimony')}
+                  </p>
+                )}
+                <textarea
+                  className="community-textarea"
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  placeholder={
+                    composeType === 'testimony'
+                      ? t('community_testimony_placeholder')
+                      : t('community_post_placeholder')
+                  }
+                  rows={4}
+                  maxLength={2000}
+                  required
+                  autoFocus
+                />
+                <p className="community-char-count">
+                  {t('community_chars_count', { count: draft.length, max: 2000 })}
+                </p>
+                <div className="community-form-actions">
                   <button
                     type="button"
-                    className={`community-reaction-btn ${reacted ? 'community-reaction-btn--active' : ''}`}
-                    onClick={() => handleReaction(post)}
-                    disabled={reactingId === post.id || !user}
-                    title={user ? undefined : t('community_login_to_react')}
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => {
+                      setComposing(false);
+                      setDraft('');
+                    }}
                   >
-                    <Heart size={16} fill={reacted ? 'currentColor' : 'none'} />
-                    {t('community_reactions', { count: post.reactions_count || 0 })}
+                    {t('cancel')}
                   </button>
-                </footer>
-              </article>
-            );
-          })
+                  <button
+                    type="submit"
+                    className="btn btn-primary btn-sm"
+                    disabled={submitting || !draft.trim() || draft.trim().length < 8}
+                  >
+                    {submitting ? <Loader2 size={16} className="community-spin" /> : null}
+                    {composeType === 'testimony'
+                      ? t('community_testimony_submit')
+                      : t('community_post_submit')}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="community-compose-prompt">
+                <button
+                  type="button"
+                  className="community-compose-trigger"
+                  onClick={() => openCompose('post')}
+                >
+                  {t('community_post_placeholder')}
+                </button>
+                <div className="community-compose-actions">
+                  <button type="button" className="btn btn-outline btn-sm" onClick={() => openCompose('post')}>
+                    <MessageCircle size={16} aria-hidden />
+                    {t('community_create_post')}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm"
+                    onClick={() => openCompose('testimony')}
+                  >
+                    <Quote size={16} aria-hidden />
+                    {t('community_create_testimony')}
+                  </button>
+                </div>
+              </div>
+            )
+          ) : (
+            <Link to="/auth" className="btn btn-primary community-compose-login">
+              {t('community_login_to_post')}
+              <ChevronRight size={16} aria-hidden />
+            </Link>
+          )}
+        </section>
+
+        {success && (
+          <p className="community-notice community-notice--ok" role="status">
+            {success}
+          </p>
         )}
-        {!loading && posts.length > 0 && hasMore && (
-          <div className="community-load-more-wrap">
-            <button
-              type="button"
-              className="btn btn-outline btn-sm"
-              onClick={loadMorePosts}
-              disabled={loadingMore}
-            >
-              {loadingMore ? <Loader2 size={16} className="spin" /> : null}
-              {loadingMore ? t('community_loading_more') : t('community_load_more')}
-            </button>
-          </div>
+        {error && (
+          <p className="community-notice community-notice--err" role="alert">
+            {error}
+          </p>
         )}
+
+        <section className="community-feed" aria-live="polite">
+          {loading ? (
+            <p className="community-loading">
+              <Loader2 size={20} className="community-spin" aria-hidden />
+              {t('community_loading')}
+            </p>
+          ) : posts.length === 0 ? (
+            <div className="community-empty">
+              <Sparkles size={40} className="community-empty-icon" aria-hidden />
+              <p className="community-empty-title">{filteredEmpty}</p>
+              <p className="community-empty-desc">{t('community_empty_hint')}</p>
+              {user && (
+                <div className="community-empty-actions">
+                  <button type="button" className="btn btn-primary btn-sm" onClick={() => openCompose('post')}>
+                    {t('community_create_post')}
+                  </button>
+                  <Link to="/cells" className="btn btn-outline btn-sm">
+                    {t('community_cells_cta')}
+                  </Link>
+                </div>
+              )}
+            </div>
+          ) : (
+            posts.map((post) => {
+              const reacted = reactedIds.has(post.id) || hasReacted(post.id);
+              const isMine = user?.id === post.user_id;
+              return (
+                <article
+                  key={post.id}
+                  className={`community-post ${post.post_type === 'testimony' ? 'community-post--testimony' : ''}`}
+                >
+                  <header className="community-post-header">
+                    <div className="community-post-author-row">
+                      <ProfileAvatar src={post.authorAvatar} name={post.authorName} size={40} />
+                      <div className="community-post-author-block">
+                        <span className="community-post-author">{post.authorName}</span>
+                        {post.post_type === 'testimony' && (
+                          <span className="community-post-badge">{t('community_badge_testimony')}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="community-post-meta">
+                      <time className="community-post-date" dateTime={post.created_at}>
+                        {formatRelativeTime(post.created_at, t)}
+                      </time>
+                      {isMine && (
+                        <button
+                          type="button"
+                          className="community-delete-btn"
+                          onClick={() => handleDelete(post)}
+                          disabled={deletingId === post.id}
+                          aria-label={t('community_delete_post')}
+                        >
+                          {deletingId === post.id ? (
+                            <Loader2 size={14} className="community-spin" />
+                          ) : (
+                            <Trash2 size={14} />
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </header>
+                  <p className="community-post-content">{post.content}</p>
+                  <footer className="community-post-footer">
+                    <button
+                      type="button"
+                      className={`community-reaction-btn ${reacted ? 'community-reaction-btn--active' : ''}`}
+                      onClick={() => handleReaction(post)}
+                      disabled={reactingId === post.id || !user}
+                      title={user ? undefined : t('community_login_to_react')}
+                    >
+                      <Heart size={16} fill={reacted ? 'currentColor' : 'none'} aria-hidden />
+                      {t('community_reactions', { count: post.reactions_count || 0 })}
+                    </button>
+                  </footer>
+                </article>
+              );
+            })
+          )}
+          {!loading && posts.length > 0 && hasMore && (
+            <div className="community-load-more-wrap">
+              <button
+                type="button"
+                className="btn btn-outline btn-sm"
+                onClick={loadMorePosts}
+                disabled={loadingMore}
+              >
+                {loadingMore ? <Loader2 size={16} className="community-spin" /> : null}
+                {loadingMore ? t('community_loading_more') : t('community_load_more')}
+              </button>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

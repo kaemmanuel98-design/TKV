@@ -6,7 +6,8 @@
   justify-content: center;
   padding: 2rem 1.25rem;
   background:
-    radial-gradient(circle at 50% 0%, var(--gold-glow), transparent 55%),
+    radial-gradient(circle at 50% 0%, var(--royal-glow), transparent 50%),
+    radial-gradient(circle at 80% 80%, var(--teal-glow), transparent 45%),
     var(--bg-deep);
 }
 
@@ -32,16 +33,17 @@
 }
 
 .onboarding-slide-icon {
-  width: 72px;
-  height: 72px;
+  width: 76px;
+  height: 76px;
   margin: 0 auto 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-lg);
-  background: rgba(201, 169, 98, 0.1);
+  background: var(--gradient-brand-soft);
   border: 1px solid var(--border-gold);
   color: var(--gold-bright);
+  box-shadow: var(--shadow-gold);
 }
 
 .onboarding-slide h1 {
@@ -75,8 +77,8 @@
 
 .onboarding-dots span.active {
   opacity: 1;
-  background: var(--gold);
-  transform: scale(1.15);
+  background: var(--gradient-brand);
+  transform: scale(1.2);
 }
 
 .onboarding-profile-step h1 {

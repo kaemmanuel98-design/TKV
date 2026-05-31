@@ -19,7 +19,7 @@ const resources = {
       listen: 'Écouter à voix haute',
       home_badge: 'Curieux & croyants · 6 langues · La vérité en dialogue',
       home_subtitle:
-        'Que vous cherchiez, questionniez ou croyiez déjà — explorez la foi avec clarté et bienveillance.',
+        'Que vous cherchiez, questionniez ou croyiez déjà, explorez la foi avec clarté et bienveillance.',
       home_bible_desc:
         'Plongez dans les Écritures mot à mot : touchez un terme hébreu ou grec et laissez le sens original vous éclairer.',
       home_heritage_desc:
@@ -46,6 +46,7 @@ const resources = {
         'Que vous cherchiez des réponses ou approfondissiez déjà votre foi, TKV vous accueille sans jugement, avec rigueur et bienveillance.',
       home_about_cta: 'Découvrir notre mission',
       footer_nav_label: 'Liens du pied de page',
+      footer_nav_title: 'Explorer TKV',
       layout_home: 'Accueil',
       layout_support: 'Soutenir',
       layout_login: 'Se connecter',
@@ -102,6 +103,8 @@ const resources = {
       lib_progress_label: '{{percent}} % lu',
       lib_subtitle: 'Des livres choisis pour éveiller, consoler et fortifier votre foi.',
       lib_coming_soon: 'Bientôt disponible',
+      lib_section_available: 'À lire maintenant',
+      lib_section_soon: 'Prochainement',
       lib_book_essence_title: "L'Essence de la Foi",
       lib_book_masque_title: 'Le Masque de la Foi',
       lib_book_author_aek: 'Ange Emmanuel Kouamé',
@@ -135,6 +138,7 @@ const resources = {
       chat_live: 'Échanges en direct',
       chat_no_messages: 'Soyez le premier à dire un mot de bienvenue.',
       chat_placeholder: 'Partagez une pensée, une prière, un encouragement…',
+      heritage_page_eyebrow: 'Histoire & foi',
       heritage_subtitle: 'L’histoire qui nous précède et la vérité qui nous rassemble.',
       heritage_tab_timeline: 'Histoire de l’Église',
       heritage_tab_apologetics: 'Apologétique',
@@ -211,6 +215,8 @@ const resources = {
         'Pour une prononciation française naturelle, préférez « Voix cloud » plutôt que la voix du navigateur.',
       speech_accent_label: 'Accent',
       speech_error: 'Impossible de lire ce passage à voix haute.',
+      speech_autoplay_blocked:
+        'Le navigateur a bloqué le son. Réessayez en cliquant à nouveau sur Écouter, ou choisissez « Voix du navigateur » dans le profil.',
       speech_empty_text: 'Aucun texte à lire pour ce passage.',
       speech_no_native_voice:
         'Aucune voix française installée sur cet appareil. Dans Profil, choisissez « Voix cloud » (recommandé) ou installez une voix française dans les paramètres système.',
@@ -294,7 +300,7 @@ const resources = {
       listen: 'Listen aloud',
       home_badge: 'Seekers & believers · 6 languages · Truth in dialogue',
       home_subtitle:
-        'Whether you seek, question, or already believe — explore faith with clarity and care.',
+        'Whether you seek, question, or already believe, explore faith with clarity and care.',
       home_bible_desc:
         'Dive into Scripture word by word: tap a Hebrew or Greek term and let the original meaning light your path.',
       home_heritage_desc:
@@ -377,6 +383,8 @@ const resources = {
       lib_progress_label: '{{percent}}% read',
       lib_subtitle: 'Books chosen to awaken, comfort, and strengthen your faith.',
       lib_coming_soon: 'Coming soon',
+      lib_section_available: 'Read now',
+      lib_section_soon: 'Coming soon',
       lib_book_essence_title: 'The Essence of Faith',
       lib_book_masque_title: 'The Mask of Faith',
       lib_book_author_aek: 'Ange Emmanuel Kouamé',
@@ -410,6 +418,7 @@ const resources = {
       chat_live: 'Live conversation',
       chat_no_messages: 'Be the first to say a word of welcome.',
       chat_placeholder: 'Share a thought, a prayer, an encouragement…',
+      heritage_page_eyebrow: 'History & faith',
       heritage_subtitle: 'The story behind us and the truth that unites us.',
       heritage_tab_timeline: 'Church history',
       heritage_tab_apologetics: 'Apologetics',
@@ -484,6 +493,8 @@ const resources = {
       speech_cloud_recommended: 'For natural pronunciation, prefer “Cloud voice” over browser voice.',
       speech_accent_label: 'Accent',
       speech_error: 'Could not read this passage aloud.',
+      speech_autoplay_blocked:
+        'The browser blocked audio playback. Tap Listen again, or choose “Browser voice” in your profile.',
       speech_empty_text: 'No text to read for this passage.',
       speech_no_native_voice:
         'No native voice for this language on your device. In Profile, choose “Cloud voice” (recommended).',
@@ -567,7 +578,7 @@ const resources = {
       listen: 'Escuchar en voz alta',
       home_badge: 'Curiosos y creyentes · 6 idiomas · Verdad en diálogo',
       home_subtitle:
-        'Busques, cuestiones o ya creas — explora la fe con rigor y benevolencia, en 6 idiomas.',
+        'Busques, cuestiones o ya creas, explora la fe con claridad y benevolencia.',
       home_bible_desc:
         'Sumérgete en las Escrituras palabra a palabra: toca un término hebreo o griego y deja que el sentido original te ilumine.',
       home_heritage_desc:
@@ -650,6 +661,8 @@ const resources = {
       lib_progress_label: '{{percent}} % leído',
       lib_subtitle: 'Libros elegidos para despertar, consolar y fortalecer tu fe.',
       lib_coming_soon: 'Próximamente',
+      lib_section_available: 'Leer ahora',
+      lib_section_soon: 'Próximamente',
       lib_book_essence_title: 'La esencia de la fe',
       lib_book_masque_title: 'La máscara de la fe',
       lib_book_author_aek: 'Ange Emmanuel Kouamé',
@@ -683,6 +696,7 @@ const resources = {
       chat_live: 'Conversación en vivo',
       chat_no_messages: 'Sé el primero en dar la bienvenida.',
       chat_placeholder: 'Comparte un pensamiento, una oración, un ánimo…',
+      heritage_page_eyebrow: 'Historia & fe',
       heritage_subtitle: 'La historia que nos precede y la verdad que nos une.',
       heritage_tab_timeline: 'Historia de la Iglesia',
       heritage_tab_apologetics: 'Apologética',
@@ -753,6 +767,8 @@ const resources = {
       speech_cloud_recommended: 'Para una pronunciación natural, usa «Voz en la nube».',
       speech_accent_label: 'Acento',
       speech_error: 'No se pudo leer este pasaje en voz alta.',
+      speech_autoplay_blocked:
+        'El navegador bloqueó el audio. Pulse Escuchar de nuevo o elija «Voz del navegador» en el perfil.',
       speech_empty_text: 'No hay texto que leer en este pasaje.',
       speech_no_native_voice:
         'No hay voz nativa en este idioma. En Perfil, elige «Voz en la nube» (recomendado).',
@@ -836,7 +852,7 @@ const resources = {
       listen: 'Hardop luisteren',
       home_badge: 'Zoekers & gelovigen · 6 talen · Waarheid in dialoog',
       home_subtitle:
-        'Zoekt, twijfelt of gelooft u al — verken het geloof met rigor en warmte, in 6 talen.',
+        'Zoekt, twijfelt of gelooft u al, verken het geloof met helderheid en warmte.',
       home_bible_desc:
         'Duik woord voor woord in de Schrift: tik op een Hebreeuws of Grieks woord en laat de oorspronkelijke betekenis u verlichten.',
       home_heritage_desc:
@@ -919,6 +935,8 @@ const resources = {
       lib_progress_label: '{{percent}}% gelezen',
       lib_subtitle: 'Boeken die het geloof wekken, troosten en versterken.',
       lib_coming_soon: 'Binnenkort beschikbaar',
+      lib_section_available: 'Nu lezen',
+      lib_section_soon: 'Binnenkort',
       lib_book_essence_title: 'De essentie van het geloof',
       lib_book_masque_title: 'Het masker van het geloof',
       lib_book_author_aek: 'Ange Emmanuel Kouamé',
@@ -952,6 +970,7 @@ const resources = {
       chat_live: 'Live gesprek',
       chat_no_messages: 'Wees de eerste die een woord van welkom deelt.',
       chat_placeholder: 'Deel een gedachte, een gebed, een bemoediging…',
+      heritage_page_eyebrow: 'Geschiedenis & geloof',
       heritage_subtitle: 'Het verhaal vóór ons en de waarheid die ons bindt.',
       heritage_tab_timeline: 'Kerkgeschiedenis',
       heritage_tab_apologetics: 'Apologetiek',
@@ -1022,6 +1041,8 @@ const resources = {
       speech_cloud_recommended: 'Voor natuurlijke uitspraak: kies «Cloudstem».',
       speech_accent_label: 'Accent',
       speech_error: 'Dit fragment kon niet worden voorgelezen.',
+      speech_autoplay_blocked:
+        'De browser blokkeerde het geluid. Klik opnieuw op Luisteren of kies «Browserstem» in uw profiel.',
       speech_empty_text: 'Geen tekst om voor te lezen.',
       speech_no_native_voice:
         'Geen native stem voor deze taal. Kies in Profiel «Cloudstem» (aanbevolen).',
@@ -1105,7 +1126,7 @@ const resources = {
       listen: 'Ouvir em voz alta',
       home_badge: 'Curiosos e crentes · 6 idiomas · Verdade em diálogo',
       home_subtitle:
-        'Procures, questiones ou já creias — explora a fé com rigor e benevolência, em 6 idiomas.',
+        'Procures, questiones ou já creias, explora a fé com clareza e benevolência.',
       home_bible_desc:
         'Mergulha nas Escrituras palavra a palavra: toca um termo hebraico ou grego e deixa o sentido original iluminar-te.',
       home_heritage_desc:
@@ -1188,6 +1209,8 @@ const resources = {
       lib_progress_label: '{{percent}}% lido',
       lib_subtitle: 'Livros escolhidos para despertar, consolar e fortalecer a tua fé.',
       lib_coming_soon: 'Em breve',
+      lib_section_available: 'Ler agora',
+      lib_section_soon: 'Em breve',
       lib_book_essence_title: 'A essência da fé',
       lib_book_masque_title: 'A máscara da fé',
       lib_book_author_aek: 'Ange Emmanuel Kouamé',
@@ -1221,6 +1244,7 @@ const resources = {
       chat_live: 'Conversa ao vivo',
       chat_no_messages: 'Sê o primeiro a dar as boas-vindas.',
       chat_placeholder: 'Partilha um pensamento, uma oração, um encorajamento…',
+      heritage_page_eyebrow: 'História & fé',
       heritage_subtitle: 'A história que nos precede e a verdade que nos une.',
       heritage_tab_timeline: 'História da Igreja',
       heritage_tab_apologetics: 'Apologética',
@@ -1291,6 +1315,8 @@ const resources = {
       speech_cloud_recommended: 'Para pronúncia natural, use «Voz na nuvem».',
       speech_accent_label: 'Sotaque',
       speech_error: 'Não foi possível ler este trecho em voz alta.',
+      speech_autoplay_blocked:
+        'O navegador bloqueou o áudio. Toque em Ouvir novamente ou escolha «Voz do navegador» no perfil.',
       speech_empty_text: 'Não há texto para ler neste trecho.',
       speech_no_native_voice:
         'Sem voz nativa neste idioma. No Perfil, escolha «Voz na nuvem» (recomendado).',
@@ -1374,7 +1400,7 @@ const resources = {
       listen: 'استمع بصوت عالٍ',
       home_badge: 'الباحثون والمؤمنون · 6 لغات · الحقيقة في حوار',
       home_subtitle:
-        'تبحث أو تشك أو تؤمن — استكشف الإيمان بصرامة ولطف، بست لغات.',
+        'تبحث أو تشك أو تؤمن، استكشف الإيمان بوضوح ولطف.',
       home_bible_desc:
         'تعمّق في الكتاب كلمةً كلمةً: المس مصطلحاً عبرياً أو يونانياً ودع المعنى الأصلي يضيء طريقك.',
       home_heritage_desc:
@@ -1457,6 +1483,8 @@ const resources = {
       lib_progress_label: '{{percent}}٪ مقروء',
       lib_subtitle: 'كتب مختارة لإيقاظ الإيمان ومواساة القلب وتقويته.',
       lib_coming_soon: 'قريباً',
+      lib_section_available: 'اقرأ الآن',
+      lib_section_soon: 'قريباً',
       lib_book_essence_title: 'جوهر الإيمان',
       lib_book_masque_title: 'قناع الإيمان',
       lib_book_author_aek: 'أنج إيمانويل كوامي',
@@ -1489,6 +1517,7 @@ const resources = {
       chat_live: 'محادثة مباشرة',
       chat_no_messages: 'كن أول من يقدّم كلمة ترحيب.',
       chat_placeholder: 'شارك فكرة، صلاة، أو تشجيعاً…',
+      heritage_page_eyebrow: 'تاريخ وإيمان',
       heritage_subtitle: 'التاريخ الذي يسبقنا والحقيقة التي تجمعنا.',
       heritage_tab_timeline: 'تاريخ الكنيسة',
       heritage_tab_apologetics: 'الدفاع عن الإيمان',
@@ -1559,6 +1588,8 @@ const resources = {
       speech_cloud_recommended: 'لنطق طبيعي، اختر «الصوت السحابي».',
       speech_accent_label: 'اللكنة',
       speech_error: 'تعذّرت قراءة هذا المقطع بصوت عالٍ.',
+      speech_autoplay_blocked:
+        'منع المتصفح تشغيل الصوت. اضغط استماع مرة أخرى أو اختر «صوت المتصفح» في الملف الشخصي.',
       speech_empty_text: 'لا يوجد نص للقراءة في هذا المقطع.',
       speech_no_native_voice:
         'لا توجد أصوات أصلية لهذه اللغة. في الملف الشخصي، اختر «الصوت السحابي» (موصى به).',

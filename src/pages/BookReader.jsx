@@ -10,6 +10,8 @@ import { useBookProgressStore } from '../store/useBookProgressStore';
 import { translateChapter } from '../lib/translateOnDemand';
 import { formatBookContent } from '../lib/formatBookContent';
 import { prepareBookChapterSpeech } from '../lib/prepareBookSpeech';
+import { resolveBookSpeechLanguage } from '../lib/speech/bookSpeechLocale';
+import { unlockSpeechPlayback } from '../lib/speech/unlockPlayback';
 import './BookReader.css';
 
 const BookReader = () => {
@@ -140,26 +142,32 @@ const BookReader = () => {
 
   const toggleListen = useCallback(async () => {
     if (!displayChapter) return;
+    unlockSpeechPlayback();
+
     if (isSpeaking) {
       stop();
       setIsSpeaking(false);
       return;
     }
 
+    const speechLang = resolveBookSpeechLanguage(book, { translating });
     const speechText = prepareBookChapterSpeech(displayChapter.content, {
-      locale: i18n.language,
+      locale: speechLang,
     });
-    if (!speechText.trim()) return;
+    if (!speechText.trim()) {
+      alert(t('speech_empty_text'));
+      return;
+    }
 
     setIsSpeaking(true);
     try {
-      await speak(speechText, { prepared: true });
+      await speak(speechText, { prepared: true, language: speechLang });
     } catch {
       /* alertes dans useSpeak */
     } finally {
       setIsSpeaking(false);
     }
-  }, [displayChapter, i18n.language, isSpeaking, speak, stop]);
+  }, [book, displayChapter, translating, isSpeaking, speak, stop, t]);
 
   const goToChapter = (idx) => {
     setCurrentChapterIdx(idx);

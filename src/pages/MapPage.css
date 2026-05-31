@@ -1,23 +1,294 @@
 /* Carte du Royaume — thème premium */
 
+.map-page {
+  padding-bottom: calc(2.5rem + var(--safe-bottom, 0px));
+}
+
+.map-page *:focus-visible {
+  outline: 2px solid rgba(201, 169, 98, 0.45);
+  outline-offset: 2px;
+}
+
+/* —— Hero —— */
+.map-hero {
+  position: relative;
+  margin-bottom: 1.25rem;
+  padding: 1.75rem 0 1.15rem;
+  overflow: hidden;
+}
+
+.map-hero-glow {
+  position: absolute;
+  inset: -35% 5% auto;
+  height: 280px;
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 0%,
+    rgba(91, 77, 154, 0.14) 0%,
+    rgba(42, 111, 158, 0.1) 42%,
+    rgba(201, 169, 98, 0.08) 68%,
+    transparent 72%
+  );
+  pointer-events: none;
+}
+
+.map-hero-inner {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.map-hero-mark {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-glass);
+}
+
+.map-hero-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.map-hero-eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.map-hero-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 1.85rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+
+.map-hero-subtitle {
+  margin: 0.5rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  max-width: 36rem;
+}
+
+.map-body {
+  max-width: min(72rem, 100%);
+  margin: 0 auto;
+}
+
+/* —— Présence sur la carte —— */
+.map-presence {
+  padding: 1rem 1.05rem;
+}
+
+.map-presence-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.map-presence-head svg {
+  color: var(--km-royal-bright, var(--gold));
+  flex-shrink: 0;
+}
+
+.map-presence-title {
+  margin: 0;
+  flex: 1;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.map-presence-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-subtle);
+}
+
+.map-presence-badge--on {
+  color: var(--km-emerald-bright, #4ecf9a);
+  border-color: rgba(78, 207, 154, 0.35);
+  background: rgba(45, 138, 106, 0.15);
+}
+
+.map-presence-hint {
+  margin: 0 0 0.85rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-tertiary);
+}
+
+.map-presence-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.map-presence-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.map-presence-input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  outline: none;
+  font-family: inherit;
+  transition: border-color var(--duration-fast);
+}
+
+.map-presence-input:focus {
+  border-color: var(--border-gold-hover);
+}
+
+.map-presence-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.15rem;
+}
+
+.map-presence-geo,
+.map-presence-save {
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.map-presence-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin-top: 0.85rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.map-presence-toggle input {
+  margin-top: 0.15rem;
+  accent-color: var(--gold);
+}
+
+.map-presence-suggestions {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.map-presence-suggestions-title {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.map-presence-suggestions-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 11rem;
+  overflow-y: auto;
+}
+
+.map-presence-suggestion {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast),
+    background var(--duration-fast);
+}
+
+.map-presence-suggestion:hover:not(:disabled) {
+  border-color: var(--border-gold);
+  background: var(--bg-glass);
+}
+
+.map-presence-suggestion-label {
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+.map-presence-suggestion-meta {
+  font-size: 0.68rem;
+  color: var(--text-tertiary);
+}
+
+.map-presence-error {
+  margin: 0.65rem 0 0;
+  font-size: 0.8125rem;
+  color: #ef9a9a;
+}
+
+.map-presence-success {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0.65rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--km-emerald-bright, #4ecf9a);
+}
+
+.map-page .map-spin {
+  animation: map-spin 0.8s linear infinite;
+}
+
+@keyframes map-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .map-shell--kingdom {
-  --km-royal: #5b4d9a;
-  --km-royal-bright: #8b7fd4;
-  --km-sapphire: #2a6f9e;
-  --km-sapphire-bright: #4ba3d4;
-  --km-emerald: #2d8a6a;
-  --km-emerald-bright: #4ecf9a;
-  --km-coral: #c45c4a;
-  --km-coral-bright: #f08a72;
-  --km-amber: #d4a03c;
-  --km-amber-bright: #f0c96a;
-  --km-glass: rgba(14, 14, 22, 0.78);
-  --km-glass-border: rgba(255, 255, 255, 0.1);
   --km-gradient-hero: linear-gradient(
     135deg,
-    rgba(91, 77, 154, 0.35) 0%,
-    rgba(42, 111, 158, 0.28) 40%,
-    rgba(201, 169, 98, 0.22) 100%
+    rgba(99, 118, 212, 0.32) 0%,
+    rgba(58, 143, 196, 0.26) 40%,
+    rgba(212, 180, 86, 0.2) 100%
   );
   position: relative;
   padding-bottom: 2.5rem;

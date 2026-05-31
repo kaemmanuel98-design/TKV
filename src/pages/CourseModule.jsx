@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, CheckCircle, Volume2, VolumeX } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
+import { ArrowLeft, CheckCircle, Volume2, VolumeX, ChevronRight } from 'lucide-react';
 import { COURSE_MODULES } from '../data/courseModules';
 import { COURSE_CONTENT } from '../data/courseContent';
 import { useAuthStore } from '../store/useAuthStore';
@@ -30,7 +29,6 @@ const CourseModule = () => {
   const isPremium = useProfileStore((s) => s.isPremium);
   const markComplete = useCourseProgressStore((s) => s.markComplete);
   const isComplete = useCourseProgressStore((s) => s.isComplete);
-  const awardBadge = useGamificationStore((s) => s.awardBadge);
 
   const [paragraphs, setParagraphs] = useState([]);
   const [translating, setTranslating] = useState(false);
@@ -100,12 +98,12 @@ const CourseModule = () => {
       return;
     }
 
-    const speechText = prepareModuleSpeech(paragraphs.join('\n\n'), { locale: i18n.language });
+    const speechText = prepareModuleSpeech(paragraphs.join('\n\n'), { locale: lang });
     if (!speechText.trim()) return;
 
     setIsSpeaking(true);
     try {
-      await speak(speechText, { prepared: true });
+      await speak(speechText, { prepared: true, language: lang });
     } catch {
       /* alertes dans useSpeak */
     } finally {
@@ -115,9 +113,12 @@ const CourseModule = () => {
 
   if (!course || !modMeta) {
     return (
-      <div className="container">
+      <div className="container course-module-empty animate-fade-in">
         <p>{t('course_not_found')}</p>
-        <Link to="/courses">{t('course_back')}</Link>
+        <Link to="/courses" className="course-module-back">
+          <ArrowLeft size={18} aria-hidden />
+          {t('course_back')}
+        </Link>
       </div>
     );
   }
@@ -126,24 +127,24 @@ const CourseModule = () => {
 
   if (locked) {
     return (
-      <div className="container course-module-page">
-        <Link to={`/courses/${courseId}`} className="btn btn-ghost btn-sm">
-          <ArrowLeft size={18} />
+      <div className="container course-module-locked animate-fade-in">
+        <Link to={`/courses/${courseId}`} className="course-module-back">
+          <ArrowLeft size={18} aria-hidden />
           {t('course_back')}
         </Link>
-        <p className="mt-4">{t('course_premium_only')}</p>
+        <p>{t('course_premium_only')}</p>
       </div>
     );
   }
 
   if (!content) {
     return (
-      <div className="container course-module-page">
-        <Link to={`/courses/${courseId}`} className="btn btn-ghost btn-sm">
-          <ArrowLeft size={18} />
+      <div className="container course-module-empty animate-fade-in">
+        <Link to={`/courses/${courseId}`} className="course-module-back">
+          <ArrowLeft size={18} aria-hidden />
           {t('course_back')}
         </Link>
-        <p className="mt-4 text-muted">{t('course_module_no_content')}</p>
+        <p>{t('course_module_no_content')}</p>
       </div>
     );
   }
@@ -155,77 +156,87 @@ const CourseModule = () => {
     applyCourseBadgesFromProgress(useCourseProgressStore.getState().completed);
   };
 
+  const hasNext = index < course.modules.length;
+
   return (
-    <div className="container course-module-page animate-fade-in">
-      <Link to={`/courses/${courseId}`} className="btn btn-ghost btn-sm course-module-back">
-        <ArrowLeft size={18} />
-        {t('course_back')}
-      </Link>
+    <div className="course-module-page animate-fade-in">
+      <div className="container course-module-top">
+        <Link to={`/courses/${courseId}`} className="course-module-back">
+          <ArrowLeft size={18} aria-hidden />
+          {t('course_back')}
+        </Link>
+        <header className="course-module-hero">
+          <div className="course-module-hero-copy">
+            <p className="course-module-eyebrow">
+              {t('course_module_label', { num: index })}
+            </p>
+            <h1 className="course-module-title">{t(content.titleKey)}</h1>
+          </div>
+          <div className="course-module-listen">
+            <button
+              type="button"
+              className={`btn btn-sm ${isSpeaking ? 'btn-ghost' : 'btn-outline'}`}
+              onClick={toggleListen}
+              disabled={translating || !paragraphs.length}
+              title={isSpeaking ? t('book_stop_listen') : t('course_listen_module')}
+            >
+              {isSpeaking ? <VolumeX size={18} aria-hidden /> : <Volume2 size={18} aria-hidden />}
+              <span className="hide-mobile">
+                {isSpeaking ? t('book_stop_listen') : t('course_listen_module')}
+              </span>
+            </button>
+          </div>
+        </header>
+      </div>
 
-      <PageHeader
-        title={t(content.titleKey)}
-        subtitle={t('course_module_label', { num: index })}
-        actions={
-          <button
-            type="button"
-            className={`btn btn-sm ${isSpeaking ? 'btn-ghost' : 'btn-primary'}`}
-            onClick={toggleListen}
-            disabled={translating || !paragraphs.length}
-            title={isSpeaking ? t('book_stop_listen') : t('course_listen_module')}
-          >
-            {isSpeaking ? <VolumeX size={18} /> : <Volume2 size={18} />}
-            <span className="hide-mobile">
-              {isSpeaking ? t('book_stop_listen') : t('course_listen_module')}
-            </span>
-          </button>
-        }
-      />
-
-      {translating && (
-        <p className="course-module-notice" role="status">
-          {t('content_translating')}
-        </p>
-      )}
-      {translateError && !translating && (
-        <p className="course-module-notice course-module-notice--warn" role="status">
-          {t('content_translate_error')}
-        </p>
-      )}
-
-      <article
-        className="card course-module-body"
-        dir={isRtl ? 'rtl' : 'ltr'}
-        lang={lang}
-      >
-        {paragraphs.map((para, idx) => (
-          <p key={idx}>{para}</p>
-        ))}
-      </article>
-
-      <div className="course-module-actions">
-        {!done ? (
-          <button type="button" className="btn btn-primary" onClick={handleComplete}>
-            <CheckCircle size={18} />
-            {t('course_module_mark_done')}
-          </button>
-        ) : (
-          <p className="course-module-done-msg">
-            <CheckCircle size={20} color="var(--gold-bright)" />
-            {t('course_module_complete')}
+      <div className="container course-module-body-wrap">
+        {translating && (
+          <p className="course-module-notice" role="status">
+            {t('content_translating')}
           </p>
         )}
-        {index < course.modules.length ? (
-          <Link
-            to={`/courses/${courseId}/module/${index + 1}`}
-            className="btn btn-outline"
-          >
-            {t('course_module_next')}
-          </Link>
-        ) : (
-          <Link to={`/courses/${courseId}`} className="btn btn-outline">
-            {t('course_back')}
-          </Link>
+        {translateError && !translating && (
+          <p className="course-module-notice course-module-notice--warn" role="status">
+            {t('content_translate_error')}
+          </p>
         )}
+
+        <article
+          className="course-module-article"
+          dir={isRtl ? 'rtl' : 'ltr'}
+          lang={lang}
+        >
+          {paragraphs.map((para, idx) => (
+            <p key={idx}>{para}</p>
+          ))}
+        </article>
+
+        <footer className="course-module-footer">
+          {!done ? (
+            <button type="button" className="btn btn-primary" onClick={handleComplete}>
+              <CheckCircle size={18} aria-hidden />
+              {t('course_module_mark_done')}
+            </button>
+          ) : (
+            <p className="course-module-done">
+              <CheckCircle size={18} aria-hidden />
+              {t('course_module_complete')}
+            </p>
+          )}
+          {hasNext ? (
+            <Link
+              to={`/courses/${courseId}/module/${index + 1}`}
+              className="btn btn-outline"
+            >
+              {t('course_module_next')}
+              <ChevronRight size={16} aria-hidden />
+            </Link>
+          ) : (
+            <Link to={`/courses/${courseId}`} className="btn btn-outline">
+              {t('course_back')}
+            </Link>
+          )}
+        </footer>
       </div>
     </div>
   );

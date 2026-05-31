@@ -1,15 +1,15 @@
-/** Droits animateur visio / cellule (Premium+, profil, e-mails admin). */
-export function resolvePlanType(profile) {
-  if (!profile) return 'free';
+/** Droits animateur visio / cellule (Premium, profil animateur, e-mails admin). */
+
+export function isPremiumProfile(profile) {
+  if (!profile) return false;
+  if (profile.is_premium) return true;
   const plan = profile.plan_type || 'free';
-  if (plan === 'premium_plus') return 'premium_plus';
-  if (profile.is_premium && plan === 'premium_plus') return 'premium_plus';
-  return plan;
+  return plan === 'premium' || plan === 'premium_plus';
 }
 
 export function resolveCanHostVisio(user, profile, hostEmails = []) {
   if (profile?.can_host_visio === true) return true;
-  if (resolvePlanType(profile) === 'premium_plus') return true;
+  if (isPremiumProfile(profile)) return true;
   const email = (user?.email || '').toLowerCase();
   return Boolean(email && hostEmails.includes(email));
 }

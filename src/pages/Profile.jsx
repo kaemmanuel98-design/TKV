@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Award,
-  Target,
   Shield,
   LogOut,
   Loader2,
@@ -11,17 +10,16 @@ import {
   TrendingUp,
   MessageCircle,
   BookOpen,
-  Landmark,
   MapPin,
   GraduationCap,
-  Headphones,
   DoorClosed,
   HeartHandshake,
+  Users,
+  ChevronRight,
+  Sparkles,
 } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
 import ProfileAvatar from '../components/ProfileAvatar';
 import PaywallModal from '../components/PaywallModal';
-import SpeechSettings from '../components/SpeechSettings';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { exportUserData, deleteUserAccount, downloadJsonExport } from '../lib/userApi';
@@ -35,7 +33,7 @@ import { CERTIFICATE_COURSES } from '../lib/courseCertificates';
 import { fetchUserCertificates } from '../lib/certificateSync';
 import { supabase } from '../lib/supabase';
 import MimshackLogo from '../components/MimshackLogo';
-import { LibraryLogo, ProfileLogo } from '../components/SectionLogos';
+import { LibraryLogo } from '../components/SectionLogos';
 import { useCompanionAccess } from '../hooks/useCompanionAccess';
 import './Profile.css';
 
@@ -51,17 +49,16 @@ const badgeDefs = [
 
 const profileTypes = ['believer', 'skeptic', 'curious'];
 
-const profileQuickLinks = [
-  { to: '/bible', icon: BookOpen, labelKey: 'nav_bible' },
-  { to: '/heritage', icon: Landmark, labelKey: 'nav_heritage' },
-  { to: '/confessional', icon: DoorClosed, labelKey: 'nav_confessional' },
-  { to: '/cells', icon: MessageCircle, labelKey: 'cells' },
-  { to: '/map', icon: MapPin, labelKey: 'map' },
-  { to: '/agent', mimshack: true, labelKey: 'tab_agent' },
+const primaryLinks = [
   { to: '/library', mark: 'library', labelKey: 'tab_library' },
+  { to: '/bible', icon: BookOpen, labelKey: 'nav_bible' },
+  { to: '/agent', mimshack: true, labelKey: 'tab_agent' },
+  { to: '/confessional', icon: DoorClosed, labelKey: 'nav_confessional' },
   { to: '/courses', icon: GraduationCap, labelKey: 'course_page_title' },
-  { to: '/podcasts', icon: Headphones, labelKey: 'podcast_page_title' },
+  { to: '/cells', icon: MessageCircle, labelKey: 'cells' },
 ];
+
+const TABS = ['overview', 'account', 'more'];
 
 const Profile = () => {
   const { t } = useTranslation();
@@ -74,7 +71,6 @@ const Profile = () => {
     streakCurrent,
     streakBest,
     readingProgress,
-    iaQuestionsCount,
     awardBadge,
     incrementCommunityPosts,
     checkInToday,
@@ -83,6 +79,7 @@ const Profile = () => {
   const checkedInToday = hasCheckedInToday();
   const courseProgress = useCourseProgressStore((s) => s.progressPercent);
   const courseCompleted = useCourseProgressStore((s) => s.completedCount);
+  const [tab, setTab] = useState('overview');
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
   const [bio, setBio] = useState('');
@@ -115,15 +112,12 @@ const Profile = () => {
       .eq('post_type', 'testimony')
       .order('created_at', { ascending: false })
       .limit(10);
-
     if (!error) setMyTestimonies(data || []);
   }, [user?.id]);
 
   useEffect(() => {
     if (user) fetchProfile(user.id);
-    else {
-      setUserType(localStorage.getItem(PROFILE_TYPE_KEY) || 'curious');
-    }
+    else setUserType(localStorage.getItem(PROFILE_TYPE_KEY) || 'curious');
   }, [user, fetchProfile]);
 
   useEffect(() => {
@@ -152,7 +146,6 @@ const Profile = () => {
 
   useEffect(() => {
     if (!user?.id || !locationHydrated.current) return undefined;
-
     if (locationSaveTimer.current) clearTimeout(locationSaveTimer.current);
     locationSaveTimer.current = setTimeout(async () => {
       await updateProfile(user.id, {
@@ -164,7 +157,6 @@ const Profile = () => {
       const tId = setTimeout(() => setLocationSaved(false), 2500);
       return () => clearTimeout(tId);
     }, 700);
-
     return () => {
       if (locationSaveTimer.current) clearTimeout(locationSaveTimer.current);
     };
@@ -174,11 +166,14 @@ const Profile = () => {
   const cellHost = Boolean(user && canCreateCell());
   const { isCompanion } = useCompanionAccess();
   const planLabel =
-    plan === 'premium_plus'
-      ? t('profile_plan_premium_plus')
-      : plan === 'premium'
-        ? t('profile_plan_premium')
-        : t('profile_plan_free');
+    plan === 'premium' ? t('profile_plan_premium') : t('profile_plan_free');
+
+  const displayName = user?.user_metadata?.name || profile?.name || t('profile_guest');
+  const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url || null;
+  const userEmail = user?.email || '';
+
+  const formatDate = (iso) =>
+    new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 
   const handleSave = async () => {
     localStorage.setItem(PROFILE_TYPE_KEY, userType);
@@ -221,7 +216,6 @@ const Profile = () => {
     e.preventDefault();
     const text = testimonyDraft.trim();
     if (!text || !user?.id) return;
-
     setTestimonySubmitting(true);
     setTestimonyNotice(null);
     try {
@@ -236,19 +230,12 @@ const Profile = () => {
       awardBadge('community');
       incrementCommunityPosts();
       await loadMyTestimonies();
-    } catch (err) {
-      console.error(err);
+    } catch {
       setTestimonyNotice({ type: 'err', text: t('community_error') });
     } finally {
       setTestimonySubmitting(false);
     }
   };
-
-  const displayName = user?.user_metadata?.name || profile?.name || t('profile_guest');
-  const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url || null;
-
-  const formatDate = (iso) =>
-    new Date(iso).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 
   const handleExportData = async () => {
     const token = session?.access_token;
@@ -281,439 +268,436 @@ const Profile = () => {
     }
   };
 
-  return (
-    <div className="container profile-page animate-fade-in">
-      <PageHeader
-        title={t('profile_title')}
-        subtitle={displayName}
-        mark={<ProfileLogo size={52} title={t('profile_title')} />}
-      />
+  const earnedBadges = badgeDefs.filter((b) => badges.includes(b.id)).length;
 
-      <section className="card profile-identity-card">
-        <div className="profile-identity-row">
+  return (
+    <div className="profile-page animate-fade-in">
+      <header className="profile-hero">
+        <div className="profile-hero-glow" aria-hidden />
+        <div className="profile-hero-inner container">
           <ProfileAvatar
             src={avatarUrl}
             name={displayName}
-            size={104}
+            size={88}
             editable={Boolean(user)}
             uploading={avatarUploading}
             onPickFile={handleAvatarPick}
           />
-          <div className="profile-identity-copy">
-            <h2 className="profile-identity-name">{displayName}</h2>
-            {user ? (
-              <>
-                <p className="text-muted profile-avatar-hint">{t('profile_avatar_hint')}</p>
-                {avatarUploading && (
-                  <p className="profile-notice">
-                    <Loader2 size={14} className="spin" />
-                    {t('profile_avatar_uploading')}
-                  </p>
-                )}
-                {avatarNotice && (
-                  <p className={`profile-notice profile-notice--${avatarNotice.type}`}>
-                    {avatarNotice.text}
-                  </p>
-                )}
-              </>
-            ) : (
-              <p className="text-muted profile-avatar-hint">{t('profile_avatar_login')}</p>
+          <div className="profile-hero-copy">
+            <p className="profile-hero-eyebrow">{t('profile_title')}</p>
+            <h1 className="profile-hero-name">{displayName}</h1>
+            {userEmail && <p className="profile-hero-email">{userEmail}</p>}
+            <div className="profile-hero-meta">
+              <span className={`profile-plan-pill profile-plan-pill--${plan}`}>{planLabel}</span>
+              {user && (
+                <button
+                  type="button"
+                  className={`profile-checkin-pill ${checkedInToday ? 'is-done' : ''}`}
+                  disabled={checkedInToday}
+                  onClick={() => checkInToday()}
+                >
+                  <Flame size={14} aria-hidden />
+                  {checkedInToday ? t('dashboard_checkin_done') : t('dashboard_checkin')}
+                </button>
+              )}
+            </div>
+            {avatarNotice && (
+              <p className={`profile-inline-notice profile-inline-notice--${avatarNotice.type}`}>
+                {avatarNotice.text}
+              </p>
             )}
           </div>
         </div>
-      </section>
+      </header>
 
-      <section className="card profile-activity-card">
-        <h2 className="profile-section-title">{t('profile_activity_title')}</h2>
-        <p className="text-muted profile-activity-desc">{t('profile_activity_desc')}</p>
-
-        <div className="profile-activity-stats">
-          <div className="profile-activity-stat">
-            <div className="profile-activity-stat-head">
-              <Flame size={18} aria-hidden="true" />
-              <span>{t('dashboard_streak_label')}</span>
-            </div>
-            <p className="profile-activity-stat-value">
+      <div className="container profile-body">
+        <div className="profile-metrics" role="list">
+          <article className="profile-metric" role="listitem">
+            <Flame size={18} aria-hidden />
+            <span className="profile-metric-label">{t('dashboard_streak_label')}</span>
+            <strong className="profile-metric-value">
               {streakCurrent === 1
                 ? t('dashboard_streak_days', { count: streakCurrent })
                 : t('dashboard_streak_days_plural', { count: streakCurrent })}
-            </p>
+            </strong>
             {streakBest > 0 && (
-              <p className="profile-activity-stat-meta">
+              <span className="profile-metric-sub">
                 {t('dashboard_streak_record', { count: streakBest })}
-              </p>
+              </span>
             )}
-            <button
-              type="button"
-              className="btn btn-outline btn-sm profile-activity-checkin"
-              disabled={checkedInToday}
-              onClick={() => checkInToday()}
-            >
-              {checkedInToday ? t('dashboard_checkin_done') : t('dashboard_checkin')}
-            </button>
-          </div>
-
-          <div className="profile-activity-stat">
-            <div className="profile-activity-stat-head">
-              <TrendingUp size={18} aria-hidden="true" />
-              <span>{t('dashboard_progress_label')}</span>
-            </div>
-            <p className="profile-activity-stat-value">
+          </article>
+          <article className="profile-metric" role="listitem">
+            <TrendingUp size={18} aria-hidden />
+            <span className="profile-metric-label">{t('dashboard_progress_label')}</span>
+            <strong className="profile-metric-value">
               {t('dashboard_progress_value', { percent: readingProgress })}
-            </p>
-            <div className="profile-progress-bar profile-activity-progress">
-              <div className="profile-progress-fill" style={{ width: `${readingProgress}%` }} />
-            </div>
-          </div>
-        </div>
-
-        <h3 className="profile-quick-title">{t('profile_courses_title')}</h3>
-        <p className="text-muted profile-courses-desc">
-          {user ? t('profile_courses_desc_sync') : t('profile_courses_desc')}
-        </p>
-        <ul className="profile-courses-list">
-          {COURSE_IDS.map((id) => {
-            const course = COURSE_MODULES[id];
-            const pct = courseProgress(id);
-            const done = courseCompleted(id);
-            return (
-              <li key={id}>
-                <Link to={`/courses/${id}`} className="profile-course-row">
-                  <span className="profile-course-name">{t(course.titleKey)}</span>
-                  <span className="profile-course-meta">
-                    {done} / {course.modules.length}
-                  </span>
-                  <div className="profile-progress-bar profile-course-bar">
-                    <div className="profile-progress-fill" style={{ width: `${pct}%` }} />
-                  </div>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-
-        {user && certificates.length > 0 && (
-          <>
-            <h3 className="profile-quick-title">{t('profile_certificates_title')}</h3>
-            <ul className="profile-certificates-list">
-              {certificates.map((cert) => (
-                <li key={cert.id}>
-                  <Link to={`/courses/${cert.course_slug}/certificate`} className="profile-cert-row">
-                    <Award size={18} aria-hidden="true" />
-                    <span>
-                      {t(CERTIFICATE_COURSES[cert.course_slug]?.titleKey || 'course_page_title')}
-                    </span>
-                    <span className="profile-cert-code">{cert.certificate_code}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-
-        <h3 className="profile-quick-title">{t('dashboard_quick_title')}</h3>
-        <div className="profile-quick-grid">
-          {profileQuickLinks.map(({ to, icon: Icon, labelKey, mimshack, mark }) => (
-            <Link key={to} to={to} className="profile-quick-link">
-              {mimshack ? (
-                <MimshackLogo size={18} />
-              ) : mark === 'library' ? (
-                <LibraryLogo size={18} />
-              ) : (
-                <Icon size={18} aria-hidden="true" />
-              )}
-              <span>{t(labelKey)}</span>
-            </Link>
-          ))}
-        </div>
-
-        <div className="profile-activity-banners">
-          <Link to="/cells" className="profile-activity-banner">
-            <span className="profile-activity-banner-badge">{t('dashboard_live_badge')}</span>
-            <strong>{t('dashboard_live_title')}</strong>
-            <p>{t('dashboard_live_desc')}</p>
-          </Link>
-          <Link to="/agent" className="profile-activity-banner">
-            <strong>{t('dashboard_ia_title')}</strong>
-            <p>{t('dashboard_ia_desc')}</p>
-          </Link>
-        </div>
-      </section>
-
-      <section className="card profile-testimony-card">
-        <h2 className="profile-section-title">{t('profile_testimony_title')}</h2>
-        <p className="text-muted profile-testimony-desc">{t('profile_testimony_desc')}</p>
-        {user ? (
-          <>
-            <form className="profile-testimony-form" onSubmit={handleTestimonySubmit}>
-              <textarea
-                className="input profile-testimony-textarea"
-                rows={4}
-                maxLength={2000}
-                value={testimonyDraft}
-                onChange={(e) => setTestimonyDraft(e.target.value)}
-                placeholder={t('profile_testimony_placeholder')}
-              />
-              <button
-                type="submit"
-                className="btn btn-primary"
-                disabled={testimonySubmitting || !testimonyDraft.trim()}
-              >
-                {testimonySubmitting ? <Loader2 size={16} className="spin" /> : null}
-                {t('profile_testimony_submit')}
-              </button>
-            </form>
-            {testimonyNotice && (
-              <p className={`profile-notice profile-notice--${testimonyNotice.type}`}>
-                {testimonyNotice.text}
-              </p>
-            )}
-            {myTestimonies.length > 0 ? (
-              <div className="profile-testimony-list">
-                <h3 className="profile-testimony-list-title">{t('profile_testimony_mine')}</h3>
-                <ul>
-                  {myTestimonies.map((item) => (
-                    <li key={item.id} className="profile-testimony-item">
-                      <time>{formatDate(item.created_at)}</time>
-                      <p>{item.content}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ) : (
-              <p className="text-muted profile-testimony-empty">{t('profile_testimony_empty')}</p>
-            )}
-          </>
-        ) : (
-          <Link to="/auth" className="btn btn-outline btn-sm">
-            {t('profile_testimony_login')}
-          </Link>
-        )}
-      </section>
-
-      {user && (
-        <section className="card profile-friends-link-card">
-          <h2 className="profile-section-title">{t('friends_title')}</h2>
-          <p className="text-muted">{t('friends_subtitle')}</p>
-          <Link to="/friends" className="btn btn-outline btn-sm">
-            {t('friends_nav')}
-          </Link>
-        </section>
-      )}
-
-      <section className="card profile-plan-card">
-        <div>
-          <h2 className="profile-section-title">{planLabel}</h2>
-          <p className="text-muted">
-            {plan === 'free' ? t('profile_plan_desc_free') : t('profile_plan_desc_premium')}
-          </p>
-        </div>
-        {plan === 'free' && (
-          <button type="button" className="btn btn-primary btn-sm" onClick={() => setPaywallOpen(true)}>
-            {t('agent_upgrade')}
-          </button>
-        )}
-      </section>
-
-      {cellHost && (
-        <section className="card profile-visio-host-card">
-          <div className="profile-visio-host-head">
-            <GraduationCap size={22} aria-hidden />
-            <div>
-              <h2 className="profile-section-title">{t('profile_cell_host_title')}</h2>
-              <p className="text-muted">{t('profile_cell_host_desc')}</p>
-            </div>
-          </div>
-          <Link to="/cells" className="btn btn-primary btn-sm">
-            {t('cells_create')}
-          </Link>
-        </section>
-      )}
-
-      {isCompanion ? (
-        <section className="card profile-visio-host-card profile-companion-card">
-          <div className="profile-visio-host-head">
-            <HeartHandshake size={22} aria-hidden />
-            <div>
-              <h2 className="profile-section-title">{t('profile_companion_title')}</h2>
-              <p className="text-muted">{t('profile_companion_desc')}</p>
-            </div>
-          </div>
-          <Link to="/companion" className="btn btn-primary btn-sm">
-            {t('profile_companion_cta')}
-          </Link>
-        </section>
-      ) : (
-        user && (
-          <section className="card profile-visio-host-card profile-companion-card">
-            <div className="profile-visio-host-head">
-              <HeartHandshake size={22} aria-hidden />
-              <div>
-                <h2 className="profile-section-title">{t('profile_companion_apply_title')}</h2>
-                <p className="text-muted">{t('profile_companion_apply_desc')}</p>
-              </div>
-            </div>
-            <Link to="/companion/apply" className="btn btn-outline btn-sm">
-              {t('profile_companion_apply_cta')}
-            </Link>
-          </section>
-        )
-      )}
-
-      <SpeechSettings />
-
-      <section className="card profile-form">
-        <h2 className="profile-section-title">{t('profile_edit_type')}</h2>
-        <div className="profile-type-row">
-          {profileTypes.map((type) => (
-            <button
-              key={type}
-              type="button"
-              className={`profile-type-btn ${userType === type ? 'active' : ''}`}
-              onClick={() => setUserType(type)}
-            >
-              {t(`profile_type_${type}`)}
-            </button>
-          ))}
-        </div>
-        <label className="profile-label" htmlFor="profile-country">
-          {t('profile_country')}
-        </label>
-        <input
-          id="profile-country"
-          className="input"
-          value={country}
-          onChange={(e) => setCountry(e.target.value)}
-          placeholder={t('profile_country_placeholder')}
-        />
-        <p className="text-muted profile-hint">{t('profile_country_hint')}</p>
-        <label className="profile-label" htmlFor="profile-city">
-          {t('profile_city')}
-        </label>
-        <input
-          id="profile-city"
-          className="input"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          placeholder={t('profile_city_placeholder')}
-        />
-        <p className="text-muted profile-hint">{t('profile_city_hint')}</p>
-        {(locationSaved || saved) && (
-          <p className="profile-location-saved" role="status">
-            {t('profile_location_saved')}
-          </p>
-        )}
-        <label className="profile-map-opt">
-          <input
-            type="checkbox"
-            checked={showOnMap}
-            onChange={(e) => setShowOnMap(e.target.checked)}
-            disabled={!user}
-          />
-          <span>{t('profile_show_on_map')}</span>
-        </label>
-        <p className="text-muted profile-hint">{t('profile_show_on_map_hint')}</p>
-        <label className="profile-label" htmlFor="profile-bio">
-          {t('profile_bio')}
-        </label>
-        <textarea
-          id="profile-bio"
-          className="input"
-          rows={3}
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-          placeholder={t('profile_bio_placeholder')}
-        />
-        <button type="button" className="btn btn-primary" onClick={handleSave}>
-          {saved ? t('profile_saved') : t('profile_save')}
-        </button>
-      </section>
-
-      <section className="profile-section">
-        <h2 className="profile-section-title">
-          <Award size={20} />
-          {t('profile_badges_title')}
-        </h2>
-        <div className="profile-badges">
-          {badgeDefs.map(({ id, labelKey }) => (
-            <div
-              key={id}
-              className={`profile-badge ${badges.includes(id) ? 'earned' : 'locked'}`}
-            >
-              {t(labelKey)}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="profile-section">
-        <h2 className="profile-section-title">
-          <Target size={20} />
-          {t('profile_goals_title')}
-        </h2>
-        <ul className="profile-goals">
-          <li>
-            <span>{t('profile_goal_reading')}</span>
+            </strong>
             <div className="profile-progress-bar">
               <div className="profile-progress-fill" style={{ width: `${readingProgress}%` }} />
             </div>
-          </li>
-          <li>
-            <span>{t('profile_goal_ia')}</span>
-            <strong>{iaQuestionsCount}</strong>
-          </li>
-          <li>
-            <span>{t('profile_goal_community')}</span>
-            <strong>{streakCurrent > 0 ? '✓' : '—'}</strong>
-          </li>
-        </ul>
-      </section>
+          </article>
+          <article className="profile-metric" role="listitem">
+            <Award size={18} aria-hidden />
+            <span className="profile-metric-label">{t('profile_badges_title')}</span>
+            <strong className="profile-metric-value">
+              {earnedBadges} / {badgeDefs.length}
+            </strong>
+          </article>
+        </div>
 
-      <section className="card profile-rgpd">
-        <h2 className="profile-section-title">
-          <Shield size={20} />
-          {t('profile_rgpd')}
-        </h2>
-        <p className="text-muted">{t('profile_rgpd_desc')}</p>
-        {user ? (
-          <div className="profile-rgpd-actions">
+        <nav className="profile-tabs" aria-label={t('profile_title')}>
+          {TABS.map((id) => (
             <button
+              key={id}
               type="button"
-              className="btn btn-outline btn-sm"
-              onClick={handleExportData}
-              disabled={Boolean(rgpdBusy)}
+              role="tab"
+              aria-selected={tab === id}
+              className={`profile-tab ${tab === id ? 'is-active' : ''}`}
+              onClick={() => setTab(id)}
             >
-              {rgpdBusy === 'export' ? <Loader2 size={16} className="spin" /> : null}
-              {t('profile_rgpd_export')}
+              {t(`profile_tab_${id}`)}
             </button>
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm profile-rgpd-delete"
-              onClick={handleDeleteAccount}
-              disabled={Boolean(rgpdBusy)}
-            >
-              {rgpdBusy === 'delete' ? <Loader2 size={16} className="spin" /> : null}
-              {t('profile_rgpd_delete')}
-            </button>
+          ))}
+        </nav>
+
+        {tab === 'overview' && (
+          <div className="profile-panel" role="tabpanel">
+            <section className="profile-panel-block">
+              <h2 className="profile-block-title">{t('dashboard_quick_title')}</h2>
+              <div className="profile-shortcuts">
+                {primaryLinks.map(({ to, icon: Icon, labelKey, mimshack, mark }) => (
+                  <Link key={to} to={to} className="profile-shortcut">
+                    <span className="profile-shortcut-icon">
+                      {mimshack ? (
+                        <MimshackLogo size={20} />
+                      ) : mark === 'library' ? (
+                        <LibraryLogo size={20} />
+                      ) : (
+                        <Icon size={20} aria-hidden />
+                      )}
+                    </span>
+                    <span className="profile-shortcut-label">{t(labelKey)}</span>
+                    <ChevronRight size={16} className="profile-shortcut-chevron" aria-hidden />
+                  </Link>
+                ))}
+              </div>
+            </section>
+
+            <section className="profile-panel-block">
+              <div className="profile-block-head">
+                <h2 className="profile-block-title">{t('profile_courses_title')}</h2>
+                <Link to="/courses" className="profile-block-link">
+                  {t('profile_view_all')}
+                </Link>
+              </div>
+              <ul className="profile-courses-slim">
+                {COURSE_IDS.map((id) => {
+                  const course = COURSE_MODULES[id];
+                  const pct = courseProgress(id);
+                  const done = courseCompleted(id);
+                  return (
+                    <li key={id}>
+                      <Link to={`/courses/${id}`} className="profile-course-slim">
+                        <span className="profile-course-slim-name">{t(course.titleKey)}</span>
+                        <span className="profile-course-slim-meta">
+                          {done}/{course.modules.length}
+                        </span>
+                        <div className="profile-progress-bar">
+                          <div className="profile-progress-fill" style={{ width: `${pct}%` }} />
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+
+            {user && certificates.length > 0 && (
+              <section className="profile-panel-block">
+                <h2 className="profile-block-title">{t('profile_certificates_title')}</h2>
+                <ul className="profile-certs-slim">
+                  {certificates.map((cert) => (
+                    <li key={cert.id}>
+                      <Link
+                        to={`/courses/${cert.course_slug}/certificate`}
+                        className="profile-cert-slim"
+                      >
+                        <Award size={16} aria-hidden />
+                        <span>
+                          {t(
+                            CERTIFICATE_COURSES[cert.course_slug]?.titleKey || 'course_page_title'
+                          )}
+                        </span>
+                        <code>{cert.certificate_code}</code>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {plan === 'free' && (
+              <div className="profile-upsell">
+                <Sparkles size={20} aria-hidden />
+                <div>
+                  <strong>{t('agent_upgrade')}</strong>
+                  <p>{t('profile_plan_desc_free')}</p>
+                </div>
+                <button type="button" className="btn btn-primary btn-sm" onClick={() => setPaywallOpen(true)}>
+                  {t('agent_upgrade')}
+                </button>
+              </div>
+            )}
           </div>
-        ) : (
-          <p className="text-muted profile-hint">{t('profile_rgpd_login')}</p>
         )}
-        {rgpdNotice && (
-          <p className={`profile-notice profile-notice--${rgpdNotice.type}`}>{rgpdNotice.text}</p>
-        )}
-      </section>
 
-      <div className="profile-actions-bottom">
-        {user ? (
-          <button type="button" className="btn btn-outline" onClick={signOut}>
-            <LogOut size={18} />
-            {t('profile_logout')}
-          </button>
-        ) : (
-          <Link to="/auth" className="btn btn-primary btn-lg">
-            {t('profile_login_cta')}
-          </Link>
+        {tab === 'account' && (
+          <div className="profile-panel" role="tabpanel">
+            <section className="profile-panel-block profile-form-block">
+              <h2 className="profile-block-title">{t('profile_edit_type')}</h2>
+              <p className="profile-block-desc">{t('onboarding_profile_desc')}</p>
+              <div className="profile-type-row">
+                {profileTypes.map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    className={`profile-type-btn ${userType === type ? 'active' : ''}`}
+                    onClick={() => setUserType(type)}
+                  >
+                    {t(`profile_type_${type}`)}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="profile-panel-block profile-form-block">
+              <h2 className="profile-block-title">{t('profile_show_on_map')}</h2>
+              <div className="profile-field-grid">
+                <div className="profile-field">
+                  <label htmlFor="profile-country">{t('profile_country')}</label>
+                  <input
+                    id="profile-country"
+                    className="input"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    placeholder={t('profile_country_placeholder')}
+                  />
+                </div>
+                <div className="profile-field">
+                  <label htmlFor="profile-city">{t('profile_city')}</label>
+                  <input
+                    id="profile-city"
+                    className="input"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder={t('profile_city_placeholder')}
+                  />
+                </div>
+              </div>
+              <label className="profile-map-opt">
+                <input
+                  type="checkbox"
+                  checked={showOnMap}
+                  onChange={(e) => setShowOnMap(e.target.checked)}
+                  disabled={!user}
+                />
+                <span>{t('profile_show_on_map')}</span>
+              </label>
+              {(locationSaved || saved) && (
+                <p className="profile-saved-hint" role="status">
+                  {t('profile_location_saved')}
+                </p>
+              )}
+            </section>
+
+            <section className="profile-panel-block profile-form-block">
+              <h2 className="profile-block-title">{t('profile_bio')}</h2>
+              <textarea
+                id="profile-bio"
+                className="input"
+                rows={3}
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder={t('profile_bio_placeholder')}
+              />
+              <button type="button" className="btn btn-primary profile-save-btn" onClick={handleSave}>
+                {saved ? t('profile_saved') : t('profile_save')}
+              </button>
+            </section>
+
+            {!user && (
+              <Link to="/auth" className="btn btn-primary btn-lg profile-login-cta">
+                {t('profile_login_cta')}
+              </Link>
+            )}
+          </div>
+        )}
+
+        {tab === 'more' && (
+          <div className="profile-panel" role="tabpanel">
+            <div className="profile-action-cards">
+              {user && (
+                <Link to="/friends" className="profile-action-card">
+                  <Users size={20} aria-hidden />
+                  <div>
+                    <strong>{t('friends_nav')}</strong>
+                    <p>{t('friends_subtitle')}</p>
+                  </div>
+                  <ChevronRight size={18} aria-hidden />
+                </Link>
+              )}
+              {user && (
+                <Link to="/map" className="profile-action-card">
+                  <MapPin size={20} aria-hidden />
+                  <div>
+                    <strong>{t('map')}</strong>
+                    <p>{t('profile_show_on_map_hint')}</p>
+                  </div>
+                  <ChevronRight size={18} aria-hidden />
+                </Link>
+              )}
+              {cellHost && (
+                <Link to="/cells" className="profile-action-card profile-action-card--accent">
+                  <MessageCircle size={20} aria-hidden />
+                  <div>
+                    <strong>{t('profile_cell_host_title')}</strong>
+                    <p>{t('profile_cell_host_desc')}</p>
+                  </div>
+                  <ChevronRight size={18} aria-hidden />
+                </Link>
+              )}
+              {isCompanion ? (
+                <Link to="/companion" className="profile-action-card profile-action-card--accent">
+                  <HeartHandshake size={20} aria-hidden />
+                  <div>
+                    <strong>{t('profile_companion_title')}</strong>
+                    <p>{t('profile_companion_desc')}</p>
+                  </div>
+                  <ChevronRight size={18} aria-hidden />
+                </Link>
+              ) : (
+                user && (
+                  <Link to="/companion/apply" className="profile-action-card">
+                    <HeartHandshake size={20} aria-hidden />
+                    <div>
+                      <strong>{t('profile_companion_apply_title')}</strong>
+                      <p>{t('profile_companion_apply_desc')}</p>
+                    </div>
+                    <ChevronRight size={18} aria-hidden />
+                  </Link>
+                )
+              )}
+            </div>
+
+            <details className="profile-details">
+              <summary>{t('profile_testimony_title')}</summary>
+              <div className="profile-details-body">
+                <p className="profile-block-desc">{t('profile_testimony_desc')}</p>
+                {user ? (
+                  <>
+                    <form className="profile-testimony-form" onSubmit={handleTestimonySubmit}>
+                      <textarea
+                        className="input"
+                        rows={3}
+                        maxLength={2000}
+                        value={testimonyDraft}
+                        onChange={(e) => setTestimonyDraft(e.target.value)}
+                        placeholder={t('profile_testimony_placeholder')}
+                      />
+                      <button
+                        type="submit"
+                        className="btn btn-outline btn-sm"
+                        disabled={testimonySubmitting || !testimonyDraft.trim()}
+                      >
+                        {testimonySubmitting ? <Loader2 size={14} className="spin" /> : null}
+                        {t('profile_testimony_submit')}
+                      </button>
+                    </form>
+                    {testimonyNotice && (
+                      <p className={`profile-inline-notice profile-inline-notice--${testimonyNotice.type}`}>
+                        {testimonyNotice.text}
+                      </p>
+                    )}
+                    {myTestimonies.length > 0 && (
+                      <ul className="profile-testimony-mini">
+                        {myTestimonies.map((item) => (
+                          <li key={item.id}>
+                            <time>{formatDate(item.created_at)}</time>
+                            <p>{item.content}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
+                ) : (
+                  <Link to="/auth" className="btn btn-outline btn-sm">
+                    {t('profile_testimony_login')}
+                  </Link>
+                )}
+              </div>
+            </details>
+
+            <details className="profile-details">
+              <summary>
+                {t('profile_badges_title')} ({earnedBadges}/{badgeDefs.length})
+              </summary>
+              <div className="profile-details-body">
+                <div className="profile-badges-track">
+                  {badgeDefs.map(({ id, labelKey }) => (
+                    <span
+                      key={id}
+                      className={`profile-badge-chip ${badges.includes(id) ? 'earned' : ''}`}
+                    >
+                      {t(labelKey)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </details>
+
+            <section className="profile-panel-block profile-rgpd-block">
+              <h2 className="profile-block-title">
+                <Shield size={18} aria-hidden />
+                {t('profile_rgpd')}
+              </h2>
+              <p className="profile-block-desc">{t('profile_rgpd_desc')}</p>
+              {user ? (
+                <div className="profile-rgpd-actions">
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm"
+                    onClick={handleExportData}
+                    disabled={Boolean(rgpdBusy)}
+                  >
+                    {rgpdBusy === 'export' ? <Loader2 size={14} className="spin" /> : null}
+                    {t('profile_rgpd_export')}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm profile-rgpd-delete"
+                    onClick={handleDeleteAccount}
+                    disabled={Boolean(rgpdBusy)}
+                  >
+                    {t('profile_rgpd_delete')}
+                  </button>
+                </div>
+              ) : (
+                <p className="profile-block-desc">{t('profile_rgpd_login')}</p>
+              )}
+              {rgpdNotice && (
+                <p className={`profile-inline-notice profile-inline-notice--${rgpdNotice.type}`}>
+                  {rgpdNotice.text}
+                </p>
+              )}
+            </section>
+
+            {user && (
+              <button type="button" className="profile-logout-btn" onClick={signOut}>
+                <LogOut size={18} aria-hidden />
+                {t('profile_logout')}
+              </button>
+            )}
+          </div>
         )}
       </div>
 

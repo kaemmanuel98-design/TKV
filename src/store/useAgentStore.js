@@ -5,8 +5,7 @@ const todayKey = () => new Date().toISOString().slice(0, 10);
 
 const limits = {
   free: { chat: 3, perspectives: 0 },
-  premium: { chat: 30, perspectives: 2 },
-  premium_plus: { chat: 9999, perspectives: 9999 },
+  premium: { chat: 9999, perspectives: 9999 },
 };
 
 export const useAgentStore = create(

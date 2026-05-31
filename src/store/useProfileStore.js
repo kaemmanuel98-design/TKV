@@ -9,6 +9,7 @@ import {
   pickLocationFields,
   saveProfileLocationCache,
 } from '../lib/profileLocation';
+import { enrichProfileWithFounderAccess } from '../lib/founderAccess';
 import { PROFILE_TYPE_KEY, ONBOARDING_KEY } from './useGamificationStore';
 
 async function persistProfileUpdate(userId, updates) {
@@ -23,11 +24,18 @@ async function persistProfileUpdate(userId, updates) {
 
   const hasCity = Object.prototype.hasOwnProperty.call(updates, 'city');
   const hasMapOptIn = Object.prototype.hasOwnProperty.call(updates, 'show_on_map');
-  if (!hasCity && !hasMapOptIn) return { data: null, error };
+  const hasMapCoords =
+    Object.prototype.hasOwnProperty.call(updates, 'map_address') ||
+    Object.prototype.hasOwnProperty.call(updates, 'latitude') ||
+    Object.prototype.hasOwnProperty.call(updates, 'longitude');
+  if (!hasCity && !hasMapOptIn && !hasMapCoords) return { data: null, error };
 
   const fallback = { ...updates };
   delete fallback.city;
   delete fallback.show_on_map;
+  delete fallback.map_address;
+  delete fallback.latitude;
+  delete fallback.longitude;
 
   if (!Object.keys(fallback).length) return { data: null, error };
 
@@ -46,6 +54,9 @@ export const useProfileStore = create((set, get) => ({
     }
     set({ loading: true });
     try {
+      const { data: authData } = await supabase.auth.getUser();
+      const userEmail = authData?.user?.email || '';
+
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -55,11 +66,19 @@ export const useProfileStore = create((set, get) => ({
       if (error) throw error;
 
       if (data) {
-        let merged = mergeProfileLocation(data, userId);
+        let merged = enrichProfileWithFounderAccess(
+          mergeProfileLocation(data, userId),
+          userEmail
+        );
         const cache = getProfileLocationCache(userId);
         if (cache && locationNeedsDbSync(merged, userId)) {
           const { data: synced } = await persistProfileUpdate(userId, pickLocationFields(cache));
-          if (synced) merged = mergeProfileLocation(synced, userId);
+          if (synced) {
+            merged = enrichProfileWithFounderAccess(
+              mergeProfileLocation(synced, userId),
+              userEmail
+            );
+          }
         }
         set({ profile: merged });
         if (merged.user_type) localStorage.setItem(PROFILE_TYPE_KEY, merged.user_type);
@@ -68,28 +87,47 @@ export const useProfileStore = create((set, get) => ({
       }
 
       const cached = getProfileLocationCache(userId);
-      const fallback = {
-        user_type: localStorage.getItem(PROFILE_TYPE_KEY) || 'curious',
-        plan_type: 'free',
-        is_premium: false,
-        onboarding_completed: localStorage.getItem(ONBOARDING_KEY) === 'true',
-        country: cached?.country || '',
-        city: cached?.city || '',
-        show_on_map: cached?.show_on_map ?? false,
-      };
+      const fallback = enrichProfileWithFounderAccess(
+        {
+          user_type: localStorage.getItem(PROFILE_TYPE_KEY) || 'curious',
+          plan_type: 'free',
+          is_premium: false,
+          onboarding_completed: localStorage.getItem(ONBOARDING_KEY) === 'true',
+          country: cached?.country || '',
+          city: cached?.city || '',
+          map_address: cached?.map_address || '',
+          latitude: cached?.latitude ?? null,
+          longitude: cached?.longitude ?? null,
+          show_on_map: cached?.show_on_map ?? false,
+        },
+        userEmail
+      );
       set({ profile: fallback });
       return fallback;
     } catch {
       const cached = getProfileLocationCache(userId);
-      const fallback = {
-        user_type: localStorage.getItem(PROFILE_TYPE_KEY) || 'curious',
-        plan_type: 'free',
-        is_premium: false,
-        onboarding_completed: localStorage.getItem(ONBOARDING_KEY) === 'true',
-        country: cached?.country || '',
-        city: cached?.city || '',
-        show_on_map: cached?.show_on_map ?? false,
-      };
+      let userEmail = '';
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+        userEmail = authData?.user?.email || '';
+      } catch {
+        /* ignore */
+      }
+      const fallback = enrichProfileWithFounderAccess(
+        {
+          user_type: localStorage.getItem(PROFILE_TYPE_KEY) || 'curious',
+          plan_type: 'free',
+          is_premium: false,
+          onboarding_completed: localStorage.getItem(ONBOARDING_KEY) === 'true',
+          country: cached?.country || '',
+          city: cached?.city || '',
+          map_address: cached?.map_address || '',
+          latitude: cached?.latitude ?? null,
+          longitude: cached?.longitude ?? null,
+          show_on_map: cached?.show_on_map ?? false,
+        },
+        userEmail
+      );
       set({ profile: fallback });
       return fallback;
     } finally {
@@ -133,18 +171,18 @@ export const useProfileStore = create((set, get) => ({
 
   getPlanType: () => {
     const p = get().profile;
-    if (p?.is_premium) return p.plan_type === 'premium_plus' ? 'premium_plus' : 'premium';
+    if (p?.is_premium || p?.plan_type === 'premium' || p?.plan_type === 'premium_plus') {
+      return 'premium';
+    }
     return p?.plan_type || 'free';
   },
 
-  isPremium: () => {
-    const plan = get().getPlanType();
-    return plan === 'premium' || plan === 'premium_plus';
-  },
+  isPremium: () => get().getPlanType() === 'premium',
 
-  isPremiumPlus: () => get().getPlanType() === 'premium_plus',
+  /** @deprecated alias — Premium inclut tous les anciens privilèges Premium+ */
+  isPremiumPlus: () => get().isPremium(),
 
-  /** Créer une cellule (Premium+ ou animateur sur le profil). */
+  /** Créer une cellule (Premium ou animateur sur le profil). */
   canCreateCell: () => canCreateCellFromProfile(get().profile),
 
   /** @deprecated alias — utiliser canCreateCell */

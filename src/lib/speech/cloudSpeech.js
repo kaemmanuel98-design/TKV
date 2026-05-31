@@ -16,7 +16,8 @@ let currentAudio = null;
 export function stopCloudSpeech() {
   if (currentAudio) {
     currentAudio.pause();
-    currentAudio.src = '';
+    currentAudio.removeAttribute('src');
+    currentAudio.load();
     currentAudio = null;
   }
 }
@@ -38,40 +39,62 @@ export async function checkCloudSpeechAvailable() {
 function playAudioBlob(blob) {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(blob);
-    const audio = new Audio();
+    const audio = new Audio(url);
     currentAudio = audio;
+    let settled = false;
+    let playStarted = false;
 
-    const cleanup = () => {
+    const finish = (err) => {
+      if (settled) return;
+      settled = true;
       URL.revokeObjectURL(url);
       if (currentAudio === audio) currentAudio = null;
+      if (err) reject(err);
+      else resolve();
     };
 
-    audio.preload = 'auto';
-    audio.setAttribute('playsinline', '');
-    audio.playsInline = true;
-    audio.volume = 1;
-
-    audio.onended = () => {
-      cleanup();
-      resolve();
-    };
-    audio.onerror = () => {
-      cleanup();
-      reject(new Error('audio_playback'));
-    };
-
-    audio.oncanplaythrough = () => {
-      const playPromise = audio.play();
-      if (playPromise?.catch) {
-        playPromise.catch((err) => {
-          cleanup();
-          reject(err);
+    const tryPlay = () => {
+      if (playStarted || settled) return;
+      playStarted = true;
+      const p = audio.play();
+      if (p?.then) {
+        p.catch((err) => {
+          const name = err?.name || '';
+          if (name === 'NotAllowedError') {
+            finish(new Error('audio_autoplay_blocked'));
+            return;
+          }
+          finish(err);
         });
       }
     };
 
+    audio.volume = 1;
+    audio.playsInline = true;
+    audio.setAttribute('playsinline', '');
+    audio.preload = 'auto';
+    audio.onended = () => finish();
+    audio.onerror = () => finish(new Error('audio_playback'));
+
+    audio.addEventListener('loadeddata', tryPlay, { once: true });
+    audio.addEventListener('canplaythrough', tryPlay, { once: true });
+
     audio.src = url;
     audio.load();
+
+    if (audio.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+      tryPlay();
+    }
+
+    setTimeout(() => {
+      if (!settled && audio.paused) tryPlay();
+    }, 400);
+
+    setTimeout(() => {
+      if (!settled && audio.paused) {
+        finish(new Error('audio_playback_timeout'));
+      }
+    }, 120_000);
   });
 }
 
@@ -116,6 +139,11 @@ export async function speakWithCloud(text, locale) {
 
     if (!res.ok) {
       throw await parseTtsError(res);
+    }
+
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('audio') && !contentType.includes('mpeg')) {
+      throw new Error('tts_invalid_response');
     }
 
     const blob = await res.blob();

@@ -79,12 +79,12 @@ const BibleStrong = () => {
       setIsSpeaking(false);
       return;
     }
-    const chapterText = prepareChapterSpeechText(verses, { locale: i18n.language });
+    const chapterText = prepareChapterSpeechText(verses, { locale: lang });
     if (!chapterText.trim()) return;
 
     setIsSpeaking(true);
     try {
-      await speak(chapterText, { prepared: true });
+      await speak(chapterText, { prepared: true, language: lang });
     } catch {
       /* alertes gérées dans useSpeak */
     } finally {
@@ -99,7 +99,7 @@ const BibleStrong = () => {
 
     setIsSpeaking(true);
     try {
-      await speak(text);
+      await speak(text, { language: lang });
     } catch {
       /* alertes gérées dans useSpeak */
     } finally {
@@ -144,7 +144,7 @@ const BibleStrong = () => {
     if (isSpeaking) stop();
     setIsSpeaking(true);
     try {
-      await speak(lexiconSelection.speakLemma);
+      await speak(lexiconSelection.speakLemma, { language: lang });
     } catch {
       /* alertes gérées dans useSpeak */
     } finally {

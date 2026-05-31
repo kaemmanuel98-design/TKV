@@ -61,7 +61,20 @@ Exécuter les scripts SQL dans cet ordre :
 
 Paiements **PayPal** : voir [docs/PAYMENTS.md](docs/PAYMENTS.md).
 
-Agent RAG (optionnel) : `npm run ingest:knowledge:embed` puis `npm run upload:chunks`.
+**Cerveau de Mim (RAG)** — sources indexées par priorité :
+1. Livres TKV (GYNOSKO, EIDO) — priorité doctrinale
+2. Bible Strong (lexique complet, mots originaux)
+3. Héritage (preuves historiques de Jésus, manuscrits, résurrection…)
+4. Références pastorales (Chris Oyakhilome, Myles Munroe, Joseph Prince) — complément ; en cas de contradiction, les livres TKV priment.
+
+```bash
+npm run build:bible          # si lexicon.json absent
+npm run ingest:knowledge:embed   # OPENAI_API_KEY dans .env — ~14k entrées + embeddings
+npm run upload:chunks:embed      # idem si ingest sans --embed (génère puis envoie Supabase)
+# ou recherche par mots-clés seule (sans vecteurs) : npm run upload:chunks:text
+```
+
+Dev rapide sans lexique : `node scripts/ingest-knowledge.mjs --skip-lexicon`
 
 ## Structure
 
@@ -80,3 +93,4 @@ Agent RAG (optionnel) : `npm run ingest:knowledge:embed` puis `npm run upload:ch
 | `npm run ingest:knowledge` | Préparer chunks RAG |
 | `npm run lint` | ESLint |
 | `node scripts/mark-order-paid.mjs TKV-…` | Activer Premium manuellement (secours admin) |
+| `node scripts/grant-premium.mjs votre@email.com` | Premium complet + cellules + accompagnateur |

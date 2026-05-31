@@ -1,8 +1,18 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { UserPlus, Search, Loader2, Check, X, Users, MessageCircle } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
+import {
+  UserPlus,
+  Search,
+  Loader2,
+  Check,
+  X,
+  Users,
+  MessageCircle,
+  Bell,
+  ChevronRight,
+} from 'lucide-react';
+import { FriendsLogo } from '../components/SectionLogos';
 import ProfileAvatar from '../components/ProfileAvatar';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
@@ -18,6 +28,28 @@ import {
   relationWith,
 } from '../lib/friends';
 import './Friends.css';
+
+function FriendRow({ avatar, name, meta, actions, highlight }) {
+  return (
+    <li className={`friends-row ${highlight ? 'friends-row--highlight' : ''}`}>
+      <ProfileAvatar src={avatar} name={name} size={44} />
+      <div className="friends-row-body">
+        <span className="friends-row-name">{name}</span>
+        {meta && <div className="friends-row-meta">{meta}</div>}
+      </div>
+      {actions && <div className="friends-row-actions">{actions}</div>}
+    </li>
+  );
+}
+
+function StatusPill({ online, onlineLabel, offlineLabel }) {
+  return (
+    <span className={`friends-status ${online ? 'friends-status--on' : ''}`}>
+      <span className="friends-status-dot" aria-hidden />
+      {online ? onlineLabel : offlineLabel}
+    </span>
+  );
+}
 
 const Friends = () => {
   const { t } = useTranslation();
@@ -35,6 +67,7 @@ const Friends = () => {
   const [busyId, setBusyId] = useState(null);
   const [notifyApp, setNotifyApp] = useState(true);
   const [notifyEmail, setNotifyEmail] = useState(false);
+  const [savingNotify, setSavingNotify] = useState(false);
 
   const reload = useCallback(async () => {
     if (!user?.id) return;
@@ -85,12 +118,22 @@ const Friends = () => {
     return () => clearTimeout(id);
   }, [searchQ, user?.id]);
 
+  const onlineCount = useMemo(
+    () => friends.filter((f) => isOnline(f.otherLastSeen)).length,
+    [friends]
+  );
+
   const handleNotifySave = async () => {
-    if (!user?.id) return;
-    await updateProfile(user.id, {
-      notify_friend_online_email: notifyEmail,
-      notify_friend_online_app: notifyApp,
-    });
+    if (!user?.id || savingNotify) return;
+    setSavingNotify(true);
+    try {
+      await updateProfile(user.id, {
+        notify_friend_online_email: notifyEmail,
+        notify_friend_online_app: notifyApp,
+      });
+    } finally {
+      setSavingNotify(false);
+    }
   };
 
   const handleSend = async (toUserId) => {
@@ -137,203 +180,295 @@ const Friends = () => {
     }
   };
 
+  const hero = (
+    <header className="friends-hero">
+      <div className="friends-hero-glow" aria-hidden />
+      <div className="friends-hero-inner container">
+        <div className="friends-hero-mark">
+          <FriendsLogo size={44} title={t('friends_title')} />
+        </div>
+        <div className="friends-hero-copy">
+          <p className="friends-hero-eyebrow">{t('home_section_eyebrow')}</p>
+          <h1 className="friends-hero-title">{t('friends_title')}</h1>
+          <p className="friends-hero-subtitle">{t('friends_subtitle')}</p>
+        </div>
+      </div>
+    </header>
+  );
+
   if (!user) {
     return (
-      <div className="container friends-page">
-        <PageHeader title={t('friends_title')} subtitle={t('friends_subtitle')} />
-        <div className="card friends-login-prompt">
-          <p>{t('friends_login_required')}</p>
-          <Link to="/auth" className="btn btn-primary">
-            {t('profile_login_cta')}
-          </Link>
+      <div className="friends-page animate-fade-in">
+        {hero}
+        <div className="container friends-body">
+          <div className="friends-guest-card">
+            <Users size={28} strokeWidth={1.5} aria-hidden />
+            <p>{t('friends_login_required')}</p>
+            <Link to="/auth" className="btn btn-primary">
+              {t('profile_login_cta')}
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container friends-page animate-fade-in">
-      <PageHeader title={t('friends_title')} subtitle={t('friends_subtitle')} />
+    <div className="friends-page animate-fade-in">
+      {hero}
 
-      <div className="card friends-notify-prefs">
-        <h3 className="friends-section-title">{t('friends_notify_title')}</h3>
-        <label className="friends-check">
-          <input
-            type="checkbox"
-            checked={notifyApp}
-            onChange={(e) => setNotifyApp(e.target.checked)}
-          />
-          {t('friends_notify_app')}
-        </label>
-        <label className="friends-check">
-          <input
-            type="checkbox"
-            checked={notifyEmail}
-            onChange={(e) => setNotifyEmail(e.target.checked)}
-          />
-          {t('friends_notify_email')}
-        </label>
-        <button type="button" className="btn btn-outline btn-sm" onClick={handleNotifySave}>
-          {t('profile_save')}
-        </button>
-      </div>
+      <div className="container friends-body">
+        {!loading && (
+          <div className="friends-stats" aria-label={t('friends_title')}>
+            <div className="friends-stat">
+              <span className="friends-stat-value">{friends.length}</span>
+              <span className="friends-stat-label">{t('friends_stat_friends')}</span>
+            </div>
+            <div className="friends-stat">
+              <span className="friends-stat-value friends-stat-value--on">{onlineCount}</span>
+              <span className="friends-stat-label">{t('friends_stat_online')}</span>
+            </div>
+            <div className="friends-stat">
+              <span
+                className={`friends-stat-value ${incoming.length > 0 ? 'friends-stat-value--pending' : ''}`}
+              >
+                {incoming.length}
+              </span>
+              <span className="friends-stat-label">{t('friends_stat_pending')}</span>
+            </div>
+          </div>
+        )}
 
-      <div className="card friends-search">
-        <h3 className="friends-section-title">
-          <Search size={18} />
-          {t('friends_search_title')}
-        </h3>
-        <input
-          className="input"
-          type="search"
-          value={searchQ}
-          onChange={(e) => setSearchQ(e.target.value)}
-          placeholder={t('friends_search_placeholder')}
-        />
-        {searching && (
-          <p className="friends-muted">
-            <Loader2 size={14} className="spin" /> {t('friends_searching')}
+        <section className="friends-panel friends-panel--search" aria-labelledby="friends-search-heading">
+          <h2 id="friends-search-heading" className="friends-panel-title">
+            <Search size={18} strokeWidth={1.75} aria-hidden />
+            {t('friends_search_title')}
+          </h2>
+          <div className="friends-search-wrap">
+            <Search size={18} className="friends-search-icon" aria-hidden />
+            <input
+              className="friends-search-input"
+              type="search"
+              value={searchQ}
+              onChange={(e) => setSearchQ(e.target.value)}
+              placeholder={t('friends_search_placeholder')}
+              autoComplete="off"
+            />
+            {searching && <Loader2 size={18} className="friends-search-spinner spin" aria-hidden />}
+          </div>
+          {searchQ.trim().length >= 2 && !searching && searchResults.length === 0 && (
+            <p className="friends-hint">{t('friends_search_empty')}</p>
+          )}
+          {searchResults.length > 0 && (
+            <ul className="friends-list">
+              {searchResults.map((m) => {
+                const rel = relationWith(allRequests, user.id, m.id);
+                const displayName = m.name || t('community_author_anonymous');
+                return (
+                  <FriendRow
+                    key={m.id}
+                    avatar={m.avatar_url}
+                    name={displayName}
+                    actions={
+                      <>
+                        {rel === 'none' && (
+                          <button
+                            type="button"
+                            className="btn btn-outline btn-sm"
+                            disabled={busyId === m.id}
+                            onClick={() => handleSend(m.id)}
+                          >
+                            <UserPlus size={15} aria-hidden />
+                            {t('friends_add')}
+                          </button>
+                        )}
+                        {rel === 'pending_out' && (
+                          <span className="friends-chip">{t('friends_pending_sent')}</span>
+                        )}
+                        {rel === 'pending_in' && (
+                          <span className="friends-chip friends-chip--accent">
+                            {t('friends_pending_received')}
+                          </span>
+                        )}
+                        {rel === 'friends' && (
+                          <span className="friends-chip friends-chip--ok">{t('friends_already')}</span>
+                        )}
+                      </>
+                    }
+                  />
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
+        {error && (
+          <p className="friends-banner friends-banner--error" role="alert">
+            {error}
           </p>
         )}
-        {searchQ.trim().length >= 2 && !searching && searchResults.length === 0 && (
-          <p className="friends-muted">{t('friends_search_empty')}</p>
-        )}
-        <ul className="friends-list">
-          {searchResults.map((m) => {
-            const rel = relationWith(allRequests, user.id, m.id);
-            return (
-              <li key={m.id} className="friends-list-item">
-                <ProfileAvatar src={m.avatar_url} name={m.name} size={40} />
-                <span className="friends-list-name">{m.name || t('community_author_anonymous')}</span>
-                <div className="friends-list-actions">
-                  {rel === 'none' && (
-                    <button
-                      type="button"
-                      className="btn btn-outline btn-sm"
-                      disabled={busyId === m.id}
-                      onClick={() => handleSend(m.id)}
-                    >
-                      <UserPlus size={14} />
-                      {t('friends_add')}
-                    </button>
-                  )}
-                  {rel === 'pending_out' && (
-                    <span className="friends-badge">{t('friends_pending_sent')}</span>
-                  )}
-                  {rel === 'pending_in' && (
-                    <span className="friends-badge">{t('friends_pending_received')}</span>
-                  )}
-                  {rel === 'friends' && (
-                    <span className="friends-badge friends-badge--ok">{t('friends_already')}</span>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </div>
 
-      {error && <p className="friends-error">{error}</p>}
-
-      {loading ? (
-        <p className="friends-muted">
-          <Loader2 size={18} className="spin" /> {t('friends_loading')}
-        </p>
-      ) : (
-        <>
-          {incoming.length > 0 && (
-            <section className="card friends-section">
-              <h3 className="friends-section-title">{t('friends_incoming')}</h3>
-              <ul className="friends-list">
-                {incoming.map((r) => (
-                  <li key={r.id} className="friends-list-item">
-                    <ProfileAvatar src={r.otherAvatar} name={r.otherName} size={40} />
-                    <span className="friends-list-name">{r.otherName}</span>
-                    <div className="friends-list-actions">
-                      <button
-                        type="button"
-                        className="btn btn-primary btn-sm"
-                        disabled={busyId === r.id}
-                        onClick={() => handleRespond(r.id, 'accepted')}
-                      >
-                        <Check size={14} />
-                        {t('friends_accept')}
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-ghost btn-sm"
-                        disabled={busyId === r.id}
-                        onClick={() => handleRespond(r.id, 'rejected')}
-                      >
-                        <X size={14} />
-                        {t('friends_decline')}
-                      </button>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          <section className="card friends-section">
-            <h3 className="friends-section-title">
-              <Users size={18} />
-              {t('friends_list_title')} ({friends.length})
-            </h3>
-            {friends.length === 0 ? (
-              <p className="friends-muted">{t('friends_empty')}</p>
-            ) : (
-              <ul className="friends-list">
-                {friends.map((r) => (
-                  <li key={r.id} className="friends-list-item">
-                    <ProfileAvatar src={r.otherAvatar} name={r.otherName} size={40} />
-                    <div className="friends-list-main">
-                      <span className="friends-list-name">{r.otherName}</span>
-                      <span className="friends-online-label">
-                        <span
-                          className={`friends-online-dot ${isOnline(r.otherLastSeen) ? 'friends-online-dot--on' : ''}`}
-                        />
-                        {isOnline(r.otherLastSeen)
-                          ? t('friends_status_online')
-                          : t('friends_status_offline')}
-                      </span>
-                    </div>
-                    <Link
-                      to={`/friends/chat/${r.otherId}`}
-                      className="btn btn-primary btn-sm"
-                    >
-                      <MessageCircle size={14} />
-                      {t('friend_chat_open')}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+        {loading ? (
+          <p className="friends-loading">
+            <Loader2 size={20} className="spin" aria-hidden />
+            {t('friends_loading')}
+          </p>
+        ) : (
+          <>
+            {incoming.length > 0 && (
+              <section
+                className="friends-panel friends-panel--incoming"
+                aria-labelledby="friends-incoming-heading"
+              >
+                <h2 id="friends-incoming-heading" className="friends-panel-title">
+                  {t('friends_incoming')}
+                  <span className="friends-panel-count">{incoming.length}</span>
+                </h2>
+                <ul className="friends-list">
+                  {incoming.map((r) => (
+                    <FriendRow
+                      key={r.id}
+                      highlight
+                      avatar={r.otherAvatar}
+                      name={r.otherName}
+                      actions={
+                        <>
+                          <button
+                            type="button"
+                            className="btn btn-primary btn-sm"
+                            disabled={busyId === r.id}
+                            onClick={() => handleRespond(r.id, 'accepted')}
+                          >
+                            <Check size={15} aria-hidden />
+                            {t('friends_accept')}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            disabled={busyId === r.id}
+                            onClick={() => handleRespond(r.id, 'rejected')}
+                          >
+                            <X size={15} aria-hidden />
+                            {t('friends_decline')}
+                          </button>
+                        </>
+                      }
+                    />
+                  ))}
+                </ul>
+              </section>
             )}
-          </section>
 
-          {outgoing.length > 0 && (
-            <section className="card friends-section">
-              <h3 className="friends-section-title">{t('friends_outgoing')}</h3>
-              <ul className="friends-list">
-                {outgoing.map((r) => (
-                  <li key={r.id} className="friends-list-item">
-                    <ProfileAvatar src={r.otherAvatar} name={r.otherName} size={40} />
-                    <span className="friends-list-name">{r.otherName}</span>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      disabled={busyId === r.id}
-                      onClick={() => handleCancel(r.id)}
-                    >
-                      {t('friends_cancel_request')}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+            <section className="friends-panel" aria-labelledby="friends-list-heading">
+              <h2 id="friends-list-heading" className="friends-panel-title">
+                <Users size={18} strokeWidth={1.75} aria-hidden />
+                {t('friends_list_title')}
+                <span className="friends-panel-count">{friends.length}</span>
+              </h2>
+
+              {friends.length === 0 ? (
+                <div className="friends-empty">
+                  <p className="friends-empty-title">{t('friends_empty_title')}</p>
+                  <p className="friends-hint">{t('friends_empty_hint')}</p>
+                </div>
+              ) : (
+                <ul className="friends-list">
+                  {friends.map((r) => (
+                    <FriendRow
+                      key={r.id}
+                      avatar={r.otherAvatar}
+                      name={r.otherName}
+                      meta={
+                        <StatusPill
+                          online={isOnline(r.otherLastSeen)}
+                          onlineLabel={t('friends_status_online')}
+                          offlineLabel={t('friends_status_offline')}
+                        />
+                      }
+                      actions={
+                        <Link
+                          to={`/friends/chat/${r.otherId}`}
+                          className="btn btn-primary btn-sm friends-chat-btn"
+                        >
+                          <MessageCircle size={15} aria-hidden />
+                          {t('friend_chat_open')}
+                          <ChevronRight size={15} aria-hidden />
+                        </Link>
+                      }
+                    />
+                  ))}
+                </ul>
+              )}
             </section>
-          )}
-        </>
-      )}
+
+            {outgoing.length > 0 && (
+              <details className="friends-details">
+                <summary className="friends-details-summary">
+                  {t('friends_outgoing')}
+                  <span className="friends-panel-count">{outgoing.length}</span>
+                </summary>
+                <ul className="friends-list friends-list--nested">
+                  {outgoing.map((r) => (
+                    <FriendRow
+                      key={r.id}
+                      avatar={r.otherAvatar}
+                      name={r.otherName}
+                      actions={
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          disabled={busyId === r.id}
+                          onClick={() => handleCancel(r.id)}
+                        >
+                          {t('friends_cancel_request')}
+                        </button>
+                      }
+                    />
+                  ))}
+                </ul>
+              </details>
+            )}
+
+            <details className="friends-details friends-details--prefs">
+              <summary className="friends-details-summary">
+                <Bell size={16} aria-hidden />
+                {t('friends_prefs_section')}
+              </summary>
+              <div className="friends-prefs">
+                <p className="friends-hint">{t('friends_notify_hint')}</p>
+                <p className="friends-prefs-label">{t('friends_notify_title')}</p>
+                <label className="friends-toggle">
+                  <input
+                    type="checkbox"
+                    checked={notifyApp}
+                    onChange={(e) => setNotifyApp(e.target.checked)}
+                  />
+                  <span>{t('friends_notify_app')}</span>
+                </label>
+                <label className="friends-toggle">
+                  <input
+                    type="checkbox"
+                    checked={notifyEmail}
+                    onChange={(e) => setNotifyEmail(e.target.checked)}
+                  />
+                  <span>{t('friends_notify_email')}</span>
+                </label>
+                <button
+                  type="button"
+                  className="btn btn-outline btn-sm"
+                  disabled={savingNotify}
+                  onClick={handleNotifySave}
+                >
+                  {savingNotify ? (
+                    <Loader2 size={14} className="spin" aria-hidden />
+                  ) : null}
+                  {t('profile_save')}
+                </button>
+              </div>
+            </details>
+          </>
+        )}
+      </div>
     </div>
   );
 };

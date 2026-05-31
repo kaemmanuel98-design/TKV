@@ -18,6 +18,22 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CHUNKS_PATH = path.join(__dirname, '../server/data/chunks.json');
 const BATCH = 25;
 
+/** Table `contents` n’accepte que book | course | podcast | article */
+const CONTENTS_TYPE_MAP = {
+  tkv_book: 'book',
+  heritage_history: 'article',
+  pastor_teaching: 'article',
+  bible_strong: 'article',
+  book: 'book',
+  course: 'course',
+  podcast: 'podcast',
+  article: 'article',
+};
+
+function contentTypeForContents(mimType) {
+  return CONTENTS_TYPE_MAP[mimType] || 'article';
+}
+
 const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -42,27 +58,60 @@ async function embedBatch(texts) {
   return res.data.map((d) => d.embedding);
 }
 
+function persistChunksFile(chunks) {
+  const raw = JSON.parse(fs.readFileSync(CHUNKS_PATH, 'utf8'));
+  raw.chunks = chunks;
+  raw.embeddedAt = new Date().toISOString();
+  fs.writeFileSync(CHUNKS_PATH, JSON.stringify(raw));
+}
+
 async function ensureEmbeddings(chunks, withEmbedFlag) {
   const missing = chunks.filter((c) => !c.embedding?.length);
+  const done = chunks.length - missing.length;
   if (!missing.length) return chunks;
   if (!withEmbedFlag) {
     console.error(`${missing.length} chunks sans embedding. Lancez:`);
     console.error('  npm run ingest:knowledge:embed');
-    console.error('  ou: npm run upload:chunks -- --embed');
+    console.error('  ou: npm run upload:chunks:embed');
     process.exit(1);
   }
-  console.log(`Génération embeddings pour ${missing.length} chunks…`);
-  for (let i = 0; i < missing.length; i += BATCH) {
-    const batch = missing.slice(i, i + BATCH);
-    const vectors = await embedBatch(batch.map((c) => c.chunk_text));
-    batch.forEach((c, j) => {
-      c.embedding = vectors[j];
-    });
-    console.log(`  ${Math.min(i + BATCH, missing.length)}/${missing.length}`);
+  if (done > 0) {
+    console.log(`Reprise : ${done} embeddings déjà présents, ${missing.length} restants.`);
+  } else {
+    console.log(`Génération embeddings pour ${missing.length} chunks…`);
   }
-  const raw = JSON.parse(fs.readFileSync(CHUNKS_PATH, 'utf8'));
-  raw.chunks = chunks;
-  fs.writeFileSync(CHUNKS_PATH, JSON.stringify(raw));
+
+  const SAVE_EVERY = 20;
+  try {
+    for (let i = 0; i < missing.length; i += BATCH) {
+      const batch = missing.slice(i, i + BATCH);
+      const vectors = await embedBatch(batch.map((c) => c.chunk_text));
+      batch.forEach((c, j) => {
+        c.embedding = vectors[j];
+      });
+      const progress = Math.min(i + BATCH, missing.length);
+      console.log(`  ${done + progress}/${chunks.length}`);
+      if ((i / BATCH + 1) % SAVE_EVERY === 0) {
+        persistChunksFile(chunks);
+        console.log('  (sauvegarde intermédiaire chunks.json)');
+      }
+    }
+  } catch (err) {
+    persistChunksFile(chunks);
+    const quota =
+      err?.code === 'insufficient_quota' ||
+      err?.status === 429 ||
+      /quota/i.test(err?.message || '');
+    if (quota) {
+      console.error('\nQuota OpenAI dépassé. Progrès sauvegardé dans chunks.json.');
+      console.error('→ Vérifiez facturation : https://platform.openai.com/account/billing');
+      console.error('→ Puis relancez : npm run upload:chunks:embed');
+      console.error('→ En attendant : npm run upload:chunks:text (recherche par mots-clés uniquement)');
+    }
+    throw err;
+  }
+
+  persistChunksFile(chunks);
   console.log('chunks.json mis à jour avec embeddings.');
   return chunks;
 }
@@ -95,15 +144,23 @@ async function upsertContent(slug, sample) {
     return existing.id;
   }
 
+  const mimType = sample.content_type || sample.metadata?.content_type || 'tkv_book';
+  const dbType = contentTypeForContents(mimType);
+  const { content_type: _metaCt, ...metaRest } = sample.metadata || {};
   const row = {
     title,
-    content_type: sample.content_type || 'book',
+    content_type: dbType,
     language,
-    metadata: { ...sample.metadata, slug },
+    metadata: { ...metaRest, slug, mim_content_type: mimType },
     slug,
   };
 
   const { data, error } = await supabase.from('contents').insert(row).select('id').single();
+  if (error && dbType !== 'book' && mimType === 'tkv_book') {
+    const retry = { ...row, content_type: 'book' };
+    const second = await supabase.from('contents').insert(retry).select('id').single();
+    if (!second.error) return second.data.id;
+  }
   if (error) throw error;
   return data.id;
 }

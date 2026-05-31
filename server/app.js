@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { config } from './config.js';
 import { verifyUser, getUserProfile } from './lib/supabaseAdmin.js';
+import { enrichProfileWithFounderAccess } from './lib/founderAccess.js';
 import { checkAndIncrementUsage } from './lib/quota.js';
 import { checkAndIncrementConfessionalUsage } from './lib/confessionalQuota.js';
 import { handleChat, handlePerspectives } from './lib/agentService.js';
@@ -69,6 +70,7 @@ import {
   verifyWaveWebhookAuth,
 } from './lib/paymentService.js';
 import { getPlanPricing, PLAN_IDS } from './lib/paymentPlans.js';
+import { geocodeAddressQuery, reverseGeocodeCoords, searchAddressSuggestions } from './lib/geocodeService.js';
 
 const app = express();
 
@@ -103,7 +105,12 @@ async function authMiddleware(req, res, next) {
   const header = req.headers.authorization || '';
   const token = header.replace(/^Bearer\s+/i, '');
   req.user = token ? await verifyUser(token) : null;
-  req.profile = req.user ? await getUserProfile(req.user.id) : null;
+  if (req.user) {
+    const profile = await getUserProfile(req.user.id);
+    req.profile = enrichProfileWithFounderAccess(profile, req.user.email);
+  } else {
+    req.profile = null;
+  }
   next();
 }
 
@@ -125,6 +132,15 @@ function requireCompanion(req, res) {
   return true;
 }
 
+app.get('/', (_req, res) => {
+  res.json({
+    ok: true,
+    service: 'TKV API',
+    health: '/api/health',
+    hint: 'Interface web : lancez npm run dev puis ouvrez http://localhost:5173',
+  });
+});
+
 app.get('/api/health', (_req, res) => {
   if (config.isProduction) {
     return res.json({ ok: true, tts: Boolean(config.openaiKey), translate: true });
@@ -136,6 +152,55 @@ app.get('/api/health', (_req, res) => {
     chunks: loadChunks().length,
     supabase: Boolean(config.supabaseUrl),
   });
+});
+
+const geocodeRateLimit = rateLimit({
+  windowMs: 60_000,
+  max: config.isProduction ? 30 : 90,
+  keyPrefix: 'geocode',
+});
+
+app.post('/api/map/geocode/search', geocodeRateLimit, async (req, res) => {
+  try {
+    const query = String(req.body?.query || '').trim();
+    const lang = String(req.body?.lang || 'fr').slice(0, 8);
+    const results = await searchAddressSuggestions(query, lang, 5);
+    res.json({ results });
+  } catch (err) {
+    if (err.message === 'too_short') return res.status(400).json({ error: 'too_short' });
+    if (err.message === 'not_found') return res.status(404).json({ error: 'not_found' });
+    console.error('[map geocode search]', err.message);
+    res.status(502).json({ error: 'geocode_failed' });
+  }
+});
+
+app.post('/api/map/geocode', geocodeRateLimit, async (req, res) => {
+  try {
+    const query = String(req.body?.query || '').trim();
+    const lang = String(req.body?.lang || 'fr').slice(0, 8);
+    const result = await geocodeAddressQuery(query, lang);
+    res.json(result);
+  } catch (err) {
+    if (err.message === 'too_short') return res.status(400).json({ error: 'too_short' });
+    if (err.message === 'not_found') return res.status(404).json({ error: 'not_found' });
+    console.error('[map geocode]', err.message);
+    res.status(502).json({ error: 'geocode_failed' });
+  }
+});
+
+app.post('/api/map/reverse-geocode', geocodeRateLimit, async (req, res) => {
+  try {
+    const latitude = parseFloat(req.body?.latitude);
+    const longitude = parseFloat(req.body?.longitude);
+    const lang = String(req.body?.lang || 'fr').slice(0, 8);
+    const result = await reverseGeocodeCoords(latitude, longitude, lang);
+    res.json(result);
+  } catch (err) {
+    if (err.message === 'invalid_coords') return res.status(400).json({ error: 'invalid_coords' });
+    if (err.message === 'not_found') return res.status(404).json({ error: 'not_found' });
+    console.error('[map reverse-geocode]', err.message);
+    res.status(502).json({ error: 'geocode_failed' });
+  }
 });
 
 function resolveCanCreateCell(user, profile) {
@@ -169,7 +234,7 @@ app.post('/api/cells', authMiddleware, async (req, res) => {
     if (!resolveCanCreateCell(req.user, req.profile)) {
       return res.status(403).json({
         error: 'cells_create_forbidden',
-        message: 'Premium+ or TKV host profile required to create a cell.',
+        message: 'Premium subscription or TKV host profile required to create a cell.',
       });
     }
 
@@ -246,7 +311,7 @@ app.post('/api/confessional/chat', authMiddleware, confessionalRateLimit, async 
       return res.status(400).json({ error: 'consent_required' });
     }
 
-    const usage = await checkAndIncrementConfessionalUsage(req.user.id);
+    const usage = await checkAndIncrementConfessionalUsage(req.user.id, req.user.email);
     if (!usage.allowed) {
       return res.status(402).json({ error: 'quota_exceeded', plan: usage.plan, limit: usage.limit });
     }

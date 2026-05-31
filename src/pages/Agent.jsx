@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Send, Scale, Loader2 } from 'lucide-react';
+import { Send, Scale, Loader2, Sparkles, Crown } from 'lucide-react';
 import MimshackLogo from '../components/MimshackLogo';
 import PaywallModal from '../components/PaywallModal';
 import { useAuthStore } from '../store/useAuthStore';
@@ -20,6 +20,7 @@ const Agent = () => {
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const messagesEndRef = useRef(null);
 
   const session = useAuthStore((s) => s.session);
   const profile = useProfileStore((s) => s.profile);
@@ -45,6 +46,10 @@ const Agent = () => {
   const token = session?.access_token;
 
   const chatHistory = messages.map((m) => ({ role: m.role, content: m.content }));
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages.length, loading, tab]);
 
   const handleSend = async () => {
     const q = input.trim();
@@ -119,147 +124,213 @@ const Agent = () => {
     }
   };
 
+  const quotaLabel = isPremium()
+    ? t('agent_quota_premium')
+    : t('agent_quota', { used: chatCount, limit: limits.chat });
+
   return (
-    <div className="container agent-page animate-fade-in">
-      <header className="agent-header-brand">
-        <MimshackLogo size={56} showWordmark title="Mim" />
-        <div className="agent-header-brand-copy">
-          <h1>{t('agent_title')}</h1>
-          <p>{t('agent_subtitle')}</p>
+    <div className="agent-page animate-fade-in">
+      <header className="agent-hero">
+        <div className="agent-hero-glow" aria-hidden />
+        <div className="agent-hero-inner container">
+          <div className="agent-hero-mark">
+            <MimshackLogo size={48} title={t('agent_title')} />
+          </div>
+          <div className="agent-hero-copy">
+            <p className="agent-hero-eyebrow">{t('home_section_eyebrow')}</p>
+            <h1 className="agent-hero-title">{t('agent_title')}</h1>
+            <p className="agent-hero-subtitle">{t('agent_subtitle')}</p>
+            <p className="agent-hero-brain">{t('agent_brain_hint')}</p>
+            <span
+              className={`agent-quota-chip ${isPremium() ? 'agent-quota-chip--premium' : ''}`}
+            >
+              {isPremium() ? <Crown size={14} aria-hidden /> : <Sparkles size={14} aria-hidden />}
+              {quotaLabel}
+            </span>
+          </div>
         </div>
       </header>
 
-      <div className="agent-tabs">
-        <button
-          type="button"
-          className={`agent-tab ${tab === 'chat' ? 'active' : ''}`}
-          onClick={() => setTab('chat')}
-        >
-          <MimshackLogo size={18} />
-          {t('agent_tab_chat')}
-        </button>
-        <button
-          type="button"
-          className={`agent-tab ${tab === 'perspectives' ? 'active' : ''}`}
-          onClick={() => setTab('perspectives')}
-        >
-          <Scale size={18} />
-          {t('agent_tab_perspectives')}
-        </button>
-      </div>
+      <div className="container agent-body">
+        <div className="agent-tabs" role="tablist" aria-label={t('agent_title')}>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'chat'}
+            className={`agent-tab ${tab === 'chat' ? 'agent-tab--active' : ''}`}
+            onClick={() => setTab('chat')}
+          >
+            <MimshackLogo size={18} />
+            {t('agent_tab_chat')}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={tab === 'perspectives'}
+            className={`agent-tab ${tab === 'perspectives' ? 'agent-tab--active' : ''}`}
+            onClick={() => setTab('perspectives')}
+          >
+            <Scale size={18} strokeWidth={1.75} aria-hidden />
+            {t('agent_tab_perspectives')}
+          </button>
+        </div>
 
-      <p className="agent-quota">
-        {isPremium()
-          ? t('agent_quota_premium')
-          : t('agent_quota', { used: chatCount, limit: limits.chat })}
-      </p>
+        {error && (
+          <p className="agent-banner agent-banner--error" role="alert">
+            {error}
+          </p>
+        )}
 
-      {error && <p className="agent-error">{error}</p>}
-
-      {tab === 'chat' ? (
-        <div className="agent-chat card">
-          <div className="agent-messages">
-            {messages.length === 0 && (
-              <p className="agent-empty text-muted">{t('agent_placeholder')}</p>
-            )}
-            {messages.map((msg, i) => (
-              <div key={i} className={`agent-msg agent-msg-${msg.role}`}>
-                <p>{msg.content}</p>
-                {msg.sources?.length > 0 && (
-                  <div className="agent-sources">
-                    <span className="agent-sources-label">{t('agent_sources')}</span>
-                    {msg.sources.map((s, j) => (
-                      <cite key={j}>
-                        {s.title}
-                        {s.chapter ? ` — ${s.chapter}` : ''}
-                      </cite>
-                    ))}
+        {tab === 'chat' ? (
+          <section className="agent-panel agent-panel--chat" aria-label={t('agent_tab_chat')}>
+            <div className="agent-messages">
+              {messages.length === 0 && !loading && (
+                <div className="agent-welcome">
+                  <MimshackLogo size={40} title={t('agent_title')} />
+                  <p className="agent-welcome-title">{t('agent_welcome_title')}</p>
+                  <p className="agent-welcome-hint">{t('agent_welcome_hint')}</p>
+                </div>
+              )}
+              {messages.map((msg, i) => (
+                <div
+                  key={i}
+                  className={`agent-msg agent-msg--${msg.role}`}
+                >
+                  {msg.role === 'assistant' && (
+                    <div className="agent-msg-avatar" aria-hidden>
+                      <MimshackLogo size={28} />
+                    </div>
+                  )}
+                  <div className="agent-msg-bubble">
+                    <p>{msg.content}</p>
+                    {msg.sources?.length > 0 && (
+                      <div className="agent-sources">
+                        <span className="agent-sources-label">{t('agent_sources')}</span>
+                        <ul className="agent-sources-list">
+                          {msg.sources.map((s, j) => (
+                            <li key={j}>
+                              {s.title}
+                              {s.chapter ? ` — ${s.chapter}` : ''}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
-            {loading && (
-              <div className="agent-msg agent-msg-assistant agent-loading">
-                <Loader2 size={18} className="spin" />
-                {t('agent_loading')}
+                </div>
+              ))}
+              {loading && (
+                <div className="agent-msg agent-msg--assistant agent-msg--loading">
+                  <div className="agent-msg-avatar" aria-hidden>
+                    <MimshackLogo size={28} />
+                  </div>
+                  <div className="agent-msg-bubble">
+                    <Loader2 size={18} className="spin" aria-hidden />
+                    <span>{t('agent_loading')}</span>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} className="agent-messages-anchor" />
+            </div>
+
+            <div className="agent-composer">
+              <input
+                type="text"
+                className="agent-composer-input"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && !loading && handleSend()}
+                placeholder={t('agent_placeholder')}
+                disabled={loading}
+                aria-label={t('agent_placeholder')}
+              />
+              <button
+                type="button"
+                className="btn btn-primary agent-composer-send"
+                onClick={handleSend}
+                disabled={loading || !input.trim()}
+                aria-label={t('agent_send')}
+              >
+                <Send size={18} aria-hidden />
+              </button>
+            </div>
+            <p className="agent-disclaimer">{t('agent_disclaimer')}</p>
+          </section>
+        ) : (
+          <section className="agent-panel agent-panel--perspectives" aria-label={t('agent_tab_perspectives')}>
+            <div className="agent-panel-head">
+              <h2 className="agent-panel-title">{t('perspectives_title')}</h2>
+              <p className="agent-panel-desc">{t('perspectives_subtitle')}</p>
+            </div>
+
+            {!isPremium() && (
+              <div className="agent-premium-strip">
+                <p>{t('perspectives_premium_only')}</p>
+                <button type="button" className="btn btn-outline btn-sm" onClick={() => setPaywallOpen(true)}>
+                  {t('agent_upgrade')}
+                </button>
               </div>
             )}
-          </div>
-          <div className="agent-input-row">
-            <input
-              type="text"
-              className="input"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !loading && handleSend()}
-              placeholder={t('agent_placeholder')}
+
+            <label className="agent-field-label" htmlFor="perspective-q">
+              {t('perspectives_question_label')}
+            </label>
+            <textarea
+              id="perspective-q"
+              className="agent-field-textarea"
+              rows={3}
+              value={perspectiveQ}
+              onChange={(e) => setPerspectiveQ(e.target.value)}
+              placeholder={t('perspectives_placeholder')}
               disabled={loading}
-              aria-label={t('agent_placeholder')}
             />
             <button
               type="button"
-              className="btn btn-primary"
-              onClick={handleSend}
-              disabled={loading}
-              aria-label={t('agent_send')}
+              className="btn btn-primary agent-analyze-btn"
+              onClick={handlePerspectives}
+              disabled={loading || !perspectiveQ.trim()}
             >
-              <Send size={18} />
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="spin" aria-hidden />
+                  {t('agent_loading')}
+                </>
+              ) : (
+                <>
+                  <Scale size={18} aria-hidden />
+                  {t('perspectives_analyze')}
+                </>
+              )}
             </button>
-          </div>
-          <p className="agent-disclaimer">{t('agent_disclaimer')}</p>
-        </div>
-      ) : (
-        <div className="agent-perspectives">
-          {!isPremium() && (
-            <div className="agent-premium-banner card">
-              <p>{t('perspectives_premium_only')}</p>
-              <button type="button" className="btn btn-outline btn-sm" onClick={() => setPaywallOpen(true)}>
-                {t('agent_upgrade')}
-              </button>
-            </div>
-          )}
-          <label className="agent-label" htmlFor="perspective-q">
-            {t('perspectives_question_label')}
-          </label>
-          <textarea
-            id="perspective-q"
-            className="input agent-textarea"
-            rows={3}
-            value={perspectiveQ}
-            onChange={(e) => setPerspectiveQ(e.target.value)}
-            placeholder={t('perspectives_placeholder')}
-            disabled={loading}
-          />
-          <button type="button" className="btn btn-primary" onClick={handlePerspectives} disabled={loading}>
-            {loading ? t('agent_loading') : t('perspectives_analyze')}
-          </button>
-          {perspectiveResult && (
-            <div className="agent-perspective-results">
-              <article className="card">
-                <h3>{t('perspectives_believers')}</h3>
-                <p>{perspectiveResult.believers}</p>
-              </article>
-              <article className="card">
-                <h3>{t('perspectives_skeptics')}</h3>
-                <p>{perspectiveResult.skeptics}</p>
-              </article>
-              <article className="card agent-synthesis">
-                <h3>{t('perspectives_synthesis')}</h3>
-                <p>{perspectiveResult.synthesis}</p>
-              </article>
-            </div>
-          )}
-        </div>
-      )}
 
-      {!isPremium() && (
-        <p className="agent-upgrade-hint">
-          {t('agent_premium_gate')}{' '}
-          <button type="button" className="link-btn" onClick={() => setPaywallOpen(true)}>
-            {t('agent_upgrade')}
-          </button>
-        </p>
-      )}
+            {perspectiveResult && (
+              <div className="agent-perspective-grid">
+                <article className="agent-perspective-card">
+                  <h3>{t('perspectives_believers')}</h3>
+                  <p>{perspectiveResult.believers}</p>
+                </article>
+                <article className="agent-perspective-card">
+                  <h3>{t('perspectives_skeptics')}</h3>
+                  <p>{perspectiveResult.skeptics}</p>
+                </article>
+                <article className="agent-perspective-card agent-perspective-card--synthesis">
+                  <h3>{t('perspectives_synthesis')}</h3>
+                  <p>{perspectiveResult.synthesis}</p>
+                </article>
+              </div>
+            )}
+
+            {!isPremium() && (
+              <p className="agent-upgrade-hint">
+                {t('agent_premium_gate')}{' '}
+                <button type="button" className="agent-link-btn" onClick={() => setPaywallOpen(true)}>
+                  {t('agent_upgrade')}
+                </button>
+              </p>
+            )}
+          </section>
+        )}
+      </div>
 
       <PaywallModal isOpen={paywallOpen} onClose={() => setPaywallOpen(false)} />
     </div>

@@ -115,7 +115,7 @@ export async function markOrderPaid(order, { externalId } = {}) {
     .from('profiles')
     .update({
       is_premium: true,
-      plan_type: order.plan_type,
+      plan_type: 'premium',
       premium_until: premiumUntil.toISOString(),
     })
     .eq('id', order.user_id);

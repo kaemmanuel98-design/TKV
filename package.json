@@ -9,6 +9,7 @@
     "ingest:knowledge": "node scripts/ingest-knowledge.mjs",
     "ingest:knowledge:embed": "node scripts/ingest-knowledge.mjs --embed",
     "upload:chunks": "node scripts/upload-chunks-to-supabase.mjs",
+    "upload:chunks:embed": "node scripts/upload-chunks-to-supabase.mjs --embed",
     "upload:chunks:text": "node scripts/upload-chunks-to-supabase.mjs --text-only",
     "seed:podcasts": "node scripts/seed-podcasts.mjs",
     "build:bible": "node scripts/build-bible-strong.mjs",

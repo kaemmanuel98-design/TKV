@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { config } from '../config.js';
+import { SOURCE_PRIORITY } from './knowledgePriority.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const CHUNKS_PATH = path.join(__dirname, '../data/chunks.json');
@@ -114,6 +115,19 @@ export async function searchChunksText(supabaseAdmin, query, { language = 'fr', 
         if (terms.some((t) => b.includes(t) || t.includes(b)) && text.includes(b)) score += 1;
       }
       if (isAboutGodQuery(query) && text.includes('dieu')) score += 3;
+
+      const type = c.metadata?.content_type;
+      const priority = c.metadata?.source_priority ?? SOURCE_PRIORITY[type] ?? 50;
+      score *= 1 + priority / 150;
+
+      if (type === 'bible_strong' && /\b(strong|grec|hebreu|hébreu|mot original|lemma)\b/i.test(query)) {
+        score += 4;
+      }
+      if (type === 'heritage_history' && /\b(histor|preuve|exist|tacite|josephe|manuscrit|archéo)\b/i.test(query)) {
+        score += 3;
+      }
+      if (type === 'tkv_book') score += 2;
+
       return { ...c, similarity: score };
     })
     .filter((c) => c.similarity > 0)

@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
-import { Send, Loader2, Plus } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
+import { Send, Loader2, Plus, Globe, Users } from 'lucide-react';
+import { CellsLogo } from '../components/SectionLogos';
 import ProfileAvatar from '../components/ProfileAvatar';
 import { CELL_ROOMS } from '../data/cellsRooms';
 import { fetchCustomCells, createCell } from '../lib/cellsApi';
@@ -251,197 +251,231 @@ const Cells = () => {
     { value: 'ar', labelKey: 'cells_room_ar' },
   ];
 
+  const selectRoom = (slug) => {
+    setActiveSlug(slug);
+    setError(null);
+  };
+
   return (
-    <div className="container animate-fade-in cells-page">
-      <PageHeader
-        eyebrow={t('cells')}
-        title={t('cells_page_title')}
-        subtitle={t('cells_page_subtitle')}
-        showLogo
-        actions={
-          user ? (
-            <button type="button" className="btn btn-outline btn-sm" onClick={openCreateCell}>
-              <Plus size={18} />
-              {t('cells_create')}
-            </button>
-          ) : null
-        }
-      />
+    <div className="cells-page animate-fade-in">
+      <header className="cells-hero">
+        <div className="cells-hero-glow" aria-hidden />
+        <div className="cells-hero-inner container">
+          <div className="cells-hero-mark">
+            <CellsLogo size={44} title={t('cells_page_title')} />
+          </div>
+          <div className="cells-hero-copy">
+            <p className="cells-hero-eyebrow">{t('home_section_eyebrow')}</p>
+            <h1 className="cells-hero-title">{t('cells_page_title')}</h1>
+            <p className="cells-hero-subtitle">{t('cells_page_subtitle')}</p>
+          </div>
+        </div>
+      </header>
 
-      {createNotice && (
-        <p className={`cells-notice cells-notice--${createNotice.type}`}>{createNotice.text}</p>
-      )}
-
-      <p className="cells-pick-label text-muted">{t('cells_pick_room')}</p>
-      <p className="cells-section-label text-muted">{t('cells_section_official')}</p>
-      <div className="cells-room-picker" role="tablist" aria-label={t('cells_section_official')}>
-        {CELL_ROOMS.map((room) => (
-          <button
-            key={room.slug}
-            type="button"
-            role="tab"
-            aria-selected={activeSlug === room.slug}
-            className={`cells-room-btn ${activeSlug === room.slug ? 'active' : ''}`}
-            onClick={() => setActiveSlug(room.slug)}
-          >
-            {t(room.labelKey)}
-          </button>
-        ))}
-      </div>
-
-      <p className="cells-section-label text-muted">{t('cells_section_custom')}</p>
-      <div
-        className="cells-room-picker cells-room-picker--custom"
-        role="tablist"
-        aria-label={t('cells_section_custom')}
-      >
-        {user && allowCreateCell && (
-          <button type="button" className="cells-create-banner btn btn-outline" onClick={openCreateCell}>
-            <Plus size={20} />
-            <span>
-              <strong>{t('cells_create')}</strong>
-              <small>{t('cells_create_banner_hint')}</small>
-            </span>
-          </button>
+      <div className="container cells-body">
+        {createNotice && (
+          <p className={`cells-banner cells-banner--${createNotice.type}`} role="status">
+            {createNotice.text}
+          </p>
         )}
 
-        {customCells.length === 0 ? (
-          <p className="cells-custom-empty text-muted">{t('cells_custom_empty')}</p>
-        ) : (
-          customCells.map((cell) => (
-            <button
-              key={cell.id}
-              type="button"
-              role="tab"
-              aria-selected={activeSlug === cell.slug}
-              className={`cells-room-btn cells-room-btn--custom ${activeSlug === cell.slug ? 'active' : ''}`}
-              onClick={() => setActiveSlug(cell.slug)}
-              title={cell.description || undefined}
-            >
-              {cell.name}
-              {cell.created_by === user?.id && (
-                <span className="cells-room-host-badge">{t('cells_host_badge')}</span>
+        {!user && (
+          <div className="cells-strip">
+            <span>{t('cells_members_hint')}</span>
+            <Link to="/auth" className="btn btn-primary btn-sm">
+              {t('layout_login')}
+            </Link>
+          </div>
+        )}
+
+        {user && !allowCreateCell && (
+          <div className="cells-strip cells-strip--muted">
+            <span>{t('cells_create_forbidden')}</span>
+            <button type="button" className="btn btn-outline btn-sm" onClick={() => setPaywallOpen(true)}>
+              {t('cells_create_upgrade_premium')}
+            </button>
+          </div>
+        )}
+
+        <div className="cells-layout">
+          <aside className="cells-sidebar" aria-label={t('cells_pick_room')}>
+            <div className="cells-sidebar-head">
+              <h2 className="cells-sidebar-title">{t('cells_pick_room')}</h2>
+              {user && (
+                <button type="button" className="btn btn-outline btn-sm cells-sidebar-create" onClick={openCreateCell}>
+                  <Plus size={16} aria-hidden />
+                  {t('cells_create')}
+                </button>
               )}
-            </button>
-          ))
-        )}
-        {user ? (
-          <button type="button" className="cells-room-btn cells-room-btn--add" onClick={openCreateCell}>
-            <Plus size={16} />
-            {t('cells_create')}
-          </button>
-        ) : (
-          <Link to="/auth" className="cells-room-btn cells-room-btn--add">
-            <Plus size={16} />
-            {t('cells_create_login')}
-          </Link>
-        )}
-      </div>
+            </div>
 
-      {!user && (
-        <div className="cells-login-banner">
-          <span>{t('cells_members_hint')}</span>
-          <Link to="/auth" className="btn btn-primary btn-sm">
-            {t('layout_login')}
-          </Link>
-        </div>
-      )}
-
-      {user && !allowCreateCell && (
-        <div className="cells-login-banner cells-login-banner--muted">
-          <span>{t('cells_create_forbidden')}</span>
-          <button type="button" className="btn btn-outline btn-sm" onClick={() => setPaywallOpen(true)}>
-            {t('cells_create_upgrade_premium_plus')}
-          </button>
-        </div>
-      )}
-
-      <div className="cells-main">
-        <div className="card cells-chat-panel cells-chat-panel--full">
-          <div className="cells-chat-head">
-            <h3>{activeRoomLabel}</h3>
-            <span className="cells-chat-meta">
-              {loading ? t('cells_loading') : t('cells_message_count', { count: messages.length })}
-            </span>
-          </div>
-
-          {error && <p className="cells-error">{error}</p>}
-
-          <div className="cells-chat-feed">
-            {loading ? (
-              <p className="text-center text-muted">
-                <Loader2 size={20} className="spin" />
-              </p>
-            ) : messages.length === 0 ? (
-              <p className="text-center text-muted">{t('chat_no_messages')}</p>
-            ) : (
-              messages.map((msg) => {
-                const isMine = msg.user_id === user?.id;
-                return (
-                  <div
-                    key={msg.id}
-                    className={`cells-msg ${isMine ? 'cells-msg--mine' : 'cells-msg--other'}`}
+            <section className="cells-sidebar-block">
+              <h3 className="cells-sidebar-label">
+                <Globe size={14} aria-hidden />
+                {t('cells_section_official')}
+              </h3>
+              <div className="cells-room-list" role="tablist" aria-label={t('cells_section_official')}>
+                {CELL_ROOMS.map((room) => (
+                  <button
+                    key={room.slug}
+                    type="button"
+                    role="tab"
+                    aria-selected={activeSlug === room.slug}
+                    className={`cells-room-chip ${activeSlug === room.slug ? 'cells-room-chip--active' : ''}`}
+                    onClick={() => selectRoom(room.slug)}
                   >
-                    <ProfileAvatar
-                      src={isMine ? profile?.avatar_url : msg.authorAvatar}
-                      name={isMine ? profile?.name || user?.user_metadata?.name : msg.authorName}
-                      size={32}
-                    />
-                    <div className="cells-msg-body">
-                      {!isMine && <span className="cells-msg-author">{msg.authorName}</span>}
-                      <p className="cells-msg-text">{msg.content}</p>
-                      <time className="cells-msg-time" dateTime={msg.created_at}>
-                        {formatTime(msg.created_at)}
-                      </time>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+                    {room.slug === 'global' && <Globe size={14} aria-hidden />}
+                    {t(room.labelKey)}
+                  </button>
+                ))}
+              </div>
+            </section>
 
-          <form onSubmit={handleSendMessage} className="cells-form">
-            <input
-              type="text"
-              className="input"
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              placeholder={t('chat_placeholder')}
-              maxLength={500}
-              disabled={sending}
-              aria-label={t('chat_placeholder')}
-            />
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={sending || !newMessage.trim()}
-              aria-label={t('chat_live')}
-            >
-              {sending ? <Loader2 size={18} className="spin" /> : <Send size={18} />}
-            </button>
-          </form>
+            <section className="cells-sidebar-block">
+              <h3 className="cells-sidebar-label">
+                <Users size={14} aria-hidden />
+                {t('cells_section_custom')}
+              </h3>
+              <div className="cells-room-list cells-room-list--custom" role="tablist" aria-label={t('cells_section_custom')}>
+                {customCells.length === 0 ? (
+                  <p className="cells-sidebar-empty">{t('cells_custom_empty')}</p>
+                ) : (
+                  customCells.map((cell) => (
+                    <button
+                      key={cell.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={activeSlug === cell.slug}
+                      className={`cells-room-chip cells-room-chip--custom ${activeSlug === cell.slug ? 'cells-room-chip--active' : ''}`}
+                      onClick={() => selectRoom(cell.slug)}
+                      title={cell.description || undefined}
+                    >
+                      <span className="cells-room-chip-name">{cell.name}</span>
+                      {cell.created_by === user?.id && (
+                        <span className="cells-host-badge">{t('cells_host_badge')}</span>
+                      )}
+                    </button>
+                  ))
+                )}
+                {user ? (
+                  <button
+                    type="button"
+                    className="cells-room-chip cells-room-chip--dashed"
+                    onClick={openCreateCell}
+                  >
+                    <Plus size={14} aria-hidden />
+                    {t('cells_create')}
+                  </button>
+                ) : (
+                  <Link to="/auth" className="cells-room-chip cells-room-chip--dashed">
+                    <Plus size={14} aria-hidden />
+                    {t('cells_create_login')}
+                  </Link>
+                )}
+              </div>
+            </section>
+          </aside>
+
+          <section className="cells-chat" aria-label={activeRoomLabel}>
+            <div className="cells-chat-head">
+              <div>
+                <h2 className="cells-chat-title">{activeRoomLabel}</h2>
+                <p className="cells-chat-meta">
+                  {loading ? t('cells_loading') : t('cells_message_count', { count: messages.length })}
+                </p>
+              </div>
+            </div>
+
+            {error && (
+              <p className="cells-banner cells-banner--err" role="alert">
+                {error}
+              </p>
+            )}
+
+            <div className={`cells-chat-feed${loading ? ' cells-chat-feed--loading' : ''}`}>
+              {loading ? (
+                <div className="cells-chat-status">
+                  <Loader2 size={22} className="cells-spin" aria-hidden />
+                  <span>{t('cells_loading')}</span>
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="cells-chat-empty">
+                  <CellsLogo size={36} title={t('cells_page_title')} />
+                  <p className="cells-chat-empty-title">{t('cells_empty_welcome')}</p>
+                  <p className="cells-chat-empty-hint">{t('cells_empty_hint')}</p>
+                </div>
+              ) : (
+                messages.map((msg) => {
+                  const isMine = msg.user_id === user?.id;
+                  return (
+                    <div
+                      key={msg.id}
+                      className={`cells-msg ${isMine ? 'cells-msg--mine' : 'cells-msg--other'}`}
+                    >
+                      <ProfileAvatar
+                        src={isMine ? profile?.avatar_url : msg.authorAvatar}
+                        name={
+                          isMine ? profile?.name || user?.user_metadata?.name : msg.authorName
+                        }
+                        size={36}
+                      />
+                      <div className="cells-msg-bubble">
+                        {!isMine && <span className="cells-msg-author">{msg.authorName}</span>}
+                        <p className="cells-msg-text">{msg.content}</p>
+                        <time className="cells-msg-time" dateTime={msg.created_at}>
+                          {formatTime(msg.created_at)}
+                        </time>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+              <div ref={messagesEndRef} className="cells-chat-anchor" />
+            </div>
+
+            <form onSubmit={handleSendMessage} className="cells-composer">
+              <input
+                type="text"
+                className="cells-composer-input"
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                placeholder={user ? t('chat_placeholder') : t('cells_members_hint')}
+                maxLength={500}
+                disabled={sending || !user}
+                aria-label={t('chat_placeholder')}
+              />
+              <button
+                type="submit"
+                className="btn btn-primary cells-composer-send"
+                disabled={sending || !newMessage.trim() || !user}
+                aria-label={t('chat_live')}
+              >
+                {sending ? <Loader2 size={18} className="cells-spin" aria-hidden /> : <Send size={18} aria-hidden />}
+              </button>
+            </form>
+          </section>
         </div>
       </div>
 
       {showCreateCell && (
         <div className="cells-modal-backdrop" role="presentation" onClick={() => setShowCreateCell(false)}>
           <div
-            className="card cells-create-card"
+            className="cells-modal"
             role="dialog"
             aria-labelledby="cells-create-title"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 id="cells-create-title" className="cells-create-title">
+            <h2 id="cells-create-title" className="cells-modal-title">
               {t('cells_create_title')}
             </h2>
-            <form onSubmit={handleCreateCell} className="cells-create-form">
-              <label className="cells-create-label" htmlFor="cells-create-name">
+            <p className="cells-modal-hint">{t('cells_create_banner_hint')}</p>
+            <form onSubmit={handleCreateCell} className="cells-modal-form">
+              <label className="cells-field-label" htmlFor="cells-create-name">
                 {t('cells_create_name')}
               </label>
               <input
                 id="cells-create-name"
-                className="input"
+                className="cells-field-input"
                 value={createName}
                 onChange={(e) => setCreateName(e.target.value)}
                 placeholder={t('cells_create_name_placeholder')}
@@ -449,24 +483,24 @@ const Cells = () => {
                 required
                 autoFocus
               />
-              <label className="cells-create-label" htmlFor="cells-create-desc">
+              <label className="cells-field-label" htmlFor="cells-create-desc">
                 {t('cells_create_description')}
               </label>
               <textarea
                 id="cells-create-desc"
-                className="input cells-create-textarea"
+                className="cells-field-textarea"
                 value={createDescription}
                 onChange={(e) => setCreateDescription(e.target.value)}
                 placeholder={t('cells_create_description_placeholder')}
                 maxLength={280}
                 rows={3}
               />
-              <label className="cells-create-label" htmlFor="cells-create-lang">
+              <label className="cells-field-label" htmlFor="cells-create-lang">
                 {t('cells_create_language')}
               </label>
               <select
                 id="cells-create-lang"
-                className="input"
+                className="cells-field-input"
                 value={createLanguage}
                 onChange={(e) => setCreateLanguage(e.target.value)}
               >
@@ -476,7 +510,7 @@ const Cells = () => {
                   </option>
                 ))}
               </select>
-              <div className="cells-create-actions">
+              <div className="cells-modal-actions">
                 <button
                   type="button"
                   className="btn btn-ghost"
@@ -486,7 +520,7 @@ const Cells = () => {
                   {t('cells_create_cancel')}
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={createBusy || !createName.trim()}>
-                  {createBusy ? <Loader2 size={18} className="spin" /> : <Plus size={18} />}
+                  {createBusy ? <Loader2 size={18} className="cells-spin" aria-hidden /> : <Plus size={18} aria-hidden />}
                   {t('cells_create_submit')}
                 </button>
               </div>

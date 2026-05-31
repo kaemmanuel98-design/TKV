@@ -13,14 +13,14 @@ import {
   groupMembersByCountry,
   groupMembersByCity,
 } from '../lib/kingdomPlacements';
-import PageHeader from '../components/PageHeader';
+import { MapLogo } from '../components/SectionLogos';
 import ProfileAvatar from '../components/ProfileAvatar';
 import { useProfileStore } from '../store/useProfileStore';
-import { createAvatarMarkerIcon } from '../lib/mapMarkerIcon';
+import { hasMapCoordinates } from '../lib/profileLocation';
 import { createCityMarkerIcon, createCountryClusterIcon, createHouseMarkerIcon } from '../lib/kingdomMapIcons';
 import MapViewportController from '../components/kingdom/MapViewportController';
 import KingdomTree from '../components/kingdom/KingdomTree';
-import MapSetupBanner from '../components/kingdom/MapSetupBanner';
+import MapPresencePanel from '../components/kingdom/MapPresencePanel';
 import HouseExterior from '../components/kingdom/HouseExterior';
 import HouseInterior from '../components/kingdom/HouseInterior';
 import './MapPage.css';
@@ -33,9 +33,18 @@ L.Icon.Default.mergeOptions({
 });
 
 async function fetchMapMembers(currentUserId) {
-  const fieldsWithOptIn =
-    'id, name, country, city, bio, show_on_map, avatar_url';
+  const fieldsFull =
+    'id, name, country, city, bio, show_on_map, avatar_url, map_address, latitude, longitude';
+  const fieldsWithOptIn = 'id, name, country, city, bio, show_on_map, avatar_url';
   const fieldsBasic = 'id, name, country, avatar_url';
+
+  const withCoords = await supabase.from('profiles').select(fieldsFull).eq('show_on_map', true);
+
+  if (!withCoords.error) {
+    return (withCoords.data || []).filter(
+      (row) => row.country?.trim() || hasMapCoordinates(row)
+    );
+  }
 
   const withOptIn = await supabase
     .from('profiles')
@@ -59,29 +68,21 @@ async function fetchMapMembers(currentUserId) {
 }
 
 const MapPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language?.split('-')[0] || 'fr';
   const { user } = useAuthStore();
   const profile = useProfileStore((s) => s.profile);
   const profileLoading = useProfileStore((s) => s.loading);
   const fetchProfile = useProfileStore((s) => s.fetchProfile);
-  const [userLocation, setUserLocation] = useState(null);
   const [members, setMembers] = useState([]);
   const [friendMembers, setFriendMembers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [membersRefresh, setMembersRefresh] = useState(0);
   const [focus, setFocus] = useState({ level: 'world' });
 
   useEffect(() => {
     if (user?.id) fetchProfile(user.id);
   }, [user?.id, fetchProfile]);
-
-  useEffect(() => {
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => setUserLocation([position.coords.latitude, position.coords.longitude]),
-        () => {}
-      );
-    }
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -103,13 +104,18 @@ const MapPage = () => {
 
       const friendIds = new Set(friends.map((f) => f.id));
       const selfRow =
-        user?.id && profile?.country
+        user?.id &&
+        profile?.show_on_map &&
+        (profile?.country?.trim() || hasMapCoordinates(profile))
           ? {
               id: user.id,
               name: profile.name || user.user_metadata?.name,
               country: profile.country,
               city: profile.city,
               bio: profile.bio,
+              map_address: profile.map_address,
+              latitude: profile.latitude,
+              longitude: profile.longitude,
               avatar_url: profile.avatar_url || user.user_metadata?.avatar_url,
               show_on_map: profile.show_on_map,
             }
@@ -146,7 +152,22 @@ const MapPage = () => {
     return () => {
       cancelled = true;
     };
-  }, [t, user?.id, user?.user_metadata, profileLoading, profile?.country, profile?.city, profile?.bio, profile?.name, profile?.show_on_map, profile?.avatar_url]);
+  }, [
+    t,
+    user?.id,
+    user?.user_metadata,
+    profileLoading,
+    profile?.country,
+    profile?.city,
+    profile?.bio,
+    profile?.name,
+    profile?.show_on_map,
+    profile?.avatar_url,
+    profile?.map_address,
+    profile?.latitude,
+    profile?.longitude,
+    membersRefresh,
+  ]);
 
   const allMembers = useMemo(() => [...friendMembers, ...members], [friendMembers, members]);
   const countryGroups = useMemo(() => groupMembersByCountry(allMembers), [allMembers]);
@@ -188,20 +209,21 @@ const MapPage = () => {
       countryLabel: myMember.country,
       cityId: myMember.cityData?.id,
       cityName: myMember.cityData?.name || myMember.city,
-      cityCoords: myMember.cityCoords,
+      cityCoords: myMember.hasExactCoords ? myMember.houseLocation : myMember.cityCoords,
     });
   }, [myMember?.id]); // eslint-disable-line react-hooks/exhaustive-deps -- une seule fois au chargement
 
   const viewport = useMemo(() => {
     if (focus.level === 'city' && focus.cityCoords) {
-      return { center: focus.cityCoords, zoom: 13 };
+      const zoom = myMember?.hasExactCoords && focus.cityCoords === myMember.houseLocation ? 15 : 13;
+      return { center: focus.cityCoords, zoom };
     }
     if (focus.level === 'country' && focus.countryKey) {
       const group = countryGroups.find((g) => g.countryKey === focus.countryKey);
       if (group?.location) return { center: group.location, zoom: 6 };
     }
     return { center: [20, 0], zoom: 2 };
-  }, [focus, countryGroups]);
+  }, [focus, countryGroups, myMember?.hasExactCoords, myMember?.houseLocation]);
 
   const showMap = focus.level === 'world' || focus.level === 'country' || focus.level === 'city';
 
@@ -278,15 +300,22 @@ const MapPage = () => {
   );
 
   return (
-    <div className="container animate-fade-in map-shell map-shell--kingdom">
-      <div className="map-hero-aura" aria-hidden />
-      <PageHeader
-        eyebrow={t('map')}
-        title={t('map_title')}
-        subtitle={t('map_subtitle_explore')}
-        showLogo
-      />
+    <div className="map-page map-shell--kingdom animate-fade-in">
+      <header className="map-hero">
+        <div className="map-hero-glow" aria-hidden />
+        <div className="map-hero-inner container">
+          <div className="map-hero-mark">
+            <MapLogo size={44} title={t('map_title')} />
+          </div>
+          <div className="map-hero-copy">
+            <p className="map-hero-eyebrow">{t('map_page_eyebrow')}</p>
+            <h1 className="map-hero-title">{t('map_title')}</h1>
+            <p className="map-hero-subtitle">{t('map_page_subtitle')}</p>
+          </div>
+        </div>
+      </header>
 
+      <div className="container map-body">
       <nav className="kingdom-breadcrumb kingdom-glass-card" aria-label={t('map_levels_title')}>
         <button type="button" className={`kingdom-crumb ${focus.level === 'world' ? 'active' : ''}`} onClick={goWorld}>
           {t('map_level_world')}
@@ -329,10 +358,19 @@ const MapPage = () => {
         )}
       </nav>
 
-      <MapSetupBanner user={user} profile={profile} t={t} />
-
       <div className="map-kingdom-workspace">
         <aside className="map-kingdom-sidebar">
+          <MapPresencePanel
+            user={user}
+            profile={profile}
+            t={t}
+            lang={lang}
+            onSaved={() => {
+              if (user?.id) fetchProfile(user.id);
+              setMembersRefresh((n) => n + 1);
+            }}
+          />
+
           {!loading && allMembers.length > 0 && (
             <KingdomTree
               members={allMembers}
@@ -486,35 +524,12 @@ const MapPage = () => {
                   </Marker>
                 ))}
 
-            {userLocation && focus.level === 'world' && (
-              <Marker
-                position={userLocation}
-                icon={createAvatarMarkerIcon({
-                  avatarUrl: profile?.avatar_url || user?.user_metadata?.avatar_url,
-                  name: user?.user_metadata?.name || profile?.name,
-                  size: 44,
-                })}
-              >
-                <Popup>
-                  <div className="map-popup-avatar">
-                    <ProfileAvatar
-                      src={profile?.avatar_url || user?.user_metadata?.avatar_url}
-                      name={user?.user_metadata?.name || profile?.name}
-                      size={36}
-                    />
-                    <div className="map-popup-meta">
-                      <strong>{t('map_you_are_here')}</strong>
-                      <span>{user?.user_metadata?.name || t('map_visitor')}</span>
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
-            )}
           </MapContainer>
               </div>
             </>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

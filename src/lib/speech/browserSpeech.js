@@ -52,25 +52,53 @@ export function preloadSpeechVoices() {
   window.speechSynthesis.onvoiceschanged = refresh;
 }
 
+function normalizeVoiceLang(lang) {
+  return String(lang || '')
+    .toLowerCase()
+    .replace(/_/g, '-');
+}
+
 function voiceMatchesLocale(voice, locale) {
-  const target = locale.toLowerCase();
+  const target = normalizeVoiceLang(locale);
   const langPrefix = target.split('-')[0];
-  const voiceLang = voice.lang.toLowerCase();
+  const voiceLang = normalizeVoiceLang(voice.lang);
+  if (!voiceLang) return false;
   if (voiceLang === target) return true;
+  if (voiceLang === langPrefix) return true;
   if (voiceLang.startsWith(`${langPrefix}-`)) return true;
   return false;
+}
+
+/** Évite les voix « English » installées sous une étiquette locale ambiguë */
+function voiceNameConflictsLanguage(voice, langPrefix) {
+  const voiceLang = normalizeVoiceLang(voice.lang).split('-')[0];
+  if (voiceLang === langPrefix) return false;
+
+  const name = voice.name.toLowerCase();
+  const conflicts = {
+    fr: ['english', ' uk ', ' us english'],
+    en: ['français', 'french (france)'],
+    es: ['english (us)', 'french (france)'],
+    nl: ['english (us)', 'french (france)'],
+    pt: ['english (us)', 'french (france)'],
+    ar: ['english (us)', 'french (france)'],
+  };
+  return (conflicts[langPrefix] || []).some((token) => name.includes(token));
 }
 
 function scoreVoice(voice, locale) {
   if (!voiceMatchesLocale(voice, locale)) return -1;
 
-  const target = locale.toLowerCase();
-  const voiceLang = voice.lang.toLowerCase();
+  const target = normalizeVoiceLang(locale);
+  const voiceLang = normalizeVoiceLang(voice.lang);
   const langPrefix = target.split('-')[0];
   let score = 0;
 
   if (voiceLang === target) score += 150;
   else if (voiceLang.startsWith(`${langPrefix}-`)) score += 80;
+  else if (voiceLang === langPrefix) score += 60;
+
+  if (voiceNameConflictsLanguage(voice, langPrefix)) return -1;
 
   const name = voice.name.toLowerCase();
   for (const pref of PREFERRED_VOICES[langPrefix] || []) {
@@ -136,11 +164,11 @@ function waitForVoices(maxMs = 6000) {
   });
 }
 
-function speakOneChunk(text, voice, locale) {
+function speakOneChunk(text, voice, locale, isRetry = false) {
   return new Promise((resolve, reject) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.voice = voice;
-    utterance.lang = voice.lang;
+    utterance.lang = voice.lang || locale;
 
     const langCode = locale.split('-')[0];
     utterance.rate = RATE_BY_LANG[langCode] ?? 0.94;
@@ -156,7 +184,20 @@ function speakOneChunk(text, voice, locale) {
     };
 
     utterance.onend = () => finish();
-    utterance.onerror = (e) => finish(e.error || new Error('speech_error'));
+    utterance.onerror = (e) => {
+      const code = e?.error || '';
+      if (
+        !isRetry &&
+        (code === 'canceled' || code === 'interrupted')
+      ) {
+        window.speechSynthesis.cancel();
+        setTimeout(() => {
+          speakOneChunk(text, voice, locale, true).then(resolve).catch(reject);
+        }, 150);
+        return;
+      }
+      finish(new Error(code || 'speech_error'));
+    };
 
     window.speechSynthesis.speak(utterance);
 
@@ -166,21 +207,34 @@ function speakOneChunk(text, voice, locale) {
   });
 }
 
+const LOCALE_FALLBACKS_BY_LANG = {
+  fr: ['fr-FR', 'fr-CA', 'fr-BE'],
+  en: ['en-US', 'en-GB', 'en-AU'],
+  es: ['es-ES', 'es-MX', 'es-AR'],
+  nl: ['nl-NL', 'nl-BE'],
+  pt: ['pt-PT', 'pt-BR'],
+  ar: ['ar-SA', 'ar-EG'],
+};
+
 function resolveVoice(locale) {
   const voices = voicesCache.length ? voicesCache : window.speechSynthesis.getVoices();
-  const langCode = locale.split('-')[0];
-  const fallbacks = [locale, `${langCode}-${langCode.toUpperCase()}`, 'fr-FR', 'en-US', 'en-GB'];
+  const langCode = normalizeVoiceLang(locale).split('-')[0];
+  const tryLocales = [
+    locale,
+    ...LOCALE_FALLBACKS_BY_LANG[langCode] || [],
+  ];
 
-  for (const loc of fallbacks) {
+  const seen = new Set();
+  for (const loc of tryLocales) {
+    const key = normalizeVoiceLang(loc);
+    if (seen.has(key)) continue;
+    seen.add(key);
     const v = pickVoice(loc);
     if (v) return v;
   }
 
   return (
-    voices.find((v) => v.lang?.toLowerCase().startsWith(langCode)) ||
-    voices.find((v) => v.lang?.toLowerCase().startsWith('en')) ||
-    voices.find((v) => v.default) ||
-    voices[0] ||
+    voices.find((v) => voiceMatchesLocale(v, locale) && !voiceNameConflictsLanguage(v, langCode)) ||
     null
   );
 }
@@ -193,6 +247,7 @@ export async function speakWithBrowser(text, locale) {
   stopRequested = false;
   await waitForVoices();
   window.speechSynthesis.cancel();
+  await new Promise((r) => setTimeout(r, 80));
 
   const voice = resolveVoice(locale);
   if (!voice) {
@@ -201,12 +256,20 @@ export async function speakWithBrowser(text, locale) {
 
   const utterLocale = voice.lang || locale;
   const chunks = chunkTextForSpeech(text, 280);
+  const segments = chunks.length ? chunks : [text];
 
-  for (const chunk of chunks) {
+  let played = 0;
+  for (const chunk of segments) {
     if (stopRequested) break;
+    if (!chunk?.trim()) continue;
     await speakOneChunk(chunk, voice, utterLocale);
+    played += 1;
     if (stopRequested) break;
-    await new Promise((r) => setTimeout(r, 60));
+    await new Promise((r) => setTimeout(r, 50));
+  }
+
+  if (played === 0) {
+    throw new Error('speech_not_started');
   }
 }
 

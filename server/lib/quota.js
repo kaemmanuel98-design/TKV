@@ -1,5 +1,6 @@
 import { PLAN_LIMITS } from '../config.js';
 import { getSupabaseAdmin, getUserProfile } from './supabaseAdmin.js';
+import { enrichProfileWithFounderAccess } from './founderAccess.js';
 
 const memoryUsage = new Map();
 
@@ -19,13 +20,15 @@ function memoryKey(userId, req) {
 
 export function resolvePlan(profile) {
   if (!profile) return 'free';
-  if (profile.plan_type === 'premium_plus') return 'premium_plus';
-  if (profile.plan_type === 'premium' || profile.is_premium) return 'premium';
+  if (profile.is_premium || profile.plan_type === 'premium' || profile.plan_type === 'premium_plus') {
+    return 'premium';
+  }
   return 'free';
 }
 
 export async function checkAndIncrementUsage(userId, type = 'chat', req = null) {
-  const profile = userId ? await getUserProfile(userId) : null;
+  const rawProfile = userId ? await getUserProfile(userId) : null;
+  const profile = enrichProfileWithFounderAccess(rawProfile, req?.user?.email);
   const plan = resolvePlan(profile);
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
   const limit = type === 'perspectives' ? limits.perspectives : limits.chat;

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { GraduationCap, Lock, ArrowRight, CheckCircle } from 'lucide-react';
-import PageHeader from '../components/PageHeader';
+import { GraduationCap, Lock, CheckCircle, ChevronRight } from 'lucide-react';
 import { useProfileStore } from '../store/useProfileStore';
 import { useCourseProgressStore } from '../store/useCourseProgressStore';
 import { getNextIncompleteModuleInCourse } from '../lib/courseStats';
@@ -39,56 +38,79 @@ const Courses = () => {
   const completed = useCourseProgressStore((s) => s.completed);
 
   return (
-    <div className="container courses-page animate-fade-in">
-      <PageHeader
-        eyebrow={t('course_eyebrow')}
-        title={t('course_page_title')}
-        subtitle={t('course_page_subtitle')}
-      />
+    <div className="courses-page animate-fade-in">
+      <header className="courses-hero">
+        <div className="courses-hero-glow" aria-hidden />
+        <div className="courses-hero-inner container">
+          <div className="courses-hero-mark" aria-hidden>
+            <GraduationCap size={28} strokeWidth={1.5} />
+          </div>
+          <div className="courses-hero-copy">
+            <p className="courses-hero-eyebrow">{t('course_eyebrow')}</p>
+            <h1 className="courses-hero-title">{t('course_page_title')}</h1>
+            <p className="courses-hero-subtitle">{t('course_page_subtitle')}</p>
+          </div>
+        </div>
+      </header>
 
-      <div className="courses-grid">
-        {courses.map(({ id, titleKey, descKey, modules, free }) => {
-          const locked = !free && !isPremium();
-          const done = completedCount(id);
-          const progress = modules > 0 ? Math.round((done / modules) * 100) : 0;
-          const next = getNextIncompleteModuleInCourse(id, completed);
-          const courseHref =
-            !locked && next
-              ? `/courses/${id}/module/${next.moduleIndex}`
-              : `/courses/${id}`;
-          return (
-            <article key={id} className={`card course-card ${locked ? 'course-card-locked' : ''}`}>
-              <div className="course-card-icon">
-                {locked ? <Lock size={22} /> : <GraduationCap size={22} strokeWidth={1.5} />}
-              </div>
-              <h3>{t(titleKey)}</h3>
-              <p className="text-muted">{t(descKey)}</p>
-              <p className="course-meta">
-                {t('course_modules_count', { count: modules })}
-                {free ? ` · ${t('course_free_badge')}` : ''}
-              </p>
-              {!locked && progress > 0 && (
-                <div className="course-progress">
-                  <div className="course-progress-fill" style={{ width: `${progress}%` }} />
+      <div className="container courses-body">
+        <div className="courses-list">
+          {courses.map(({ id, titleKey, descKey, modules, free }) => {
+            const locked = !free && !isPremium();
+            const done = completedCount(id);
+            const progress = modules > 0 ? Math.round((done / modules) * 100) : 0;
+            const next = getNextIncompleteModuleInCourse(id, completed);
+            const courseHref =
+              !locked && next
+                ? `/courses/${id}/module/${next.moduleIndex}`
+                : `/courses/${id}`;
+
+            return (
+              <article key={id} className={`courses-card ${locked ? 'is-locked' : ''}`}>
+                <div className="courses-card-icon" aria-hidden>
+                  {locked ? <Lock size={20} /> : <GraduationCap size={20} strokeWidth={1.5} />}
                 </div>
-              )}
-              {locked ? (
-                <span className="course-locked-label">{t('course_premium_only')}</span>
-              ) : (
-                <Link to={courseHref} className="btn btn-outline btn-sm">
-                  {progress > 0 ? t('course_continue') : t('course_start')}
-                  <ArrowRight size={16} />
-                </Link>
-              )}
-            </article>
-          );
-        })}
-      </div>
+                <div className="courses-card-body">
+                  <h2 className="courses-card-title">{t(titleKey)}</h2>
+                  <p className="courses-card-desc">{t(descKey)}</p>
+                  <p className="courses-card-meta">
+                    {t('course_modules_count', { count: modules })}
+                    {free ? (
+                      <>
+                        {' · '}
+                        <span className="courses-card-meta-badge">{t('course_free_badge')}</span>
+                      </>
+                    ) : null}
+                  </p>
+                  {!locked && progress > 0 && (
+                    <div className="courses-card-progress" aria-hidden>
+                      <div
+                        className="courses-card-progress-fill"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="courses-card-action">
+                  {locked ? (
+                    <span className="courses-card-locked">{t('course_premium_only')}</span>
+                  ) : (
+                    <Link to={courseHref} className="btn btn-outline btn-sm">
+                      {progress > 0 ? t('course_continue') : t('course_start')}
+                      <ChevronRight size={16} aria-hidden />
+                    </Link>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
 
-      <section className="card course-free-note">
-        <CheckCircle size={20} />
-        <p>{t('course_free_note')}</p>
-      </section>
+        <aside className="courses-note">
+          <CheckCircle size={20} aria-hidden />
+          <p>{t('course_free_note')}</p>
+        </aside>
+      </div>
     </div>
   );
 };

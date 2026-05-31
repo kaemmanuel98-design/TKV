@@ -7,15 +7,17 @@ import { formatApiError } from '../lib/apiClient';
 import { createPaymentCheckout } from '../lib/paymentApi';
 import './PaywallModal.css';
 
-const PLANS = [
-  { id: 'premium', priceKey: 'paywall_price_premium', highlight: true },
-  { id: 'premium_plus', priceKey: 'paywall_price_premium_plus', highlight: false },
+const PREMIUM_FEATURES = [
+  'paywall_feature_ia_unlimited',
+  'paywall_feature_perspectives',
+  'paywall_feature_sources',
+  'paywall_feature_cells',
+  'paywall_feature_visio',
 ];
 
 const PaywallModal = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
   const { user, session } = useAuthStore();
-  const [selectedPlan, setSelectedPlan] = useState('premium');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
 
@@ -37,7 +39,7 @@ const PaywallModal = ({ isOpen, onClose }) => {
 
     try {
       const result = await createPaymentCheckout({
-        planType: selectedPlan,
+        planType: 'premium',
         paymentMethod: 'paypal',
         accessToken: session.access_token,
       });
@@ -81,32 +83,18 @@ const PaywallModal = ({ isOpen, onClose }) => {
         {error && <p className="paywall-error">{error}</p>}
 
         <div className="paywall-plans">
-          {PLANS.map((plan) => (
-            <button
-              key={plan.id}
-              type="button"
-              className={`paywall-plan paywall-plan-selectable ${selectedPlan === plan.id ? 'paywall-plan-selected' : ''} ${plan.highlight ? 'paywall-plan-featured' : ''}`}
-              onClick={() => setSelectedPlan(plan.id)}
-            >
-              <h3>{t(plan.id === 'premium_plus' ? 'paywall_premium_plus' : 'paywall_premium')}</h3>
-              <p className="paywall-price">{t(plan.priceKey)}</p>
-              <ul>
-                {(plan.id === 'premium'
-                  ? [
-                      t('paywall_feature_ia_30'),
-                      t('paywall_feature_perspectives'),
-                      t('paywall_feature_sources'),
-                    ]
-                  : [t('paywall_feature_ia_unlimited'), t('paywall_feature_perspectives')]
-                ).map((f) => (
-                  <li key={f}>
-                    <Check size={14} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-            </button>
-          ))}
+          <div className="paywall-plan paywall-plan-featured paywall-plan-selected">
+            <h3>{t('paywall_premium')}</h3>
+            <p className="paywall-price">{t('paywall_price_premium')}</p>
+            <ul>
+              {PREMIUM_FEATURES.map((key) => (
+                <li key={key}>
+                  <Check size={14} />
+                  {t(key)}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         <button

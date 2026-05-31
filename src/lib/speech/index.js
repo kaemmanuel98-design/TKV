@@ -12,6 +12,7 @@ import {
   pickVoice,
 } from './browserSpeech';
 import { speakWithCloud, stopCloudSpeech, checkCloudSpeechAvailable } from './cloudSpeech';
+import { unlockSpeechPlayback } from './unlockPlayback';
 
 export { preloadSpeechVoices, listVoicesForLocale, pickVoice, checkCloudSpeechAvailable, ensureVoicesReady };
 export { accentsForLanguage, SPEECH_ACCENTS_BY_LANG } from './accents';
@@ -44,7 +45,17 @@ async function speakWithCloudLong(text, locale) {
   }
 }
 
+async function tryCloudSpeak(trimmed, targetLocale) {
+  if (trimmed.length > 3800) {
+    await speakWithCloudLong(trimmed, targetLocale);
+  } else {
+    await speakWithCloud(trimmed, targetLocale);
+  }
+}
+
 export async function speakText(text, { language = 'fr', locale, prepared = false } = {}) {
+  unlockSpeechPlayback();
+
   const store = useSpeechStore.getState();
   const targetLocale = resolveSpeechLocale(language, locale, store.getAccent);
   const trimmed = prepared
@@ -65,8 +76,19 @@ export async function speakText(text, { language = 'fr', locale, prepared = fals
 
     const cloudAvailable = await ensureCloudAvailable();
     const engine = store.engine;
+    const useCloudFirst = cloudAvailable && engine !== 'browser';
 
-    if (engine !== 'cloud' && 'speechSynthesis' in window) {
+    if (useCloudFirst) {
+      try {
+        await tryCloudSpeak(trimmed, targetLocale);
+        return;
+      } catch (cloudErr) {
+        console.warn('[TKV TTS] cloud:', cloudErr?.message || cloudErr);
+        if (wantsCloudOnly(engine)) throw cloudErr;
+      }
+    }
+
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       try {
         await speakWithBrowser(trimmed, targetLocale);
         return;
@@ -78,26 +100,12 @@ export async function speakText(text, { language = 'fr', locale, prepared = fals
       }
     }
 
-    if (cloudAvailable && engine !== 'browser') {
-      try {
-        if (trimmed.length > 3800) {
-          await speakWithCloudLong(trimmed, targetLocale);
-        } else {
-          await speakWithCloud(trimmed, targetLocale);
-        }
-        return;
-      } catch (cloudErr) {
-        console.warn('[TKV TTS] cloud:', cloudErr?.message || cloudErr);
-        if (wantsCloudOnly(engine)) throw cloudErr;
-        if ('speechSynthesis' in window) {
-          await speakWithBrowser(trimmed, targetLocale);
-          return;
-        }
-        throw cloudErr;
-      }
+    if (cloudAvailable && !useCloudFirst) {
+      await tryCloudSpeak(trimmed, targetLocale);
+      return;
     }
 
-    if ('speechSynthesis' in window) {
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       await speakWithBrowser(trimmed, targetLocale);
       return;
     }
