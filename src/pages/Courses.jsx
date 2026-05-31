@@ -5,6 +5,7 @@ import { GraduationCap, Lock, CheckCircle, ChevronRight } from 'lucide-react';
 import { useProfileStore } from '../store/useProfileStore';
 import { useCourseProgressStore } from '../store/useCourseProgressStore';
 import { getNextIncompleteModuleInCourse } from '../lib/courseStats';
+import { COURSE_MODULES } from '../data/courseModules';
 import './Courses.css';
 
 const courses = [
@@ -12,21 +13,18 @@ const courses = [
     id: 'foundations',
     titleKey: 'course_foundations_title',
     descKey: 'course_foundations_desc',
-    modules: 8,
     free: true,
   },
   {
     id: 'apologetics',
     titleKey: 'course_apologetics_title',
     descKey: 'course_apologetics_desc',
-    modules: 6,
     free: false,
   },
   {
     id: 'teleios',
     titleKey: 'course_teleios_title',
     descKey: 'course_teleios_desc',
-    modules: 6,
     free: false,
   },
 ];
@@ -55,7 +53,8 @@ const Courses = () => {
 
       <div className="container courses-body">
         <div className="courses-list">
-          {courses.map(({ id, titleKey, descKey, modules, free }) => {
+          {courses.map(({ id, titleKey, descKey, free }) => {
+            const modules = COURSE_MODULES[id]?.modules.length ?? 0;
             const locked = !free && !isPremium();
             const done = completedCount(id);
             const progress = modules > 0 ? Math.round((done / modules) * 100) : 0;
@@ -105,11 +104,6 @@ const Courses = () => {
             );
           })}
         </div>
-
-        <aside className="courses-note">
-          <CheckCircle size={20} aria-hidden />
-          <p>{t('course_free_note')}</p>
-        </aside>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import { useSpeak } from '../hooks/useSpeak';
 import { stopSpeech } from '../lib/speech';
 import { prepareModuleSpeech } from '../lib/prepareBookSpeech';
 import { isUsableInLanguage, translateParagraphs } from '../lib/translateOnDemand';
+import CourseQuiz, { COURSE_QUIZ_PASS_RATIO } from '../components/CourseQuiz';
 import './CourseModule.css';
 
 const BOOK_LANGS = ['fr', 'en', 'es', 'nl', 'pt', 'ar'];
@@ -34,6 +35,8 @@ const CourseModule = () => {
   const [translating, setTranslating] = useState(false);
   const [translateError, setTranslateError] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [quizPassed, setQuizPassed] = useState(false);
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
 
   const langCode = i18n.language?.split('-')[0] || 'fr';
   const lang = BOOK_LANGS.includes(langCode) ? langCode : 'fr';
@@ -87,6 +90,8 @@ const CourseModule = () => {
   useEffect(() => {
     stopSpeech();
     setIsSpeaking(false);
+    setQuizPassed(false);
+    setQuizSubmitted(false);
   }, [lang, index]);
 
   useEffect(() => () => stopSpeech(), []);
@@ -150,6 +155,13 @@ const CourseModule = () => {
   }
 
   const done = isComplete(courseId, index);
+  const hasQuiz = Boolean(content?.quiz?.fr?.length || content?.quiz?.en?.length);
+  const canComplete = !hasQuiz || (quizSubmitted && quizPassed);
+
+  const handleQuizSubmitted = (passed) => {
+    setQuizSubmitted(true);
+    setQuizPassed(passed);
+  };
 
   const handleComplete = () => {
     markComplete(courseId, index, user?.id);
@@ -206,17 +218,51 @@ const CourseModule = () => {
           dir={isRtl ? 'rtl' : 'ltr'}
           lang={lang}
         >
-          {paragraphs.map((para, idx) => (
-            <p key={idx}>{para}</p>
-          ))}
+          {paragraphs.map((para, idx) => {
+            if (para.startsWith('### ')) {
+              return (
+                <h3 key={idx} className="course-module-heading">
+                  {para.slice(4)}
+                </h3>
+              );
+            }
+            if (para.startsWith('>> ')) {
+              return (
+                <blockquote key={idx} className="course-module-verse">
+                  {para.slice(3)}
+                </blockquote>
+              );
+            }
+            return <p key={idx}>{para}</p>;
+          })}
         </article>
+
+        {content.quiz && (
+          <CourseQuiz quiz={content.quiz} lang={lang} onSubmitted={handleQuizSubmitted} />
+        )}
 
         <footer className="course-module-footer">
           {!done ? (
-            <button type="button" className="btn btn-primary" onClick={handleComplete}>
+            <>
+              {hasQuiz && !canComplete && (
+                <p className="course-module-quiz-hint" role="status">
+                  {quizSubmitted && !quizPassed
+                    ? t('course_quiz_need_pass', {
+                        percent: Math.round(COURSE_QUIZ_PASS_RATIO * 100),
+                      })
+                    : t('course_quiz_before_complete')}
+                </p>
+              )}
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleComplete}
+                disabled={!canComplete}
+              >
               <CheckCircle size={18} aria-hidden />
               {t('course_module_mark_done')}
-            </button>
+              </button>
+            </>
           ) : (
             <p className="course-module-done">
               <CheckCircle size={18} aria-hidden />

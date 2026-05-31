@@ -45,6 +45,7 @@ const badgeDefs = [
   { id: 'course_nepios', labelKey: 'badge_course_nepios' },
   { id: 'course_neaniskos', labelKey: 'badge_course_neaniskos' },
   { id: 'course_teleios', labelKey: 'badge_course_teleios' },
+  { id: 'course_eido', labelKey: 'badge_course_eido' },
 ];
 
 const profileTypes = ['believer', 'skeptic', 'curious'];
