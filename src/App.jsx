@@ -38,6 +38,7 @@ const Friends = lazy(() => import('./pages/Friends'));
 const FriendChat = lazy(() => import('./pages/FriendChat'));
 const Confessional = lazy(() => import('./pages/Confessional'));
 const CompanionDashboard = lazy(() => import('./pages/CompanionDashboard'));
+const CompanionApply = lazy(() => import('./pages/CompanionApply'));
 
 function PageFallback() {
   return <LoadingScreen />;
@@ -78,6 +79,16 @@ function App() {
         <Routes>
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route
+            path="/companion/apply"
+            element={
+              <RequireAuth>
+                <Suspense fallback={<PageFallback />}>
+                  <CompanionApply />
+                </Suspense>
+              </RequireAuth>
+            }
+          />
           <Route
             path="/companion"
             element={

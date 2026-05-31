@@ -52,6 +52,13 @@ import {
   removeCompanionPushSubscription,
   webPushConfigured,
 } from './lib/companionWebPush.js';
+import {
+  getOwnCompanionApplication,
+  submitCompanionApplication,
+  listCompanionApplicationsForAdmin,
+  patchCompanionApplicationStatus,
+  isCompanionAdmin,
+} from './lib/companionApplicationService.js';
 import { rateLimit, securityHeaders, safeErrorMessage } from './lib/security.js';
 import {
   createSubscriptionOrder,
@@ -396,6 +403,58 @@ app.post('/api/confessional/companion-chat/:requestId', authMiddleware, async (r
   }
 });
 
+app.get('/api/companion/apply', authMiddleware, async (req, res) => {
+  try {
+    if (!requireUser(req, res)) return;
+    const application = await getOwnCompanionApplication(req.user.id);
+    res.json({ application });
+  } catch (err) {
+    console.error('companion apply get error', err);
+    res.status(500).json({ error: 'apply_error' });
+  }
+});
+
+app.post('/api/companion/apply', authMiddleware, async (req, res) => {
+  try {
+    if (!requireUser(req, res)) return;
+    const application = await submitCompanionApplication(req.user.id, req.body);
+    res.json({ application });
+  } catch (err) {
+    if (err.code === 'motivation_too_short') {
+      return res.status(400).json({ error: 'motivation_too_short' });
+    }
+    if (err.code === 'charter_required') return res.status(400).json({ error: 'charter_required' });
+    if (err.code === 'already_applied') return res.status(409).json({ error: 'already_applied' });
+    console.error('companion apply post error', err);
+    res.status(500).json({ error: 'apply_error' });
+  }
+});
+
+app.get('/api/companion/applications', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionAdmin(req.user)) return res.status(403).json({ error: 'forbidden' });
+    const applications = await listCompanionApplicationsForAdmin();
+    res.json({ applications });
+  } catch (err) {
+    console.error('companion applications list error', err);
+    res.status(500).json({ error: 'apply_error' });
+  }
+});
+
+app.patch('/api/companion/applications/:id', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionAdmin(req.user)) return res.status(403).json({ error: 'forbidden' });
+    const row = await patchCompanionApplicationStatus(req.params.id, req.body?.status);
+    res.json({ application: row });
+  } catch (err) {
+    if (err.code === 'status_invalid') return res.status(400).json({ error: 'status_invalid' });
+    console.error('companion application patch error', err);
+    res.status(500).json({ error: 'apply_error' });
+  }
+});
+
 app.get('/api/companion/me', authMiddleware, async (req, res) => {
   try {
     if (!requireCompanion(req, res)) return;
@@ -404,6 +463,7 @@ app.get('/api/companion/me', authMiddleware, async (req, res) => {
       me,
       encryption: Boolean(config.confessionalEncryptionKey),
       webPush: webPushConfigured(),
+      isAdmin: isCompanionAdmin(req.user),
     });
   } catch (err) {
     console.error('companion me error', err);

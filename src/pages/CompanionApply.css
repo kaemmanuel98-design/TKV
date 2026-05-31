@@ -1,0 +1,52 @@
+.companion-apply {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1.25rem 1rem 2.5rem;
+}
+
+.companion-apply-header {
+  margin: 1rem 0 1.25rem;
+}
+
+.companion-apply-header h1 {
+  margin: 0.5rem 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+}
+
+.companion-apply-charter ul {
+  margin: 0.75rem 0 0;
+  padding-left: 1.15rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.companion-apply-charter li {
+  margin-bottom: 0.45rem;
+}
+
+.companion-apply-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.companion-apply-check {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  font-size: 0.85rem;
+  margin: 0.5rem 0;
+  cursor: pointer;
+}
+
+.companion-apply-check input {
+  margin-top: 0.2rem;
+}
+
+.companion-apply-success-icon {
+  color: #8fd4a8;
+  margin-bottom: 0.5rem;
+}

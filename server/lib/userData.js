@@ -74,6 +74,7 @@ export async function deleteUserData(userId) {
   await admin.from('companion_case_notes').delete().eq('companion_id', userId);
   await admin.from('companion_chat_messages').delete().eq('sender_id', userId);
   await admin.from('companion_push_subscriptions').delete().eq('user_id', userId);
+  await admin.from('companion_applications').delete().eq('user_id', userId);
 
   await admin.from('confessional_support_messages').delete().eq('user_id', userId);
   await admin.from('confessional_support_group_members').delete().eq('user_id', userId);

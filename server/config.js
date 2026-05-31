@@ -63,7 +63,7 @@ export const config = {
   /** Web Push (alertes crise accompagnateurs) — générer avec: npx web-push generate-vapid-keys */
   vapidPublicKey: envTrim('VAPID_PUBLIC_KEY') || envTrim('VITE_VAPID_PUBLIC_KEY'),
   vapidPrivateKey: envTrim('VAPID_PRIVATE_KEY'),
-  vapidSubject: envTrim('VAPID_SUBJECT') || 'mailto:support@thekingdomsvoice.com',
+  vapidSubject: envTrim('VAPID_SUBJECT') || 'mailto:kaemmanuel98@gmail.com',
   /** Origines CORS autorisées (virgules). Vide = refléter l’Origin en dev uniquement. */
   corsOrigins: envTrim('CORS_ORIGINS')
     .split(',')

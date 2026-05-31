@@ -530,7 +530,7 @@ const Profile = () => {
         </section>
       )}
 
-      {isCompanion && (
+      {isCompanion ? (
         <section className="card profile-visio-host-card profile-companion-card">
           <div className="profile-visio-host-head">
             <HeartHandshake size={22} aria-hidden />
@@ -543,6 +543,21 @@ const Profile = () => {
             {t('profile_companion_cta')}
           </Link>
         </section>
+      ) : (
+        user && (
+          <section className="card profile-visio-host-card profile-companion-card">
+            <div className="profile-visio-host-head">
+              <HeartHandshake size={22} aria-hidden />
+              <div>
+                <h2 className="profile-section-title">{t('profile_companion_apply_title')}</h2>
+                <p className="text-muted">{t('profile_companion_apply_desc')}</p>
+              </div>
+            </div>
+            <Link to="/companion/apply" className="btn btn-outline btn-sm">
+              {t('profile_companion_apply_cta')}
+            </Link>
+          </section>
+        )
       )}
 
       <SpeechSettings />

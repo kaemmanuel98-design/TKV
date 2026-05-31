@@ -25,7 +25,9 @@ import {
   fetchCompanionMe,
   fetchCompanionQueue,
   fetchCompanionRequest,
+  fetchCompanionApplications,
   fetchCompanionTeam,
+  patchCompanionApplication,
   transferCompanionRequest,
   patchCompanionAvailability,
   patchCompanionRequestStatus,
@@ -56,6 +58,8 @@ export default function CompanionDashboard() {
   const [error, setError] = useState(null);
   const [team, setTeam] = useState([]);
   const [transferTo, setTransferTo] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [applications, setApplications] = useState([]);
   const chatEndRef = useRef(null);
   const [notifyState, setNotifyState] = useState(
     typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
@@ -73,8 +77,14 @@ export default function CompanionDashboard() {
         fetchCompanionCrises(token),
       ]);
       setMe(meRes.me);
+      setIsAdmin(Boolean(meRes.isAdmin));
       setQueue(queueRes.queue || []);
       setCrises(crisisRes.crises || []);
+      if (meRes.isAdmin) {
+        fetchCompanionApplications(token)
+          .then((data) => setApplications(data.applications || []))
+          .catch(() => setApplications([]));
+      }
     } catch {
       setError(t('companion_error_load'));
     } finally {
@@ -259,6 +269,51 @@ export default function CompanionDashboard() {
           <AlertTriangle size={20} />
           <span>{t('companion_crisis_alert', { count: crises.length })}</span>
         </aside>
+      )}
+
+      {isAdmin && applications.length > 0 && (
+        <section className="card companion-applications">
+          <h2>{t('companion_applications_title')}</h2>
+          <ul className="companion-applications-list">
+            {applications
+              .filter((a) => a.status === 'pending' || a.status === 'reviewing')
+              .map((app) => (
+                <li key={app.id} className="companion-application-item">
+                  <div>
+                    <strong>{app.applicant_name || app.applicant_email || '—'}</strong>
+                    <span className="text-muted companion-application-meta">
+                      {new Date(app.created_at).toLocaleDateString()} · {app.status}
+                    </span>
+                    <p className="companion-application-motivation">{app.motivation}</p>
+                  </div>
+                  <div className="companion-application-actions">
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-primary"
+                      onClick={async () => {
+                        await patchCompanionApplication(app.id, 'approved', token);
+                        const data = await fetchCompanionApplications(token);
+                        setApplications(data.applications || []);
+                      }}
+                    >
+                      {t('companion_application_approve')}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-outline"
+                      onClick={async () => {
+                        await patchCompanionApplication(app.id, 'rejected', token);
+                        const data = await fetchCompanionApplications(token);
+                        setApplications(data.applications || []);
+                      }}
+                    >
+                      {t('companion_application_reject')}
+                    </button>
+                  </div>
+                </li>
+              ))}
+          </ul>
+        </section>
       )}
 
       {error && <p className="confessional-error">{error}</p>}

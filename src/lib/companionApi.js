@@ -128,3 +128,35 @@ export async function sendUserCompanionChat(requestId, message, accessToken) {
   });
   return parseApiResponse(res);
 }
+
+export async function fetchOwnCompanionApplication(accessToken) {
+  const res = await fetch(`${API_BASE}/api/companion/apply`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return parseApiResponse(res);
+}
+
+export async function submitCompanionApplication(payload, accessToken) {
+  const res = await fetch(`${API_BASE}/api/companion/apply`, {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify(payload),
+  });
+  return parseApiResponse(res);
+}
+
+export async function fetchCompanionApplications(accessToken) {
+  const res = await fetch(`${API_BASE}/api/companion/applications`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return parseApiResponse(res);
+}
+
+export async function patchCompanionApplication(id, status, accessToken) {
+  const res = await fetch(`${API_BASE}/api/companion/applications/${id}`, {
+    method: 'PATCH',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ status }),
+  });
+  return parseApiResponse(res);
+}

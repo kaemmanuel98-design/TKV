@@ -10,23 +10,32 @@ export default function ConfessionalCompanionChat({ t, requestId, accessToken, o
   const [error, setError] = useState(null);
   const endRef = useRef(null);
 
-  const load = useCallback(async () => {
-    if (!accessToken || !requestId) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await fetchUserCompanionChat(requestId, accessToken);
-      setMessages(data.messages || []);
-    } catch {
-      setError(t('companion_chat_user_error'));
-    } finally {
-      setLoading(false);
-    }
-  }, [accessToken, requestId, t]);
+  const load = useCallback(
+    async (silent = false) => {
+      if (!accessToken || !requestId) return;
+      if (!silent) setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchUserCompanionChat(requestId, accessToken);
+        setMessages(data.messages || []);
+      } catch {
+        if (!silent) setError(t('companion_chat_user_error'));
+      } finally {
+        if (!silent) setLoading(false);
+      }
+    },
+    [accessToken, requestId, t]
+  );
 
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (!accessToken || !requestId) return undefined;
+    const timer = setInterval(() => load(true), 10000);
+    return () => clearInterval(timer);
+  }, [accessToken, requestId, load]);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
