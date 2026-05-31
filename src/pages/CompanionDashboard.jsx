@@ -110,6 +110,19 @@ export default function CompanionDashboard() {
   }, [selectedId, loadDetail]);
 
   useEffect(() => {
+    if (!token || !selectedId) return undefined;
+    const timer = setInterval(async () => {
+      try {
+        const chat = await fetchCompanionChatMessages(selectedId, token);
+        setMessages(chat.messages || []);
+      } catch {
+        /* ignore poll */
+      }
+    }, 10000);
+    return () => clearInterval(timer);
+  }, [token, selectedId]);
+
+  useEffect(() => {
     if (!token) return;
     fetchCompanionTeam(token)
       .then((data) => setTeam(data.team || []))
@@ -213,8 +226,10 @@ export default function CompanionDashboard() {
             type="button"
             className="btn btn-sm btn-outline"
             onClick={async () => {
-              const p = await requestCompanionNotificationPermission();
-              setNotifyState(p);
+              const p = await requestCompanionNotificationPermission(token);
+              setNotifyState(
+                p === 'registered' || p === 'granted' ? 'granted' : p
+              );
             }}
           >
             {t('companion_notify_enable')}

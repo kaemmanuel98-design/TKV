@@ -33,20 +33,25 @@ export default function ConfessionalSupport({ t, language, accessToken, onBack }
     }
   }, [accessToken, language]);
 
-  const loadMessages = useCallback(async () => {
-    if (!accessToken || !activeGroup?.id) return;
-    setChatLoading(true);
-    setChatError(null);
-    try {
-      const data = await fetchSupportGroupMessages(activeGroup.id, accessToken);
-      setMessages(data.messages || []);
-    } catch {
-      setMessages([]);
-      setChatError(t('confessional_support_chat_error'));
-    } finally {
-      setChatLoading(false);
-    }
-  }, [accessToken, activeGroup?.id, t]);
+  const loadMessages = useCallback(
+    async (silent = false) => {
+      if (!accessToken || !activeGroup?.id) return;
+      if (!silent) setChatLoading(true);
+      setChatError(null);
+      try {
+        const data = await fetchSupportGroupMessages(activeGroup.id, accessToken);
+        setMessages(data.messages || []);
+      } catch {
+        if (!silent) {
+          setMessages([]);
+          setChatError(t('confessional_support_chat_error'));
+        }
+      } finally {
+        if (!silent) setChatLoading(false);
+      }
+    },
+    [accessToken, activeGroup?.id, t]
+  );
 
   useEffect(() => {
     load();
@@ -56,6 +61,12 @@ export default function ConfessionalSupport({ t, language, accessToken, onBack }
     if (activeGroup?.joined) loadMessages();
     else setMessages([]);
   }, [activeGroup, loadMessages]);
+
+  useEffect(() => {
+    if (!activeGroup?.joined || !accessToken) return undefined;
+    const timer = setInterval(() => loadMessages(true), 8000);
+    return () => clearInterval(timer);
+  }, [activeGroup?.joined, activeGroup?.id, accessToken, loadMessages]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -93,8 +104,12 @@ export default function ConfessionalSupport({ t, language, accessToken, onBack }
       const data = await sendSupportGroupMessage(activeGroup.id, draft.trim(), accessToken);
       setMessages((prev) => [...prev, data.message]);
       setDraft('');
-    } catch {
-      setChatError(t('confessional_support_chat_error'));
+    } catch (err) {
+      setChatError(
+        err?.message === 'message_blocked'
+          ? t('confessional_support_chat_blocked')
+          : t('confessional_support_chat_error')
+      );
     } finally {
       setSending(false);
     }

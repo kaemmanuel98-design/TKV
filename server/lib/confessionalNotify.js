@@ -1,6 +1,7 @@
 import { config } from '../config.js';
 import { getSupabaseAdmin } from './supabaseAdmin.js';
 import { sendTransactionalEmail } from './sendEmail.js';
+import { sendCrisisWebPushToCompanions } from './companionWebPush.js';
 
 /** Alerte e-mail aux accompagnateurs actifs (Resend optionnel). */
 export async function notifyCompanionsCrisis({ level, situation, sessionId }) {
@@ -50,5 +51,7 @@ export async function notifyCompanionsCrisis({ level, situation, sessionId }) {
     const r = await sendTransactionalEmail({ to, subject, html, text: subject });
     if (r.ok) sent += 1;
   }
-  return { sent };
+
+  const push = await sendCrisisWebPushToCompanions({ level, situation });
+  return { emailSent: sent, pushSent: push.sent ?? 0 };
 }

@@ -60,6 +60,10 @@ export const config = {
     (envTrim('VERCEL_URL') ? `https://${envTrim('VERCEL_URL')}` : ''),
   resendApiKey: envTrim('RESEND_API_KEY'),
   emailFrom: envTrim('EMAIL_FROM') || 'TKV <onboarding@resend.dev>',
+  /** Web Push (alertes crise accompagnateurs) — générer avec: npx web-push generate-vapid-keys */
+  vapidPublicKey: envTrim('VAPID_PUBLIC_KEY') || envTrim('VITE_VAPID_PUBLIC_KEY'),
+  vapidPrivateKey: envTrim('VAPID_PRIVATE_KEY'),
+  vapidSubject: envTrim('VAPID_SUBJECT') || 'mailto:support@thekingdomsvoice.com',
   /** Origines CORS autorisées (virgules). Vide = refléter l’Origin en dev uniquement. */
   corsOrigins: envTrim('CORS_ORIGINS')
     .split(',')

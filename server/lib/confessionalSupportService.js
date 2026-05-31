@@ -4,6 +4,7 @@ import {
   decryptConfessionalContent,
   encryptConfessionalContent,
 } from './confessionalCrypto.js';
+import { validateSupportCircleMessage } from './confessionalSupportModeration.js';
 
 const MAX_MESSAGE_LEN = 800;
 const MAX_MESSAGES_PER_HOUR = 40;
@@ -115,8 +116,8 @@ export async function listSupportGroupMessages(userId, groupId) {
 
 export async function postSupportGroupMessage(userId, groupId, text) {
   const admin = getSupabaseAdmin();
-  const body = String(text || '').trim();
-  if (!body || body.length > MAX_MESSAGE_LEN) {
+  const body = validateSupportCircleMessage(text);
+  if (body.length > MAX_MESSAGE_LEN) {
     const err = new Error('message_invalid');
     err.code = 'message_invalid';
     throw err;

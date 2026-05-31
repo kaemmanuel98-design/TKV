@@ -59,6 +59,37 @@ export async function deleteUserData(userId) {
   const admin = getSupabaseAdmin();
   if (!admin) throw new Error('supabase_admin_unavailable');
 
+  const { data: userRequests } = await admin
+    .from('companion_requests')
+    .select('id')
+    .eq('user_id', userId);
+  const requestIds = (userRequests || []).map((r) => r.id);
+  if (requestIds.length) {
+    await admin.from('companion_chat_messages').delete().in('request_id', requestIds);
+    await admin.from('companion_case_notes').delete().in('request_id', requestIds);
+  }
+
+  await admin.from('companion_requests').delete().eq('user_id', userId);
+  await admin.from('companion_requests').delete().eq('assigned_companion_id', userId);
+  await admin.from('companion_case_notes').delete().eq('companion_id', userId);
+  await admin.from('companion_chat_messages').delete().eq('sender_id', userId);
+  await admin.from('companion_push_subscriptions').delete().eq('user_id', userId);
+
+  await admin.from('confessional_support_messages').delete().eq('user_id', userId);
+  await admin.from('confessional_support_group_members').delete().eq('user_id', userId);
+  await admin.from('prayer_requests').delete().eq('user_id', userId);
+  await admin.from('confession_crisis_events').delete().eq('user_id', userId);
+
+  const { data: sessions } = await admin
+    .from('confession_sessions')
+    .select('id')
+    .eq('user_id', userId);
+  const sessionIds = (sessions || []).map((s) => s.id);
+  if (sessionIds.length) {
+    await admin.from('confession_messages').delete().in('session_id', sessionIds);
+  }
+  await admin.from('confession_sessions').delete().eq('user_id', userId);
+
   await admin.from('community_posts').delete().eq('user_id', userId);
   await admin.from('ia_daily_usage').delete().eq('user_id', userId);
 

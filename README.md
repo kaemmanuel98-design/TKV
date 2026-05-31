@@ -56,6 +56,7 @@ Exécuter les scripts SQL dans cet ordre :
 22. `supabase_confessional_support_groups.sql` (cercles de soutien)
 23. `supabase_confessional_support_messages.sql` (chat anonyme des cercles)
 24. `supabase_confessional_support_groups_en.sql` (catalogue cercles EN, optionnel)
+25. `supabase_companion_web_push.sql` (Web Push alertes crise accompagnateurs)
 
 Paiements **PayPal** : voir [docs/PAYMENTS.md](docs/PAYMENTS.md).
 

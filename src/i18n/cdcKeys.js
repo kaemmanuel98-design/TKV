@@ -570,6 +570,8 @@ export const cdcKeys = {
     confessional_support_chat_placeholder: 'Un mot de soutien…',
     confessional_support_chat_send: 'Envoyer',
     confessional_support_chat_error: 'Message impossible pour le moment.',
+    confessional_support_chat_blocked:
+      'Ce message n\'est pas autorisé (pas de coordonnées, liens ou réseaux sociaux).',
     confessional_support_alias: 'Membre {{code}}',
     confessional_support_you: 'Vous',
     companion_notify_enable: 'Activer les alertes crise',
@@ -1302,6 +1304,8 @@ export const cdcKeys = {
     confessional_support_chat_placeholder: 'A word of support…',
     confessional_support_chat_send: 'Send',
     confessional_support_chat_error: 'Could not send message.',
+    confessional_support_chat_blocked:
+      'This message is not allowed (no contact details, links, or social handles).',
     confessional_support_alias: 'Member {{code}}',
     confessional_support_you: 'You',
     companion_notify_enable: 'Enable crisis alerts',

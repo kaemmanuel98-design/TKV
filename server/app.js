@@ -46,6 +46,12 @@ import {
   listSupportGroupMessages,
   postSupportGroupMessage,
 } from './lib/confessionalSupportService.js';
+import {
+  getVapidPublicKey,
+  upsertCompanionPushSubscription,
+  removeCompanionPushSubscription,
+  webPushConfigured,
+} from './lib/companionWebPush.js';
 import { rateLimit, securityHeaders, safeErrorMessage } from './lib/security.js';
 import {
   createSubscriptionOrder,
@@ -394,10 +400,51 @@ app.get('/api/companion/me', authMiddleware, async (req, res) => {
   try {
     if (!requireCompanion(req, res)) return;
     const me = await getCompanionMe(req.user.id);
-    res.json({ me, encryption: Boolean(config.confessionalEncryptionKey) });
+    res.json({
+      me,
+      encryption: Boolean(config.confessionalEncryptionKey),
+      webPush: webPushConfigured(),
+    });
   } catch (err) {
     console.error('companion me error', err);
     res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.get('/api/companion/push/vapid-public-key', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    const publicKey = getVapidPublicKey();
+    if (!publicKey) return res.status(503).json({ error: 'push_not_configured' });
+    res.json({ publicKey });
+  } catch (err) {
+    console.error('vapid key error', err);
+    res.status(500).json({ error: 'push_error' });
+  }
+});
+
+app.post('/api/companion/push/subscribe', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    const result = await upsertCompanionPushSubscription(req.user.id, req.body?.subscription);
+    res.json(result);
+  } catch (err) {
+    if (err.code === 'subscription_invalid') {
+      return res.status(400).json({ error: 'subscription_invalid' });
+    }
+    console.error('push subscribe error', err);
+    res.status(500).json({ error: 'push_error' });
+  }
+});
+
+app.delete('/api/companion/push/subscribe', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    await removeCompanionPushSubscription(req.user.id, req.body?.endpoint);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('push unsubscribe error', err);
+    res.status(500).json({ error: 'push_error' });
   }
 });
 
@@ -600,6 +647,7 @@ app.post('/api/confessional/support-groups/:id/messages', authMiddleware, async 
   } catch (err) {
     if (err.code === 'not_member') return res.status(403).json({ error: 'not_member' });
     if (err.code === 'message_invalid') return res.status(400).json({ error: 'message_invalid' });
+    if (err.code === 'message_blocked') return res.status(400).json({ error: 'message_blocked' });
     if (err.code === 'rate_limit') return res.status(429).json({ error: 'rate_limit' });
     console.error('support message post error', err);
     res.status(500).json({ error: 'support_error' });

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { fetchCompanionCrises } from '../lib/companionApi';
+import { registerCompanionWebPush } from '../lib/companionPush.js';
 
 /**
  * Alerte navigateur (Notification API) quand une nouvelle crise Confessionnal apparaît.
@@ -54,10 +55,9 @@ export function useCompanionCrisisAlerts(accessToken, enabled, t) {
   }, [accessToken, enabled, t]);
 }
 
-export async function requestCompanionNotificationPermission() {
+export async function requestCompanionNotificationPermission(accessToken) {
   if (typeof Notification === 'undefined') return 'unsupported';
-  if (Notification.permission === 'granted') return 'granted';
-  if (Notification.permission === 'denied') return 'denied';
-  const result = await Notification.requestPermission();
+  if (!accessToken) return 'no_token';
+  const result = await registerCompanionWebPush(accessToken);
   return result;
 }

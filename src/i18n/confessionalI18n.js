@@ -38,6 +38,8 @@ export const confessionalI18n = {
     confessional_support_chat_placeholder: 'Una palabra de apoyo…',
     confessional_support_chat_send: 'Enviar',
     confessional_support_chat_error: 'No se pudo enviar el mensaje.',
+    confessional_support_chat_blocked:
+      'Mensaje no permitido (sin contactos, enlaces ni redes sociales).',
     confessional_support_alias: 'Miembro {{code}}',
     confessional_support_you: 'Tú',
     confessional_back_portal: 'Volver al portal',
@@ -89,6 +91,8 @@ export const confessionalI18n = {
     confessional_support_chat_placeholder: 'Een woord van steun…',
     confessional_support_chat_send: 'Versturen',
     confessional_support_chat_error: 'Bericht kon niet worden verzonden.',
+    confessional_support_chat_blocked:
+      'Bericht niet toegestaan (geen contactgegevens, links of social media).',
     confessional_support_alias: 'Lid {{code}}',
     confessional_support_you: 'Jij',
     confessional_back_portal: 'Terug naar portaal',
@@ -140,6 +144,8 @@ export const confessionalI18n = {
     confessional_support_chat_placeholder: 'Uma palavra de apoio…',
     confessional_support_chat_send: 'Enviar',
     confessional_support_chat_error: 'Não foi possível enviar.',
+    confessional_support_chat_blocked:
+      'Mensagem não permitida (sem contactos, links ou redes sociais).',
     confessional_support_alias: 'Membro {{code}}',
     confessional_support_you: 'Você',
     confessional_back_portal: 'Voltar ao portal',
@@ -191,6 +197,8 @@ export const confessionalI18n = {
     confessional_support_chat_placeholder: 'كلمة دعم…',
     confessional_support_chat_send: 'إرسال',
     confessional_support_chat_error: 'تعذّر إرسال الرسالة.',
+    confessional_support_chat_blocked:
+      'الرسالة غير مسموحة (بدون بيانات اتصال أو روابط أو شبكات اجتماعية).',
     confessional_support_alias: 'عضو {{code}}',
     confessional_support_you: 'أنت',
     confessional_back_portal: 'العودة إلى البوابة',
