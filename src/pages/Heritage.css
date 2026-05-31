@@ -210,6 +210,16 @@
   padding: 1.5rem 1.75rem;
 }
 
+.heritage-translate-notice {
+  margin: 0 0 1rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-md);
+  background: rgba(201, 169, 98, 0.08);
+  border: 1px solid var(--border-gold);
+  font-size: 0.875rem;
+  color: var(--gold-bright);
+}
+
 .heritage-rich-body p {
   margin: 0 0 1.25rem;
   line-height: 1.75;

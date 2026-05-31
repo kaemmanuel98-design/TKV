@@ -59,7 +59,7 @@ const Onboarding = () => {
               >
                 <div className="onboarding-slide-icon">
                   {mimshack ? (
-                    <MimshackLogo size={40} title="Mimshack" />
+                    <MimshackLogo size={40} title="Mim" />
                   ) : (
                     <Icon size={32} strokeWidth={1.5} />
                   )}

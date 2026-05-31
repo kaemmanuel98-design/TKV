@@ -17,6 +17,26 @@ export default defineConfig({
           if (id.includes('node_modules/@supabase')) {
             return 'supabase';
           }
+          if (
+            id.includes('node_modules/react-dom') ||
+            id.includes('node_modules/react/') ||
+            id.includes('node_modules/react-router')
+          ) {
+            return 'react-vendor';
+          }
+          if (id.includes('/src/data/heritage/')) {
+            return 'heritage-data';
+          }
+          if (
+            id.includes('/src/i18n/heritageI18n') ||
+            id.includes('/src/i18n/heritageI18nKeys')
+          ) {
+            return 'heritage-i18n';
+          }
+          if (id.includes('/src/data/gynosko_') || id.includes('/src/data/eido_')) {
+            const match = id.match(/\/src\/data\/(gynosko|eido)_([a-z]{2})\./);
+            if (match) return `book-${match[1]}-${match[2]}`;
+          }
         },
       },
     },

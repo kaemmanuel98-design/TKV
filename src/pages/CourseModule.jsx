@@ -5,8 +5,10 @@ import { ArrowLeft, CheckCircle, Volume2, VolumeX } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { COURSE_MODULES } from '../data/courseModules';
 import { COURSE_CONTENT } from '../data/courseContent';
+import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
 import { useCourseProgressStore } from '../store/useCourseProgressStore';
+import { applyCourseBadgesFromProgress } from '../lib/courseBadges';
 import { useGamificationStore } from '../store/useGamificationStore';
 import { useSpeak } from '../hooks/useSpeak';
 import { stopSpeech } from '../lib/speech';
@@ -24,6 +26,7 @@ const CourseModule = () => {
   const course = COURSE_MODULES[courseId];
   const modMeta = course?.modules.find((m) => m.index === index);
   const content = COURSE_CONTENT[courseId]?.[index];
+  const user = useAuthStore((s) => s.user);
   const isPremium = useProfileStore((s) => s.isPremium);
   const markComplete = useCourseProgressStore((s) => s.markComplete);
   const isComplete = useCourseProgressStore((s) => s.isComplete);
@@ -148,8 +151,8 @@ const CourseModule = () => {
   const done = isComplete(courseId, index);
 
   const handleComplete = () => {
-    markComplete(courseId, index);
-    awardBadge('reader');
+    markComplete(courseId, index, user?.id);
+    applyCourseBadgesFromProgress(useCourseProgressStore.getState().completed);
   };
 
   return (
@@ -211,9 +214,18 @@ const CourseModule = () => {
             {t('course_module_complete')}
           </p>
         )}
-        <Link to={`/courses/${courseId}`} className="btn btn-outline">
-          {t('course_module_next')}
-        </Link>
+        {index < course.modules.length ? (
+          <Link
+            to={`/courses/${courseId}/module/${index + 1}`}
+            className="btn btn-outline"
+          >
+            {t('course_module_next')}
+          </Link>
+        ) : (
+          <Link to={`/courses/${courseId}`} className="btn btn-outline">
+            {t('course_back')}
+          </Link>
+        )}
       </div>
     </div>
   );

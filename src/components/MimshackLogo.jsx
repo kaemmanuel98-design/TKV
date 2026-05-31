@@ -4,7 +4,7 @@ import './MimshackLogo.css';
 const VIEWBOX = '0 0 64 64';
 
 /**
- * Marque Mimshack — assistant biblique TKV.
+ * Marque Mim — assistant biblique TKV.
  * Monogramme M, halo de discernement, palette or / violet alignée TKV.
  */
 export const MimshackLogo = ({ size = 40, className = '', title, showWordmark = false }) => {
@@ -98,7 +98,7 @@ export const MimshackLogo = ({ size = 40, className = '', title, showWordmark = 
   return (
     <span className={`mimshack-logo-full ${className}`.trim()}>
       {mark}
-      <span className="mimshack-logo-wordmark">Mimshack</span>
+      <span className="mimshack-logo-wordmark">Mim</span>
     </span>
   );
 };

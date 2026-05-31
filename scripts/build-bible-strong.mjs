@@ -24,16 +24,18 @@ const OUT = path.join(ROOT, 'public', 'bible');
 const BSB_ZIP = path.join(CACHE, 'BSB_strongs_usj.zip');
 const BSB_DIR = path.join(CACHE, 'bsb_strongs');
 const FR_JSON = path.join(CACHE, 'fr_apee.json');
+const EN_BBE_JSON = path.join(CACHE, 'en_bbe.json');
 const ES_JSON = path.join(CACHE, 'es_rvr.json');
-const PT_JSON = path.join(CACHE, 'pt_aa.json');
+const PT_JSON = path.join(CACHE, 'pt_nvi.json');
 const AR_JSON = path.join(CACHE, 'ar_svd.json');
 const NL_JSON = path.join(CACHE, 'nl_statenvertaling.json');
 const BSB_URL =
   'https://github.com/BSB-publishing/bsb2usfm/releases/download/v5.2/BSB_strongs_usj.zip';
 const THIAGO_BASE = 'https://raw.githubusercontent.com/thiagobodruk/bible/master/json';
 const FR_URL = `${THIAGO_BASE}/fr_apee.json`;
+const EN_BBE_URL = `${THIAGO_BASE}/en_bbe.json`;
 const ES_URL = `${THIAGO_BASE}/es_rvr.json`;
-const PT_URL = `${THIAGO_BASE}/pt_aa.json`;
+const PT_URL = `${THIAGO_BASE}/pt_nvi.json`;
 const AR_URL = `${THIAGO_BASE}/ar_svd.json`;
 const NL_URL = 'https://api.getbible.net/v2/statenvertaling.json';
 
@@ -417,8 +419,9 @@ async function main() {
 
   const downloads = [
     [FR_URL, FR_JSON, 'FR (Épée)'],
+    [EN_BBE_URL, EN_BBE_JSON, 'EN (Basic English)'],
     [ES_URL, ES_JSON, 'ES (RVR)'],
-    [PT_URL, PT_JSON, 'PT (Almeida)'],
+    [PT_URL, PT_JSON, 'PT (NVI)'],
     [AR_URL, AR_JSON, 'AR (Van Dyck)'],
     [NL_URL, NL_JSON, 'NL (Statenvertaling)'],
   ];
@@ -431,6 +434,7 @@ async function main() {
 
   const localizedSources = {
     fr: loadThiagobodrukBible(FR_JSON),
+    en_readable: loadThiagobodrukBible(EN_BBE_JSON),
     es: loadThiagobodrukBible(ES_JSON),
     pt: loadThiagobodrukBible(PT_JSON),
     ar: loadThiagobodrukBible(AR_JSON),
@@ -466,11 +470,16 @@ async function main() {
       const verseNums = [...enVersesMap.keys()].sort((a, b) => a - b);
 
       const enVerses = [];
+      const enReadableChapter = localizedSources.en_readable?.[bi]?.chapters?.[ch - 1];
       for (const vNum of verseNums) {
         const enSegs = enVersesMap.get(vNum);
         const enVerse = segmentsToVerse(vNum, enSegs);
-        enVerses.push({ id: vNum, segments: enVerse.segments, text: enVerse.text });
-        collectLexiconFromSegments(enVerse.segments, lexicon, wordGloss);
+        const readableText = enReadableChapter?.[vNum - 1];
+        const displayVerse = readableText
+          ? buildLocalizedVerse(vNum, readableText, enVerse.segments, enVerse.text, 'en')
+          : enVerse;
+        enVerses.push(displayVerse);
+        collectLexiconFromSegments(displayVerse.segments, lexicon, wordGloss);
       }
       payload.en = { verses: enVerses };
 
@@ -500,10 +509,10 @@ async function main() {
     chapterCount,
     languages: BIBLE_LANGS,
     sources: {
-      en: 'Berean Standard Bible with Strong (public domain)',
-      fr: 'Bible de l\'Épée (thiagobodruk/bible)',
+      en: 'Basic English text + BSB Strong alignment (public domain)',
+      fr: 'Bible de l\'Épée — traduction fidèle au texte original (thiagobodruk/bible)',
       es: 'Reina-Valera (thiagobodruk/bible)',
-      pt: 'Almeida Atualizada (thiagobodruk/bible)',
+      pt: 'Nova Versão Internacional (thiagobodruk/bible)',
       ar: 'Smith-Van Dyck (thiagobodruk/bible)',
       nl: 'Statenvertaling (getBible API)',
     },

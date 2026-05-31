@@ -35,10 +35,25 @@ export const config = {
   jitsiAppSecret: envTrim('JITSI_APP_SECRET'),
   /** Claim JWT `sub` (souvent `meet.jitsi` en Docker, ou `localhost` en local) */
   jitsiJwtSub: envTrim('JITSI_JWT_SUB') || envTrim('JITSI_DOMAIN'),
-  /** Dev uniquement — meet.jit.si sans JWT (non recommandé en production) */
-  jitsiAllowPublicFallback:
-    process.env.JITSI_ALLOW_PUBLIC_FALLBACK === 'true' ||
-    (!isProduction && process.env.JITSI_ALLOW_PUBLIC_FALLBACK !== 'false'),
+  /** E-mails autorisés à créer une visio même sans Premium+ (fondateur / admins) */
+  jitsiHostEmails: envTrim('JITSI_HOST_EMAILS')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean),
+  /** Clé AES-256 stockage messages Confessionnal (min. 16 caractères) */
+  confessionalEncryptionKey: envTrim('CONFESSIONAL_ENCRYPTION_KEY'),
+  /** E-mails autorisés dashboard accompagnateur (secours si profil non flaggé) */
+  companionEmails: envTrim('COMPANION_HOST_EMAILS')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean),
+  /** Exiger JWT aal2 (2FA Supabase) — activer explicitement avec COMPANION_REQUIRE_MFA=true */
+  companionRequireMfa: process.env.COMPANION_REQUIRE_MFA === 'true',
+  /** Dev uniquement — meet.jit.si sans JWT. Toujours désactivé en production. */
+  jitsiAllowPublicFallback: isProduction
+    ? false
+    : process.env.JITSI_ALLOW_PUBLIC_FALLBACK === 'true' ||
+      process.env.JITSI_ALLOW_PUBLIC_FALLBACK !== 'false',
   /** URL publique de l’app (liens e-mail amis) */
   appPublicUrl:
     envTrim('APP_PUBLIC_URL') ||
@@ -50,6 +65,13 @@ export const config = {
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean),
+  paypalClientId: envTrim('PAYPAL_CLIENT_ID'),
+  paypalClientSecret: envTrim('PAYPAL_CLIENT_SECRET'),
+  paypalSandbox: process.env.PAYPAL_SANDBOX !== 'false',
+  waveApiKey: envTrim('WAVE_API_KEY'),
+  waveWebhookSecret: envTrim('WAVE_WEBHOOK_SECRET'),
+  paymentSandbox: process.env.PAYMENT_SANDBOX === 'true' || !isProduction,
+  paymentDevSecret: envTrim('PAYMENT_DEV_SECRET'),
 };
 
 export const PLAN_LIMITS = {

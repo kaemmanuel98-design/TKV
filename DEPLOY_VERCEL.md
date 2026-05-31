@@ -43,9 +43,12 @@ Ajoutez pour **Production**, **Preview** et **Development** :
 
 **Important auth (évite « Load failed »)** : les variables `VITE_SUPABASE_*` sont injectées **au moment du build**. Si vous les ajoutez après coup, faites un **Redeploy** complet. Sans elles, la connexion échoue avec une erreur réseau.
 
-**Important (visio prod)** :
-- ne mettez jamais `localhost` dans `JITSI_DOMAIN` / `JITSI_PUBLIC_URL` en production ;
-- ne définissez pas `JITSI_ALLOW_PUBLIC_FALLBACK=true` en production.
+**Important (visio prod)** — guide complet : [docs/JITSI_PRODUCTION.md](docs/JITSI_PRODUCTION.md)
+
+- Jitsi tourne sur un **VPS** (`meet.votredomaine.org`), pas sur Vercel.
+- Ne mettez jamais `localhost` dans `JITSI_*` en production.
+- Ne définissez pas `JITSI_ALLOW_PUBLIC_FALLBACK` en production (désactivé automatiquement).
+- Test : `GET https://tkv-app.vercel.app/api/jitsi/status` → `"productionReady": true`.
 
 ## 4. Supabase — URLs autorisées
 

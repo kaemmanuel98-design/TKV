@@ -9,6 +9,43 @@
   display: inline-flex;
 }
 
+.course-detail-progress {
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.course-detail-progress-label {
+  margin: 0 0 0.65rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.course-detail-progress-bar {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.course-detail-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+  transition: width 0.35s ease;
+}
+
+.course-detail-continue,
+.course-detail-cert {
+  margin-top: 1rem;
+  width: 100%;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.course-detail-cert {
+  margin-top: 0.5rem;
+}
+
 .course-modules-list {
   display: flex;
   flex-direction: column;

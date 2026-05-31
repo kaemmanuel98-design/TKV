@@ -4,12 +4,17 @@ import { loadChunks } from './lib/vectorStore.js';
 
 const server = app.listen(config.port, () => {
   const n = loadChunks().length;
-  const jitsiOk = Boolean(config.jitsiDomain && config.jitsiAppId && config.jitsiAppSecret);
+  const supabaseOk = Boolean(config.supabaseUrl && config.supabaseServiceKey);
+  const paypalOk = Boolean(config.paypalClientId && config.paypalClientSecret);
   console.log(`TKV API — http://localhost:${config.port}`);
   console.log(`  chunks: ${n} | openai: ${config.openaiKey ? 'oui' : 'non'}`);
   console.log(
-    `  jitsi: ${jitsiOk ? `oui (${config.jitsiPublicUrl || config.jitsiDomain})` : 'non — copiez jitsi-local-credentials.txt → .env'}`
+    `  supabase: ${supabaseOk ? 'oui' : 'non — SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY dans .env'}`
   );
+  console.log(`  paypal: ${paypalOk ? (config.paypalSandbox ? 'oui (sandbox)' : 'oui') : 'non'}`);
+  if (!supabaseOk) {
+    console.log('  → paiements / export : redémarrez l’API après avoir rempli .env');
+  }
   if (n === 0) console.log('  → lancez: npm run ingest:knowledge');
 });
 

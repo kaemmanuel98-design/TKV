@@ -87,11 +87,11 @@ async function fetchTranslations(texts, { from, to }) {
   }
 }
 
-export async function translateTexts(texts, { from = 'fr', to } = {}) {
+export async function translateTexts(texts, { from = 'fr', to, allowSameLanguage = false } = {}) {
   const target = normalizeLang(to);
   const source = normalizeLang(from);
 
-  if (target === source) return [...texts];
+  if (target === source && !allowSameLanguage) return [...texts];
 
   const list = texts.map((t) => String(t ?? ''));
   const results = new Array(list.length);

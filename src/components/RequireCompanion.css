@@ -1,0 +1,29 @@
+.require-companion-loading,
+.require-companion {
+  max-width: 420px;
+  margin: 3rem auto;
+  text-align: center;
+  padding: 2rem;
+}
+
+.require-companion h1 {
+  font-size: 1.25rem;
+  margin: 1rem 0 0.5rem;
+}
+
+.require-companion p {
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.require-companion-hint {
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem !important;
+}
+
+.require-companion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}

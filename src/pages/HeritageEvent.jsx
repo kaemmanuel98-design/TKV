@@ -1,13 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import HeritageDetailLayout from '../components/HeritageDetailLayout';
-import { HERITAGE_EVENTS_CONTENT } from '../data/heritage/heritageEventsContent';
+import { loadHeritageEvent } from '../lib/heritageContentLoader';
 
 const HeritageEvent = () => {
   const { slug } = useParams();
   const { t } = useTranslation();
-  const event = HERITAGE_EVENTS_CONTENT[slug];
+  const [event, setEvent] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    loadHeritageEvent(slug).then((data) => {
+      if (!cancelled) {
+        setEvent(data);
+        setLoading(false);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <div className="container">
+        <p className="text-muted">{t('heritage_loading')}</p>
+      </div>
+    );
+  }
 
   if (!event) {
     return (

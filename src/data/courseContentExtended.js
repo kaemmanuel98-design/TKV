@@ -1,4 +1,4 @@
-/** Sections des modules 1–8 (fondations) et 1–6 (apologétique) — ES, NL, PT, AR */
+/** Sections des modules fondations, apologétique et teleios — ES, NL, PT, AR */
 export const COURSE_SECTIONS_EXTENDED = {
   foundations: {
     1: {
@@ -309,6 +309,140 @@ export const COURSE_SECTIONS_EXTENDED = {
         'مشاركة الإيمان تبدأ غالباً بحياة متسقة وإصغاء أكثر من خطاب مثالي.',
         'شهادتك الشخصية (قبل / بعد المسيح) لا تُستبدل: لا أحد يحكي ما صنعه الله معك.',
         'ختام المسار الدفاعي: اختر شخصاً، صلِّ من أجله واقترح قهوة أو قراءة مرقس — بلا ضغط، باحترام.',
+      ],
+    },
+  },
+  teleios: {
+    1: {
+      es: [
+        'Teleios significa «haber alcanzado la madurez». Este recorrido es para quienes quieren ir más allá de las bases y vivir una fe estable, profunda y transmisible.',
+        'La madurez bíblica no es edad ni estatus: es crecimiento en Cristo, medido por el amor, la fidelidad y el fruto del Espíritu.',
+        'Ejercicio: lee Colosenses 1.28–29 y anota lo que Pablo llama «presentar a cada uno perfecto (teleios) en Cristo».',
+      ],
+      nl: [
+        'Teleios betekent «volwassenheid bereikt hebben». Dit traject is voor wie verder wil dan de basis en een stabiel, diep en overdraagbaar geloof wil leven.',
+        'Bijbelse volwassenheid is geen leeftijd of status: het is groei in Christus, gemeten aan liefde, trouw en de vrucht van de Geest.',
+        'Oefening: lees Kolossenzen 1:28–29 en noteer wat Paulus «ieder volmaakt (teleios) in Christus» noemt.',
+      ],
+      pt: [
+        'Teleios significa «ter alcançado a maturidade». Este percurso é para quem quer ir além das bases e viver uma fé estável, profunda e transmissível.',
+        'A maturidade bíblica não é idade nem estatuto: é crescimento em Cristo, medido pelo amor, fidelidade e fruto do Espírito.',
+        'Exercício: lê Colossenses 1.28–29 e regista o que Paulo chama «apresentar cada um perfeito (teleios) em Cristo».',
+      ],
+      ar: [
+        'تيليوس تعني «بلوغ النضج». هذا المسار لمن يريدون تجاوز الأساسيات وعيش إيمان مستقر وعميق وقابل للنقل.',
+        'النضج الكتابي ليس عمراً ولا منزلة: بل نمو في المسيح يُقاس بالمحبة والأمانة وثمر الروح.',
+        'تمرين: اقرأ كولوسي 1:28–29 ودوّن ما يدعوه بولس «إتمام كل إنسان في المسيح».',
+      ],
+    },
+    2: {
+      es: [
+        'El carácter cristiano se forma en lo cotidiano: palabra veraz, dominio propio, generosidad, paz interior.',
+        'Gálatas 5 enumera el fruto del Espíritu como prueba visible de una vida habitada por Dios — no como rendimiento religioso.',
+        'Elige un fruto para cultivar esta semana y una situación concreta donde practicarlo.',
+      ],
+      nl: [
+        'Christelijk karakter wordt gevormd in het dagelijks leven: waarachtig spreken, zelfbeheersing, vrijgevigheid, innerlijke vrede.',
+        'Galaten 5 somt de vrucht van de Geest op als zichtbaar bewijs van een door God bewoond leven — geen religieuze prestatie.',
+        'Kies één vrucht om deze week te laten groeien en één concrete situatie om die te oefenen.',
+      ],
+      pt: [
+        'O caráter cristão forma-se no quotidiano: palavra verdadeira, domínio próprio, generosidade, paz interior.',
+        'Gálatas 5 lista o fruto do Espírito como prova visível de uma vida habitada por Deus — não como desempenho religioso.',
+        'Escolhe um fruto para cultivar esta semana e uma situação concreta onde o praticar.',
+      ],
+      ar: [
+        'الشخصية المسيحية تتشكّل في اليومي: كلام صادق، ضبط النفس، كرم، سلام داخلي.',
+        'غلاطية 5 تعدّ ثمر الروح دليلاً ظاهراً على حياة يسكنها الله — لا أداءً دينياً.',
+        'اختر ثمرة لتنميتها هذا الأسبوع وموقفاً ملموساً تمارسها فيه.',
+      ],
+    },
+    3: {
+      es: [
+        'El discernimiento consiste en distinguir lo que viene de Dios, de uno mismo o de presiones externas — antes de decidir.',
+        'La sabiduría práctica combina Escritura, oración y consejo de hermanos y hermanas maduros.',
+        'Antes de una decisión importante, hazte tres preguntas: ¿Es conforme a la Palabra? ¿Está motivada por el amor? ¿Está confirmada en la comunidad?',
+      ],
+      nl: [
+        'Onderscheidingsvermogen is onderscheiden wat van God, van uzelf of van buiten komt — vóór u beslist.',
+        'Praktische wijsheid combineert Schrift, gebed en raad van volwassen broeders en zusters.',
+        'Vóór een grote beslissing: Is het volgens het Woord? Gedreven door liefde? Bevestigd in de gemeenschap?',
+      ],
+      pt: [
+        'O discernimento é distinguir o que vem de Deus, de si ou de pressões externas — antes de decidir.',
+        'A sabedoria prática combina Escritura, oração e conselho de irmãos maduros.',
+        'Antes de uma decisão importante: está conforme a Palavra? Motivada pelo amor? Confirmada na comunidade?',
+      ],
+      ar: [
+        'التمييز هو التفريق بين ما من الله وما من الذات أو الضغوط — قبل القرار.',
+        'الحكمة العملية تجمع الكتاب والصلاة ومشورة إخوة ناضجين.',
+        'قبل قرار مهم: هل يوافق الكلمة؟ هل يدفعه المحبة؟ هل يؤكده الجماع؟',
+      ],
+    },
+    4: {
+      es: [
+        'La madurez se revela también en servir y transmitir: ayudar a otros a crecer como discípulos, no solo a uno mismo.',
+        'Pablo dice a los corintios: «Sed imitadores de mí, como yo lo soy de Cristo». La imitación sana es modelo de vida, no culto a la personalidad.',
+        'Identifica a una persona que puedas animar esta semana — con la Palabra, la oración o un acompañamiento simple.',
+      ],
+      nl: [
+        'Volwassenheid toont zich ook in dienen en doorgeven: anderen helpen groeien als discipelen, niet alleen uzelf.',
+        'Paulus zegt tegen de Korinthiërs: «Weest mijn navolgers, zoals ik van Christus». Gezonde navolging is levensmodel, geen persoonlijkheidsverering.',
+        'Wijs iemand aan die u deze week kunt bemoedigen — met het Woord, gebed of eenvoudige begeleiding.',
+      ],
+      pt: [
+        'A maturidade revela-se também em servir e transmitir: ajudar outros a crescer como discípulos, não só a si.',
+        'Paulo diz aos coríntios: «Sejam meus imitadores, como eu o sou de Cristo». Imitação saudável é modelo de vida, não culto à personalidade.',
+        'Identifica alguém que possas encorajar esta semana — com a Palavra, oração ou acompanhamento simples.',
+      ],
+      ar: [
+        'النضج يظهر أيضاً في الخدمة والتلمذة: إنماء آخرين لا أنفسنا فقط.',
+        'يقول بولس لأهل كورنثوس: «كونوا تلاميذي كما أنا تلميذ للمسيح». التقليد السليم نموذج حياة لا عبادة شخص.',
+        'حدّد شخصاً تشجعه هذا الأسبوع — بالكلمة أو الصلاة أو مرافقة بسيطة.',
+      ],
+    },
+    5: {
+      es: [
+        'Las pruebas revelan la profundidad de la raíz. Teleios no significa ausencia de lucha, sino perseverancia fiel.',
+        'Santiago 1 invita a considerar las pruebas como laboratorio de paciencia y madurez.',
+        'Si atraviesas una temporada difícil, compártela con un acompañante espiritual de confianza.',
+      ],
+      nl: [
+        'Beproevingen tonen de diepte van de wortel. Teleios betekent niet geen strijd, maar trouwe volharding.',
+        'Jacobus 1 nodigt uit beproevingen te zien als laboratorium van geduld en volwassenheid.',
+        'In een zware tijd: deel het met een vertrouwde geestelijke begeleider.',
+      ],
+      pt: [
+        'As provações revelam a profundidade da raiz. Teleios não é ausência de luta, mas perseverança fiel.',
+        'Tiago 1 convida a ver as provações como laboratório de paciência e maturidade.',
+        'Se atravessas uma época difícil, partilha com um acompanhante espiritual de confiança.',
+      ],
+      ar: [
+        'التجارب تكشف عمق الجذور. تيليوس لا يعني غياب الصراع بل ثباتاً أميناً.',
+        'يعقوب 1 يدعو لاعتبار التجارب مختبر صبر ونضج.',
+        'إن كنت في موسم صعب، شاركه مع مرافق روحي تثق به.',
+      ],
+    },
+    6: {
+      es: [
+        'Vivir Teleios cada día es unir adoración, Palabra, servicio y misión en una vida coherente.',
+        'La madurez no es un diploma: es una marcha continua hacia la semejanza de Cristo.',
+        'Cierre del recorrido Teleios: escribe una oración de consagración y un compromiso concreto para los próximos tres meses.',
+      ],
+      nl: [
+        'Teleios dagelijks leven is aanbidding, Woord, dienst en zending verenigen in één samenhangend leven.',
+        'Volwassenheid is geen diploma: het is een voortdurende weg naar Christusgelijkenis.',
+        'Afsluiting Teleios: schrijf een gebed van toewijding en één concrete verbintenis voor de komende drie maanden.',
+      ],
+      pt: [
+        'Viver Teleios no dia a dia é unir adoração, Palavra, serviço e missão numa vida coerente.',
+        'A maturidade não é um diploma: é caminhada contínua para a semelhança de Cristo.',
+        'Fecho Teleios: escreve uma oração de consagração e um compromisso concreto para os próximos três meses.',
+      ],
+      ar: [
+        'عيش تيليوس اليومي يوحّد العبادة والكلمة والخدمة والرسالة في حياة متسقة.',
+        'النضج ليس شهادة: بل سيراً مستمراً نحو شبه المسيح.',
+        'ختام مسار تيليوس: اكتب صلاة تكريس والتزاماً ملموساً للأشهر الثلاثة القادمة.',
       ],
     },
   },

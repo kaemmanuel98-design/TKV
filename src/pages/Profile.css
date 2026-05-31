@@ -73,6 +73,78 @@
   margin-top: 0.75rem;
 }
 
+.profile-courses-desc {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  margin: -0.35rem 0 0.85rem;
+}
+
+.profile-courses-list,
+.profile-certificates-list {
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.profile-cert-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  text-decoration: none;
+  color: inherit;
+  flex-wrap: wrap;
+}
+
+.profile-cert-row:hover {
+  border-color: var(--gold-bright);
+}
+
+.profile-cert-code {
+  margin-left: auto;
+  font-family: monospace;
+  font-size: 0.75rem;
+  color: var(--gold-bright);
+}
+
+.profile-course-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  gap: 0.25rem 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.profile-course-row:hover {
+  border-color: var(--border-gold);
+}
+
+.profile-course-name {
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.profile-course-meta {
+  font-size: 0.75rem;
+  color: var(--gold);
+}
+
+.profile-course-bar {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 .profile-quick-title {
   margin: 0 0 0.75rem;
   font-size: 0.8125rem;
@@ -288,6 +360,35 @@
   margin-bottom: 1.25rem;
 }
 
+.profile-visio-host-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  border-color: rgba(212, 175, 55, 0.35);
+}
+
+.profile-visio-host-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 12rem;
+}
+
+.profile-visio-host-head .profile-section-title {
+  margin-bottom: 0.35rem;
+}
+
+.profile-visio-host-head svg {
+  flex-shrink: 0;
+  color: var(--gold-bright);
+  margin-top: 0.15rem;
+}
+
 .profile-section-title {
   display: flex;
   align-items: center;
@@ -333,6 +434,17 @@
   font-size: 0.8125rem;
   margin: 0.35rem 0 0.75rem;
   line-height: 1.45;
+}
+
+.profile-location-saved {
+  margin: 0 0 0.75rem;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--gold-bright);
+  background: rgba(201, 169, 98, 0.12);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--gold);
 }
 
 .profile-map-opt {

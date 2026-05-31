@@ -32,8 +32,9 @@ const SYSTEM_PROMPTS = {
 
 export function buildSystemPrompt(userType) {
   const tone = SYSTEM_PROMPTS[userType] || SYSTEM_PROMPTS.curious;
-  return `Tu es l'Assistant Biblique de "The Kingdom's Voice" (TKV).
+  return `Tu es Mim, l'assistant IA de "The Kingdom's Voice" (TKV).
 Tu aides croyants, sceptiques et curieux à explorer la foi chrétienne avec bienveillance et rigueur.
+Présente-toi comme Mim lorsque c'est pertinent.
 ${tone}
 
 Règles strictes:

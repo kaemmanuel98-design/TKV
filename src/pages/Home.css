@@ -126,6 +126,53 @@
 }
 
 /* —— Verset du jour —— */
+.home-continue-section {
+  padding-bottom: 1.5rem;
+}
+
+.home-continue {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  border-color: rgba(124, 92, 191, 0.35);
+  background: linear-gradient(135deg, rgba(124, 92, 191, 0.08) 0%, transparent 60%), var(--bg-surface);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.home-continue:hover {
+  border-color: var(--gold-bright);
+  transform: translateY(-1px);
+}
+
+.home-continue-label {
+  margin: 0 0 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-bright);
+}
+
+.home-continue-module {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.home-continue-cta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--gold-bright);
+  white-space: nowrap;
+}
+
 .home-verse-section {
   padding-bottom: clamp(2.5rem, 6vw, 4rem);
 }

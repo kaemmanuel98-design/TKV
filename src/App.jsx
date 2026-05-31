@@ -3,10 +3,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useAuthStore } from './store/useAuthStore';
 import { useProfileStore } from './store/useProfileStore';
 import { useGamificationStore } from './store/useGamificationStore';
+import { useCourseProgressStore } from './store/useCourseProgressStore';
 import Layout from './components/Layout';
 import LoadingScreen from './components/LoadingScreen';
 import ErrorBoundary from './components/ErrorBoundary';
 import RequireAuth from './components/RequireAuth';
+import RequireCompanion from './components/RequireCompanion';
 import MimshackLogo from './components/MimshackLogo';
 import Onboarding from './pages/Onboarding';
 import AuthPage from './pages/AuthPage';
@@ -29,9 +31,13 @@ const HeritageArticle = lazy(() => import('./pages/HeritageArticle'));
 const HeritageEvent = lazy(() => import('./pages/HeritageEvent'));
 const HeritageCharacter = lazy(() => import('./pages/HeritageCharacter'));
 const CourseModule = lazy(() => import('./pages/CourseModule'));
+const CourseCertificate = lazy(() => import('./pages/CourseCertificate'));
+const PaymentReturn = lazy(() => import('./pages/PaymentReturn'));
 const About = lazy(() => import('./pages/About'));
 const Friends = lazy(() => import('./pages/Friends'));
 const FriendChat = lazy(() => import('./pages/FriendChat'));
+const Confessional = lazy(() => import('./pages/Confessional'));
+const CompanionDashboard = lazy(() => import('./pages/CompanionDashboard'));
 
 function PageFallback() {
   return <LoadingScreen />;
@@ -45,6 +51,10 @@ function App() {
   useEffect(() => {
     initialize();
     initSpeechEngine();
+    const pct = useCourseProgressStore.getState().overallProgressPercent();
+    if (pct > 0) {
+      useGamificationStore.getState().setReadingProgress(pct);
+    }
   }, [initialize]);
 
   useEffect(() => {
@@ -52,6 +62,9 @@ function App() {
       fetchProfile(user.id).then((profile) => {
         if (profile) syncFromProfile(profile);
       });
+      useCourseProgressStore.getState().hydrateFromUser(user.id);
+    } else {
+      useCourseProgressStore.getState().resetRemoteHydration();
     }
   }, [user?.id, fetchProfile, syncFromProfile]);
 
@@ -65,6 +78,18 @@ function App() {
         <Routes>
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route
+            path="/companion"
+            element={
+              <RequireAuth>
+                <RequireCompanion>
+                  <Suspense fallback={<PageFallback />}>
+                    <CompanionDashboard />
+                  </Suspense>
+                </RequireCompanion>
+              </RequireAuth>
+            }
+          />
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route
@@ -146,6 +171,17 @@ function App() {
               }
             />
             <Route
+              path="courses/:courseId/certificate"
+              element={
+                <RequireAuth>
+                  <Suspense fallback={<PageFallback />}>
+                    <CourseCertificate />
+                  </Suspense>
+                </RequireAuth>
+              }
+            />
+            <Route path="payment/return" element={<PaymentReturn />} />
+            <Route
               path="podcasts"
               element={
                 <Suspense fallback={<PageFallback />}>
@@ -215,6 +251,16 @@ function App() {
                 <Suspense fallback={<PageFallback />}>
                   <MapPage />
                 </Suspense>
+              }
+            />
+            <Route
+              path="confessional"
+              element={
+                <RequireAuth>
+                  <Suspense fallback={<PageFallback />}>
+                    <Confessional />
+                  </Suspense>
+                </RequireAuth>
               }
             />
             <Route

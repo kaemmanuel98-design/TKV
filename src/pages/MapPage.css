@@ -1,3 +1,403 @@
+/* Carte du Royaume — thème premium */
+
+.map-shell--kingdom {
+  --km-royal: #5b4d9a;
+  --km-royal-bright: #8b7fd4;
+  --km-sapphire: #2a6f9e;
+  --km-sapphire-bright: #4ba3d4;
+  --km-emerald: #2d8a6a;
+  --km-emerald-bright: #4ecf9a;
+  --km-coral: #c45c4a;
+  --km-coral-bright: #f08a72;
+  --km-amber: #d4a03c;
+  --km-amber-bright: #f0c96a;
+  --km-glass: rgba(14, 14, 22, 0.78);
+  --km-glass-border: rgba(255, 255, 255, 0.1);
+  --km-gradient-hero: linear-gradient(
+    135deg,
+    rgba(91, 77, 154, 0.35) 0%,
+    rgba(42, 111, 158, 0.28) 40%,
+    rgba(201, 169, 98, 0.22) 100%
+  );
+  position: relative;
+  padding-bottom: 2.5rem;
+}
+
+.map-hero-aura {
+  position: absolute;
+  top: -2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(900px, 100%);
+  height: 280px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(139, 127, 212, 0.28), transparent 68%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.map-shell--kingdom > *:not(.map-hero-aura) {
+  position: relative;
+  z-index: 1;
+}
+
+.kingdom-glass-card {
+  background: var(--km-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--km-glass-border);
+  border-radius: var(--radius-md, 16px);
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Fil d'Ariane */
+.kingdom-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1.15rem;
+  background: var(--km-gradient-hero);
+}
+
+.kingdom-crumb {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid transparent;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-pill, 999px);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s var(--ease-out-expo, ease);
+}
+
+.kingdom-crumb:hover:not(.active) {
+  border-color: var(--km-royal-bright);
+  background: rgba(91, 77, 154, 0.25);
+  color: #fff;
+}
+
+.kingdom-crumb.active {
+  background: linear-gradient(135deg, var(--km-royal), var(--km-sapphire));
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(91, 77, 154, 0.45);
+}
+
+/* Workspace */
+.map-kingdom-workspace {
+  display: grid;
+  grid-template-columns: minmax(260px, 320px) 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .map-kingdom-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+.map-kingdom-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.map-kingdom-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.map-sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.map-my-home-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--km-amber), var(--gold)) !important;
+  border: none !important;
+  box-shadow: 0 4px 24px rgba(212, 160, 60, 0.35);
+}
+
+.map-level-hint {
+  margin: 0;
+  padding: 0.65rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  background: var(--km-gradient-hero);
+  border-radius: var(--radius-sm, 10px);
+  border-left: 3px solid var(--km-royal-bright);
+}
+
+.map-status {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Légende pills */
+.map-legend--pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.map-legend-pill {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-pill, 999px);
+  letter-spacing: 0.02em;
+}
+
+.map-legend-pill--friend {
+  background: rgba(107, 91, 149, 0.35);
+  color: #c4b8f0;
+  border: 1px solid rgba(139, 127, 212, 0.5);
+}
+
+.map-legend-pill--member {
+  background: rgba(42, 111, 158, 0.3);
+  color: #9dd4f5;
+  border: 1px solid rgba(75, 163, 212, 0.45);
+}
+
+.map-legend-pill--house {
+  background: rgba(201, 169, 98, 0.25);
+  color: var(--gold-bright);
+  border: 1px solid rgba(201, 169, 98, 0.5);
+}
+
+/* Carte Leaflet */
+.kingdom-map-frame {
+  position: relative;
+  min-height: 460px;
+  height: min(68vh, 600px);
+  border-radius: var(--radius-lg, 24px);
+  overflow: hidden;
+  padding: 3px;
+  background: linear-gradient(
+    145deg,
+    var(--km-royal-bright),
+    var(--km-sapphire-bright),
+    var(--gold),
+    var(--km-coral-bright)
+  );
+  box-shadow: var(--shadow-lg), 0 0 60px rgba(91, 77, 154, 0.2);
+}
+
+.kingdom-map-frame .kingdom-leaflet-map {
+  border-radius: calc(var(--radius-lg, 24px) - 3px);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.map-frame-chrome {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.map-frame-badge {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #fff;
+  background: linear-gradient(135deg, var(--km-royal), var(--km-sapphire));
+  border-radius: var(--radius-pill, 999px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.map-shell--kingdom .leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  background: #faf9fc;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.map-shell--kingdom .leaflet-popup-tip {
+  background: #faf9fc;
+}
+
+/* Marqueurs */
+.map-country-cluster-leaflet,
+.map-city-marker-leaflet,
+.map-house-marker-leaflet {
+  background: transparent !important;
+  border: none !important;
+}
+
+.map-country-cluster {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-pill, 999px);
+  background: linear-gradient(145deg, #2a2548, #1a1830);
+  border: 2px solid var(--km-royal-bright);
+  box-shadow: 0 6px 24px rgba(91, 77, 154, 0.55);
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.map-country-cluster:hover {
+  transform: scale(1.08);
+}
+
+.map-country-cluster__ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid rgba(139, 127, 212, 0.4);
+  animation: map-pulse 2.5s ease infinite;
+}
+
+@keyframes map-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.06);
+  }
+}
+
+.map-country-cluster__count {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.map-country-cluster__label {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--km-royal-bright);
+  max-width: 76px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map-city-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 12px;
+  background: linear-gradient(160deg, #1a3d52, #0f2838);
+  border: 2px solid var(--km-sapphire-bright);
+  box-shadow: 0 4px 18px rgba(42, 111, 158, 0.5);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.map-city-marker:hover {
+  transform: translateY(-2px);
+}
+
+.map-city-marker__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--km-sapphire-bright);
+  box-shadow: 0 0 10px var(--km-sapphire-bright);
+}
+
+.map-city-marker__name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #e8f4fc;
+  white-space: nowrap;
+}
+
+.map-city-marker__count {
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--km-emerald-bright);
+}
+
+.map-house-marker {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.map-house-marker:hover {
+  transform: translateY(-3px);
+}
+
+.map-house-marker__glow {
+  position: absolute;
+  bottom: 0;
+  width: 36px;
+  height: 12px;
+  background: radial-gradient(ellipse, rgba(201, 169, 98, 0.6), transparent);
+}
+
+.map-house-marker__roof {
+  width: 0;
+  height: 0;
+  border-left: 20px solid transparent;
+  border-right: 20px solid transparent;
+  border-bottom: 16px solid var(--gold);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.map-house-marker__body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 24px;
+  margin-top: -1px;
+  border: 2px solid var(--gold-bright);
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  background: linear-gradient(180deg, #3d3428, #1f1a14);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--gold-bright);
+}
+
+.map-house-marker--friend .map-house-marker__roof {
+  border-bottom-color: var(--km-royal-bright);
+}
+
+.map-house-marker--friend .map-house-marker__body {
+  border-color: var(--km-royal-bright);
+}
+
+.map-house-marker--friend-online .map-house-marker__roof {
+  border-bottom-color: var(--km-emerald-bright);
+}
+
+.map-house-marker--friend-online .map-house-marker__body {
+  border-color: var(--km-emerald-bright);
+}
+
+/* Avatars carte */
 .map-avatar-marker-leaflet {
   background: transparent;
   border: none;
@@ -6,25 +406,19 @@
 .map-avatar-marker {
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid var(--gold, #c9a962);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
-  background: var(--bg-elevated, #1a1a1e);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 3px solid var(--gold);
+  box-shadow: 0 4px 20px rgba(201, 169, 98, 0.5);
+  background: var(--bg-elevated);
 }
 
-.map-avatar-marker img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+.map-avatar-marker--friend {
+  border-color: var(--km-royal-bright);
+  box-shadow: 0 0 0 3px rgba(139, 127, 212, 0.35), 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-.map-avatar-marker__initial {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--gold-bright, #e8d5a3);
+.map-avatar-marker--friend-online {
+  border-color: var(--km-emerald-bright);
+  box-shadow: 0 0 0 3px rgba(78, 207, 154, 0.35), 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
 .map-popup-avatar {
@@ -36,7 +430,7 @@
 
 .map-popup-meta strong {
   display: block;
-  color: #1a1a1a;
+  color: #1a1a22;
 }
 
 .map-popup-meta span {
@@ -44,89 +438,554 @@
   color: #555;
 }
 
-.map-avatar-marker--friend {
-  border-width: 3px;
-  border-color: var(--violet, #6b5b95);
-  box-shadow: 0 0 0 2px rgba(201, 169, 98, 0.35), 0 2px 12px rgba(0, 0, 0, 0.5);
-}
-
-.map-avatar-marker--friend-online {
-  border-color: #66bb6a;
-  box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.35), 0 2px 12px rgba(0, 0, 0, 0.5);
-}
-
-.map-friends-strip {
-  margin-bottom: 1rem;
-  padding: 1rem 1.25rem;
-}
-
-.map-friends-strip-title {
-  margin: 0 0 0.65rem;
-  font-size: 0.9375rem;
-}
-
-.map-friends-list {
-  list-style: none;
-  margin: 0 0 0.75rem;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.map-friends-list-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.65rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-gold);
-  text-decoration: none;
-  color: inherit;
-  font-size: 0.8125rem;
-}
-
-.map-friends-online-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #66bb6a;
-}
-
-.map-legend {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-}
-
-.map-legend-item--friend::before {
-  content: '';
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-right: 0.35rem;
-  vertical-align: middle;
-  background: var(--violet, #6b5b95);
-  border: 2px solid var(--gold);
-}
-
 .map-popup-friend-badge {
   display: block;
   font-size: 0.6875rem;
   margin-top: 0.15rem;
-  color: var(--violet, #6b5b95);
+  color: var(--km-royal);
   font-weight: 600;
 }
 
 .map-popup-friend-badge--on {
-  color: #2e7d32;
+  color: var(--km-emerald);
 }
 
 .map-popup-chat-btn {
   margin-top: 0.5rem;
   width: 100%;
   justify-content: center;
+}
+
+/* Arbre explorateur */
+.kingdom-tree {
+  padding: 1.1rem 1.2rem;
+}
+
+.kingdom-tree-title {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.85rem;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, var(--gold-bright), var(--km-royal-bright));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.kingdom-tree-root,
+.kingdom-tree-cities,
+.kingdom-tree-houses {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.kingdom-tree-cities {
+  margin: 0.35rem 0 0.5rem 1rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid rgba(75, 163, 212, 0.35);
+}
+
+.kingdom-tree-houses {
+  margin: 0.35rem 0 0.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.kingdom-tree-row {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.kingdom-tree-row--city {
+  margin-top: 0.4rem;
+}
+
+.kingdom-tree-toggle,
+.kingdom-tree-label,
+.kingdom-tree-house {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.kingdom-tree-toggle {
+  color: var(--text-tertiary);
+  padding: 0.25rem;
+}
+
+.kingdom-tree-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: var(--radius-sm, 10px);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.kingdom-tree-label--country:hover {
+  background: rgba(196, 92, 74, 0.15);
+  color: var(--km-coral-bright);
+}
+
+.kingdom-tree-label--city:hover {
+  background: rgba(75, 163, 212, 0.15);
+  color: var(--km-sapphire-bright);
+}
+
+.kingdom-tree-badge {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-pill, 999px);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+.kingdom-tree-house {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-sm, 10px);
+  font-size: 0.8125rem;
+  border: 1px solid transparent;
+  transition: all 0.15s ease;
+}
+
+.kingdom-tree-house:hover,
+.kingdom-tree-house.active {
+  background: linear-gradient(90deg, rgba(201, 169, 98, 0.2), rgba(212, 160, 60, 0.08));
+  border-color: rgba(201, 169, 98, 0.45);
+  color: var(--gold-bright);
+}
+
+/* Amis */
+.map-friends-strip {
+  padding: 1rem 1.15rem;
+}
+
+.map-friends-strip-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--km-royal-bright);
+}
+
+.map-friends-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+button.map-friends-list-link,
+.map-friends-list-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-pill, 999px);
+  border: 1px solid rgba(139, 127, 212, 0.45);
+  background: rgba(91, 77, 154, 0.15);
+  text-decoration: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.map-friends-list-link:hover {
+  border-color: var(--km-royal-bright);
+  background: rgba(91, 77, 154, 0.3);
+  transform: translateY(-1px);
+}
+
+.map-friends-online-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--km-emerald-bright);
+  box-shadow: 0 0 8px var(--km-emerald-bright);
+}
+
+/* Bandeau config */
+.map-setup-banner {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  padding: 1.1rem 1.2rem;
+}
+
+.map-setup-banner--warn {
+  background: linear-gradient(135deg, rgba(196, 92, 74, 0.18), rgba(212, 160, 60, 0.1));
+  border-color: rgba(240, 138, 114, 0.4);
+}
+
+.map-setup-banner svg {
+  flex-shrink: 0;
+  color: var(--km-coral-bright);
+}
+
+.map-setup-list {
+  margin: 0.35rem 0 0.75rem;
+  padding-left: 1.1rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Extérieur maison */
+.kingdom-house-exterior {
+  margin-bottom: 0;
+}
+
+.kingdom-toolbar-btn {
+  margin-bottom: 0.75rem;
+  border-color: var(--km-glass-border) !important;
+}
+
+.kingdom-house-scene--premium {
+  position: relative;
+  min-height: 320px;
+  border-radius: var(--radius-lg, 24px);
+  overflow: hidden;
+  background: linear-gradient(180deg, #1e3a5f 0%, #2d1f4e 38%, #1a3d2e 100%);
+  box-shadow: var(--shadow-lg), inset 0 0 80px rgba(139, 127, 212, 0.15);
+}
+
+.kingdom-house-sky {
+  position: absolute;
+  inset: 0 0 35%;
+  background: linear-gradient(180deg, #3d5a80 0%, #2a3f6e 50%, transparent 100%);
+}
+
+.kingdom-house-stars {
+  position: absolute;
+  inset: 0 30% 0 0;
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 60% 20%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(2px 2px at 80% 40%, #fff, transparent),
+    radial-gradient(1px 1px at 40% 50%, rgba(255, 255, 255, 0.6), transparent);
+  opacity: 0.7;
+}
+
+.kingdom-house-moon {
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff8e0, #e8d5a3 60%, transparent 61%);
+  box-shadow: 0 0 40px rgba(232, 213, 163, 0.5);
+}
+
+.kingdom-house-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 28%;
+  background: linear-gradient(180deg, transparent, #1a4a32 40%, #0f3020);
+}
+
+.kingdom-house-building {
+  position: absolute;
+  left: 50%;
+  bottom: 3rem;
+  transform: translateX(-50%);
+  width: min(240px, 72vw);
+  z-index: 2;
+}
+
+.kingdom-house-roof {
+  position: relative;
+  width: 0;
+  height: 0;
+  margin: 0 auto;
+  border-left: 118px solid transparent;
+  border-right: 118px solid transparent;
+  border-bottom: 76px solid #b8862d;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4));
+}
+
+.kingdom-house-roof-shine {
+  position: absolute;
+  top: 18px;
+  left: -40px;
+  width: 50px;
+  height: 30px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+}
+
+.kingdom-house-body {
+  position: relative;
+  height: 128px;
+  margin-top: -4px;
+  background: linear-gradient(180deg, #5c4a38 0%, #3a2e24 100%);
+  border: 2px solid rgba(232, 213, 163, 0.5);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+}
+
+.kingdom-house-window {
+  position: absolute;
+  top: 1.35rem;
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(180deg, rgba(255, 230, 150, 0.9), rgba(255, 180, 80, 0.5));
+  border: 2px solid rgba(232, 213, 163, 0.7);
+  border-radius: 3px;
+  box-shadow: inset 0 0 16px rgba(255, 220, 120, 0.6), 0 0 12px rgba(255, 200, 100, 0.4);
+}
+
+.kingdom-house-window--left {
+  left: 1.35rem;
+}
+
+.kingdom-house-window--right {
+  right: 1.35rem;
+}
+
+.kingdom-house-door-wrap {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 68px;
+  height: 92px;
+}
+
+.kingdom-house-door {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--gold-bright);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: linear-gradient(180deg, #8b6914 0%, #5c4520 100%);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.625rem;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  box-shadow: 0 -4px 20px rgba(232, 213, 163, 0.3);
+}
+
+.kingdom-house-door:hover {
+  background: linear-gradient(180deg, #a67c1a 0%, #6d5528 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 0 28px rgba(232, 213, 163, 0.5);
+}
+
+.kingdom-house-plaque {
+  position: absolute;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1.15rem;
+  min-width: min(340px, 92%);
+  z-index: 3;
+}
+
+.kingdom-house-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.0625rem;
+  color: var(--gold-bright);
+}
+
+.kingdom-house-meta {
+  margin: 0.2rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.kingdom-house-sparkle {
+  margin-left: auto;
+  color: var(--km-amber-bright);
+  opacity: 0.9;
+}
+
+/* Intérieur */
+.kingdom-house-interior {
+  margin-bottom: 0;
+}
+
+.kingdom-interior-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.kingdom-interior-layout {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) 1fr;
+  gap: 1.15rem;
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .kingdom-interior-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kingdom-rooms-nav {
+  padding: 1.1rem;
+}
+
+.kingdom-rooms-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+}
+
+.kingdom-rooms-nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.kingdom-room-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 10px);
+  background: rgba(255, 255, 255, 0.03);
+  color: inherit;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.kingdom-room-btn--salon:hover,
+.kingdom-room-btn--salon.active {
+  background: rgba(196, 92, 74, 0.2);
+  border-color: rgba(240, 138, 114, 0.45);
+  color: var(--km-coral-bright);
+}
+
+.kingdom-room-btn--library:hover,
+.kingdom-room-btn--library.active {
+  background: rgba(42, 111, 158, 0.25);
+  border-color: rgba(75, 163, 212, 0.45);
+  color: var(--km-sapphire-bright);
+}
+
+.kingdom-room-btn--prayer:hover,
+.kingdom-room-btn--prayer.active {
+  background: rgba(45, 138, 106, 0.25);
+  border-color: rgba(78, 207, 154, 0.45);
+  color: var(--km-emerald-bright);
+}
+
+.kingdom-room-btn--wall:hover,
+.kingdom-room-btn--wall.active {
+  background: rgba(91, 77, 154, 0.25);
+  border-color: rgba(139, 127, 212, 0.45);
+  color: var(--km-royal-bright);
+}
+
+.kingdom-room-view {
+  padding: 1.35rem;
+  min-height: 280px;
+}
+
+.kingdom-room-view--salon {
+  background: linear-gradient(160deg, rgba(196, 92, 74, 0.12), var(--km-glass));
+}
+
+.kingdom-room-view--library {
+  background: linear-gradient(160deg, rgba(42, 111, 158, 0.15), var(--km-glass));
+}
+
+.kingdom-room-view--prayer {
+  background: linear-gradient(160deg, rgba(45, 138, 106, 0.15), var(--km-glass));
+}
+
+.kingdom-room-view--wall {
+  background: linear-gradient(160deg, rgba(91, 77, 154, 0.15), var(--km-glass));
+}
+
+.kingdom-room-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-bottom: 1.15rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.kingdom-room-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.kingdom-room-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.kingdom-room-welcome {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 1.0625rem;
+  color: var(--gold-bright);
+}
+
+.kingdom-room-bio {
+  margin: 0;
+  padding: 1rem 1.15rem;
+  border-left: 4px solid var(--gold);
+  background: rgba(201, 169, 98, 0.08);
+  border-radius: 0 var(--radius-sm, 10px) var(--radius-sm, 10px) 0;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--text-primary);
 }

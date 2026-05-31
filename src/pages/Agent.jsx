@@ -26,7 +26,16 @@ const Agent = () => {
   const getPlanType = useProfileStore((s) => s.getPlanType);
   const isPremium = useProfileStore((s) => s.isPremium);
   const planType = getPlanType();
-  const { messages, sendMessage, getLimits, resetIfNewDay } = useAgentStore();
+  const {
+    messages,
+    sendMessage,
+    getLimits,
+    resetIfNewDay,
+    chatCount,
+    canSendChat,
+    canAnalyzePerspectives,
+    incrementPerspectives,
+  } = useAgentStore();
   const incrementIa = useGamificationStore((s) => s.incrementIaQuestions);
 
   resetIfNewDay();
@@ -40,6 +49,10 @@ const Agent = () => {
   const handleSend = async () => {
     const q = input.trim();
     if (!q || loading) return;
+    if (!isPremium() && !canSendChat(planType)) {
+      setPaywallOpen(true);
+      return;
+    }
     setError(null);
     sendMessage('user', q);
     incrementIa();
@@ -63,7 +76,6 @@ const Agent = () => {
         sendMessage('assistant', t('agent_quota_exceeded'));
       } else {
         setError(t('agent_error'));
-        sendMessage('assistant', t('agent_mock_reply'));
       }
     } finally {
       setLoading(false);
@@ -73,6 +85,10 @@ const Agent = () => {
   const handlePerspectives = async () => {
     const q = perspectiveQ.trim();
     if (!q || loading) return;
+    if (!canAnalyzePerspectives(planType)) {
+      setPaywallOpen(true);
+      return;
+    }
     setError(null);
     setLoading(true);
 
@@ -83,6 +99,7 @@ const Agent = () => {
         accessToken: token,
         userType,
       });
+      incrementPerspectives();
       setPerspectiveResult({
         believers: data.believers,
         skeptics: data.skeptics,
@@ -96,11 +113,6 @@ const Agent = () => {
         setPaywallOpen(true);
       } else {
         setError(t('agent_error'));
-        setPerspectiveResult({
-          believers: t('perspectives_mock_believers'),
-          skeptics: t('perspectives_mock_skeptics'),
-          synthesis: t('perspectives_mock_synthesis'),
-        });
       }
     } finally {
       setLoading(false);
@@ -110,7 +122,7 @@ const Agent = () => {
   return (
     <div className="container agent-page animate-fade-in">
       <header className="agent-header-brand">
-        <MimshackLogo size={56} showWordmark title="Mimshack" />
+        <MimshackLogo size={56} showWordmark title="Mim" />
         <div className="agent-header-brand-copy">
           <h1>{t('agent_title')}</h1>
           <p>{t('agent_subtitle')}</p>
@@ -137,7 +149,9 @@ const Agent = () => {
       </div>
 
       <p className="agent-quota">
-        {isPremium() ? t('agent_quota_premium') : t('agent_quota', { used: messages.filter((m) => m.role === 'user').length, limit: limits.chat })}
+        {isPremium()
+          ? t('agent_quota_premium')
+          : t('agent_quota', { used: chatCount, limit: limits.chat })}
       </p>
 
       {error && <p className="agent-error">{error}</p>}

@@ -1,14 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { CreditCard, DollarSign, X } from 'lucide-react';
+import { CreditCard, X } from 'lucide-react';
 
 const PaymentModal = ({ isOpen, onClose, isPremium = false }) => {
   const { t } = useTranslation();
 
   if (!isOpen) return null;
 
-  const handlePayment = (method) => {
-    alert(t('payment_redirect', { method }));
+  const handlePayment = () => {
+    alert(t('payment_redirect', { method: 'PayPal' }));
     onClose();
   };
 
@@ -26,31 +26,14 @@ const PaymentModal = ({ isOpen, onClose, isPremium = false }) => {
           {isPremium ? t('payment_premium_desc') : t('payment_support_desc')}
         </p>
 
-        <div className="flex flex-col gap-3">
-          <button
-            type="button"
-            className="btn btn-outline w-full"
-            onClick={() => handlePayment('CinetPay')}
-            style={{ padding: '1rem 1.25rem', justifyContent: 'space-between', borderColor: 'rgba(0, 200, 83, 0.4)', color: '#4ade80' }}
-          >
-            <span className="flex items-center gap-2">
-              <CreditCard size={20} /> CinetPay (Mobile Money)
-            </span>
-            <span className="text-muted" style={{ fontSize: '0.8125rem' }}>{t('payment_cinetpay_region')}</span>
-          </button>
-
-          <button
-            type="button"
-            className="btn btn-outline w-full"
-            onClick={() => handlePayment('PayPal')}
-            style={{ padding: '1rem 1.25rem', justifyContent: 'space-between', borderColor: 'rgba(0, 121, 193, 0.4)', color: '#60a5fa' }}
-          >
-            <span className="flex items-center gap-2">
-              <DollarSign size={20} /> PayPal
-            </span>
-            <span className="text-muted" style={{ fontSize: '0.8125rem' }}>{t('payment_paypal_region')}</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          className="btn btn-outline w-full"
+          onClick={handlePayment}
+          style={{ padding: '1rem 1.25rem', justifyContent: 'center', borderColor: 'rgba(0, 121, 193, 0.4)', color: '#60a5fa', gap: '0.5rem' }}
+        >
+          <CreditCard size={20} /> PayPal
+        </button>
       </div>
     </div>
   );

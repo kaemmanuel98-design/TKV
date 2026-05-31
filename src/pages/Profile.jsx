@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -9,10 +9,14 @@ import {
   Loader2,
   Flame,
   TrendingUp,
-  Video,
+  MessageCircle,
   BookOpen,
   Landmark,
   MapPin,
+  GraduationCap,
+  Headphones,
+  DoorClosed,
+  HeartHandshake,
 } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import ProfileAvatar from '../components/ProfileAvatar';
@@ -22,11 +26,17 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { exportUserData, deleteUserAccount, downloadJsonExport } from '../lib/userApi';
 import { useProfileStore } from '../store/useProfileStore';
-import { useGamificationStore } from '../store/useGamificationStore';
-import { PROFILE_TYPE_KEY } from '../store/useGamificationStore';
+import { useGamificationStore, PROFILE_TYPE_KEY } from '../store/useGamificationStore';
+import { useCourseProgressStore } from '../store/useCourseProgressStore';
+import { getProfileLocationCache } from '../lib/profileLocation';
+import { COURSE_MODULES } from '../data/courseModules';
+import { COURSE_IDS } from '../lib/courseStats';
+import { CERTIFICATE_COURSES } from '../lib/courseCertificates';
+import { fetchUserCertificates } from '../lib/certificateSync';
 import { supabase } from '../lib/supabase';
 import MimshackLogo from '../components/MimshackLogo';
 import { LibraryLogo, ProfileLogo } from '../components/SectionLogos';
+import { useCompanionAccess } from '../hooks/useCompanionAccess';
 import './Profile.css';
 
 const badgeDefs = [
@@ -34,6 +44,9 @@ const badgeDefs = [
   { id: 'streak_7', labelKey: 'badge_streak_7' },
   { id: 'reader', labelKey: 'badge_reader' },
   { id: 'community', labelKey: 'badge_community' },
+  { id: 'course_nepios', labelKey: 'badge_course_nepios' },
+  { id: 'course_neaniskos', labelKey: 'badge_course_neaniskos' },
+  { id: 'course_teleios', labelKey: 'badge_course_teleios' },
 ];
 
 const profileTypes = ['believer', 'skeptic', 'curious'];
@@ -41,17 +54,21 @@ const profileTypes = ['believer', 'skeptic', 'curious'];
 const profileQuickLinks = [
   { to: '/bible', icon: BookOpen, labelKey: 'nav_bible' },
   { to: '/heritage', icon: Landmark, labelKey: 'nav_heritage' },
-  { to: '/cells', icon: Video, labelKey: 'cells' },
+  { to: '/confessional', icon: DoorClosed, labelKey: 'nav_confessional' },
+  { to: '/cells', icon: MessageCircle, labelKey: 'cells' },
   { to: '/map', icon: MapPin, labelKey: 'map' },
   { to: '/agent', mimshack: true, labelKey: 'tab_agent' },
   { to: '/library', mark: 'library', labelKey: 'tab_library' },
+  { to: '/courses', icon: GraduationCap, labelKey: 'course_page_title' },
+  { to: '/podcasts', icon: Headphones, labelKey: 'podcast_page_title' },
 ];
 
 const Profile = () => {
   const { t } = useTranslation();
   const { user, session, signOut } = useAuthStore();
   const navigate = useNavigate();
-  const { profile, fetchProfile, updateProfile, uploadAvatar, getPlanType } = useProfileStore();
+  const { profile, fetchProfile, updateProfile, uploadAvatar, getPlanType, canCreateCell } =
+    useProfileStore();
   const {
     badges,
     streakCurrent,
@@ -64,11 +81,17 @@ const Profile = () => {
     hasCheckedInToday,
   } = useGamificationStore();
   const checkedInToday = hasCheckedInToday();
+  const courseProgress = useCourseProgressStore((s) => s.progressPercent);
+  const courseCompleted = useCourseProgressStore((s) => s.completedCount);
   const [country, setCountry] = useState('');
+  const [city, setCity] = useState('');
   const [bio, setBio] = useState('');
   const [showOnMap, setShowOnMap] = useState(false);
   const [userType, setUserType] = useState('curious');
   const [saved, setSaved] = useState(false);
+  const [locationSaved, setLocationSaved] = useState(false);
+  const locationHydrated = useRef(false);
+  const locationSaveTimer = useRef(null);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [rgpdBusy, setRgpdBusy] = useState(null);
   const [rgpdNotice, setRgpdNotice] = useState(null);
@@ -78,6 +101,7 @@ const Profile = () => {
   const [testimonySubmitting, setTestimonySubmitting] = useState(false);
   const [testimonyNotice, setTestimonyNotice] = useState(null);
   const [myTestimonies, setMyTestimonies] = useState([]);
+  const [certificates, setCertificates] = useState([]);
 
   const loadMyTestimonies = useCallback(async () => {
     if (!user?.id) {
@@ -107,15 +131,48 @@ const Profile = () => {
   }, [loadMyTestimonies]);
 
   useEffect(() => {
-    if (profile) {
-      setCountry(profile.country || '');
-      setBio(profile.bio || '');
-      setShowOnMap(Boolean(profile.show_on_map));
-      setUserType(profile.user_type || 'curious');
+    if (!user?.id) {
+      setCertificates([]);
+      return;
     }
-  }, [profile]);
+    fetchUserCertificates(user.id).then(setCertificates);
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (profile) {
+      const cached = user?.id ? getProfileLocationCache(user.id) : null;
+      setCountry(profile.country?.trim() || cached?.country || '');
+      setCity(profile.city?.trim() || cached?.city || '');
+      setBio(profile.bio || '');
+      setShowOnMap(Boolean(profile.show_on_map ?? cached?.show_on_map));
+      setUserType(profile.user_type || 'curious');
+      locationHydrated.current = true;
+    }
+  }, [profile, user?.id]);
+
+  useEffect(() => {
+    if (!user?.id || !locationHydrated.current) return undefined;
+
+    if (locationSaveTimer.current) clearTimeout(locationSaveTimer.current);
+    locationSaveTimer.current = setTimeout(async () => {
+      await updateProfile(user.id, {
+        country: country.trim(),
+        city: city.trim(),
+        show_on_map: showOnMap,
+      });
+      setLocationSaved(true);
+      const tId = setTimeout(() => setLocationSaved(false), 2500);
+      return () => clearTimeout(tId);
+    }, 700);
+
+    return () => {
+      if (locationSaveTimer.current) clearTimeout(locationSaveTimer.current);
+    };
+  }, [country, city, showOnMap, user?.id, updateProfile]);
 
   const plan = getPlanType();
+  const cellHost = Boolean(user && canCreateCell());
+  const { isCompanion } = useCompanionAccess();
   const planLabel =
     plan === 'premium_plus'
       ? t('profile_plan_premium_plus')
@@ -126,10 +183,20 @@ const Profile = () => {
   const handleSave = async () => {
     localStorage.setItem(PROFILE_TYPE_KEY, userType);
     if (user) {
-      await updateProfile(user.id, { country, bio, user_type: userType, show_on_map: showOnMap });
+      await updateProfile(user.id, {
+        country: country.trim(),
+        city: city.trim(),
+        bio,
+        user_type: userType,
+        show_on_map: showOnMap,
+      });
     }
     setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    setLocationSaved(true);
+    setTimeout(() => {
+      setSaved(false);
+      setLocationSaved(false);
+    }, 2000);
   };
 
   const handleAvatarPick = async (file) => {
@@ -300,6 +367,50 @@ const Profile = () => {
           </div>
         </div>
 
+        <h3 className="profile-quick-title">{t('profile_courses_title')}</h3>
+        <p className="text-muted profile-courses-desc">
+          {user ? t('profile_courses_desc_sync') : t('profile_courses_desc')}
+        </p>
+        <ul className="profile-courses-list">
+          {COURSE_IDS.map((id) => {
+            const course = COURSE_MODULES[id];
+            const pct = courseProgress(id);
+            const done = courseCompleted(id);
+            return (
+              <li key={id}>
+                <Link to={`/courses/${id}`} className="profile-course-row">
+                  <span className="profile-course-name">{t(course.titleKey)}</span>
+                  <span className="profile-course-meta">
+                    {done} / {course.modules.length}
+                  </span>
+                  <div className="profile-progress-bar profile-course-bar">
+                    <div className="profile-progress-fill" style={{ width: `${pct}%` }} />
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        {user && certificates.length > 0 && (
+          <>
+            <h3 className="profile-quick-title">{t('profile_certificates_title')}</h3>
+            <ul className="profile-certificates-list">
+              {certificates.map((cert) => (
+                <li key={cert.id}>
+                  <Link to={`/courses/${cert.course_slug}/certificate`} className="profile-cert-row">
+                    <Award size={18} aria-hidden="true" />
+                    <span>
+                      {t(CERTIFICATE_COURSES[cert.course_slug]?.titleKey || 'course_page_title')}
+                    </span>
+                    <span className="profile-cert-code">{cert.certificate_code}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+
         <h3 className="profile-quick-title">{t('dashboard_quick_title')}</h3>
         <div className="profile-quick-grid">
           {profileQuickLinks.map(({ to, icon: Icon, labelKey, mimshack, mark }) => (
@@ -404,6 +515,36 @@ const Profile = () => {
         )}
       </section>
 
+      {cellHost && (
+        <section className="card profile-visio-host-card">
+          <div className="profile-visio-host-head">
+            <GraduationCap size={22} aria-hidden />
+            <div>
+              <h2 className="profile-section-title">{t('profile_cell_host_title')}</h2>
+              <p className="text-muted">{t('profile_cell_host_desc')}</p>
+            </div>
+          </div>
+          <Link to="/cells" className="btn btn-primary btn-sm">
+            {t('cells_create')}
+          </Link>
+        </section>
+      )}
+
+      {isCompanion && (
+        <section className="card profile-visio-host-card profile-companion-card">
+          <div className="profile-visio-host-head">
+            <HeartHandshake size={22} aria-hidden />
+            <div>
+              <h2 className="profile-section-title">{t('profile_companion_title')}</h2>
+              <p className="text-muted">{t('profile_companion_desc')}</p>
+            </div>
+          </div>
+          <Link to="/companion" className="btn btn-primary btn-sm">
+            {t('profile_companion_cta')}
+          </Link>
+        </section>
+      )}
+
       <SpeechSettings />
 
       <section className="card profile-form">
@@ -431,6 +572,22 @@ const Profile = () => {
           placeholder={t('profile_country_placeholder')}
         />
         <p className="text-muted profile-hint">{t('profile_country_hint')}</p>
+        <label className="profile-label" htmlFor="profile-city">
+          {t('profile_city')}
+        </label>
+        <input
+          id="profile-city"
+          className="input"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          placeholder={t('profile_city_placeholder')}
+        />
+        <p className="text-muted profile-hint">{t('profile_city_hint')}</p>
+        {(locationSaved || saved) && (
+          <p className="profile-location-saved" role="status">
+            {t('profile_location_saved')}
+          </p>
+        )}
         <label className="profile-map-opt">
           <input
             type="checkbox"

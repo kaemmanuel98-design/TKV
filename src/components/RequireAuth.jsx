@@ -23,7 +23,7 @@ const RequireAuth = ({ children, icon: Icon }) => {
             <Icon size={56} title="TKV" />
           </div>
         ) : (
-          <MimshackLogo size={56} title="Mimshack" />
+          <MimshackLogo size={56} title="Mim" />
         )}
         <h1 className="require-auth-title">{t('require_auth_title')}</h1>
         <p className="require-auth-desc">{t('require_auth_desc')}</p>

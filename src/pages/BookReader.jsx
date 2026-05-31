@@ -6,6 +6,7 @@ import { LogoMark } from '../components/Logo';
 import { useSpeak } from '../hooks/useSpeak';
 import { stopSpeech } from '../lib/speech';
 import { loadBook, SUPPORTED_SLUGS } from '../lib/bookLoader';
+import { useBookProgressStore } from '../store/useBookProgressStore';
 import { translateChapter } from '../lib/translateOnDemand';
 import { formatBookContent } from '../lib/formatBookContent';
 import { prepareBookChapterSpeech } from '../lib/prepareBookSpeech';
@@ -49,7 +50,12 @@ const BookReader = () => {
         return;
       }
       setBook(data);
-      setCurrentChapterIdx(0);
+      const saved = useBookProgressStore.getState().getProgress(id);
+      const resumeIdx =
+        saved && saved.totalChapters === data.chapters.length
+          ? Math.min(saved.chapterIndex, data.chapters.length - 1)
+          : 0;
+      setCurrentChapterIdx(resumeIdx);
     };
 
     load();
@@ -57,6 +63,11 @@ const BookReader = () => {
       cancelled = true;
     };
   }, [i18n.language, id]);
+
+  useEffect(() => {
+    if (!book?.chapters?.length || !id) return;
+    useBookProgressStore.getState().saveProgress(id, currentChapterIdx, book.chapters.length);
+  }, [id, book, currentChapterIdx]);
 
   useEffect(() => {
     if (!book?.chapters?.length) return undefined;

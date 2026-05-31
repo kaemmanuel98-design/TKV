@@ -24,7 +24,10 @@ function enrichBook(slug, data, uiLang, fileLang, extra = {}) {
   const meta = BOOK_META[slug]?.langs[uiLang] || BOOK_META[slug]?.langs.fr;
   const metaRoot = BOOK_META[slug];
 
-  const sample = data.chapters[0]?.content || '';
+  const sample = data.chapters
+    .slice(0, 3)
+    .map((c) => c.content || '')
+    .join('\n');
   const usableInUi =
     fileLang === uiLang && (uiLang === 'fr' || uiLang === 'en' || isUsableInLanguage(sample, uiLang));
 
@@ -62,8 +65,12 @@ export async function loadBook(slug, language) {
     const data = await importBookFile(slug, fileLang);
     if (!data) continue;
 
-    const sample = data.chapters[0]?.content || '';
+    const sample = data.chapters
+      .slice(0, 3)
+      .map((c) => c.content || '')
+      .join('\n');
     if (fileLang === uiLang && isUsableInLanguage(sample, uiLang)) {
+      if (uiLang === 'ar' && isLikelyFrench(sample)) continue;
       return enrichBook(slug, data, uiLang, fileLang);
     }
   }

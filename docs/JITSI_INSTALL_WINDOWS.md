@@ -85,7 +85,9 @@ npm run dev:api
 ```
 
 4. Lancer le frontend : `npm run dev`
-5. Se **connecter** à TKV → **Cellules mondiales** → **Rejoindre la prière en visio**
+5. Se **connecter** à TKV → **Cellules mondiales** → **Démarrer la visio**
+
+Si vous voyez « en attente du modérateur » : redémarrez l’API TKV (`npm run dev:api`) après mise à jour — chaque membre connecté reçoit les droits pour **ouvrir** la salle.
 
 ## 4. Commandes utiles
 

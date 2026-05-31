@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     streak_best integer DEFAULT 0,
     last_active_date date,
     plan_type text DEFAULT 'free',
-    onboarding_completed boolean DEFAULT false
+    onboarding_completed boolean DEFAULT false,
+    can_host_visio boolean DEFAULT false
 );
 
 -- 6. Trigger pour créer automatiquement un profil lors d'une nouvelle inscription

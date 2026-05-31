@@ -1,11 +1,14 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, CheckCircle, Lock, Circle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Lock, Circle, Award } from 'lucide-react';
+import { isCourseEligibleForCertificate } from '../lib/courseCertificates';
 import PageHeader from '../components/PageHeader';
 import { COURSE_MODULES } from '../data/courseModules';
 import { useProfileStore } from '../store/useProfileStore';
 import { useCourseProgressStore } from '../store/useCourseProgressStore';
+import { getNextIncompleteModuleInCourse } from '../lib/courseStats';
+import { ArrowRight } from 'lucide-react';
 import './CourseDetail.css';
 
 const CourseDetail = () => {
@@ -13,7 +16,12 @@ const CourseDetail = () => {
   const { t } = useTranslation();
   const isPremium = useProfileStore((s) => s.isPremium);
   const isComplete = useCourseProgressStore((s) => s.isComplete);
+  const progressPercent = useCourseProgressStore((s) => s.progressPercent(courseId));
+  const completedCount = useCourseProgressStore((s) => s.completedCount(courseId));
+  const completed = useCourseProgressStore((s) => s.completed);
   const course = COURSE_MODULES[courseId];
+  const nextModule = getNextIncompleteModuleInCourse(courseId, completed);
+  const canClaimCertificate = isCourseEligibleForCertificate(courseId, completed);
 
   if (!course) {
     return (
@@ -32,6 +40,37 @@ const CourseDetail = () => {
       </Link>
 
       <PageHeader title={t(course.titleKey)} subtitle={t('course_detail_subtitle')} />
+
+      <div className="course-detail-progress card">
+        <p className="course-detail-progress-label">
+          {t('course_progress_label', {
+            done: completedCount,
+            total: course.modules.length,
+            percent: progressPercent,
+          })}
+        </p>
+        <div className="course-detail-progress-bar">
+          <div
+            className="course-detail-progress-fill"
+            style={{ width: `${progressPercent}%` }}
+          />
+        </div>
+        {nextModule && (
+          <Link
+            to={`/courses/${courseId}/module/${nextModule.moduleIndex}`}
+            className="btn btn-primary course-detail-continue"
+          >
+            {progressPercent > 0 ? t('course_continue') : t('course_start')}
+            <ArrowRight size={18} />
+          </Link>
+        )}
+        {canClaimCertificate && (
+          <Link to={`/courses/${courseId}/certificate`} className="btn btn-outline course-detail-cert">
+            <Award size={18} />
+            {t('certificate_claim')}
+          </Link>
+        )}
+      </div>
 
       <div className="course-modules-list">
         {course.modules.map((mod) => {

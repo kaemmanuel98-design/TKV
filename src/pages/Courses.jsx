@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { GraduationCap, Lock, ArrowRight, CheckCircle } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import { useProfileStore } from '../store/useProfileStore';
+import { useCourseProgressStore } from '../store/useCourseProgressStore';
+import { getNextIncompleteModuleInCourse } from '../lib/courseStats';
 import './Courses.css';
 
 const courses = [
@@ -13,7 +15,6 @@ const courses = [
     descKey: 'course_foundations_desc',
     modules: 8,
     free: true,
-    progress: 12,
   },
   {
     id: 'apologetics',
@@ -21,7 +22,6 @@ const courses = [
     descKey: 'course_apologetics_desc',
     modules: 6,
     free: false,
-    progress: 0,
   },
   {
     id: 'teleios',
@@ -29,13 +29,14 @@ const courses = [
     descKey: 'course_teleios_desc',
     modules: 6,
     free: false,
-    progress: 0,
   },
 ];
 
 const Courses = () => {
   const { t } = useTranslation();
   const isPremium = useProfileStore((s) => s.isPremium);
+  const completedCount = useCourseProgressStore((s) => s.completedCount);
+  const completed = useCourseProgressStore((s) => s.completed);
 
   return (
     <div className="container courses-page animate-fade-in">
@@ -46,8 +47,15 @@ const Courses = () => {
       />
 
       <div className="courses-grid">
-        {courses.map(({ id, titleKey, descKey, modules, free, progress }) => {
+        {courses.map(({ id, titleKey, descKey, modules, free }) => {
           const locked = !free && !isPremium();
+          const done = completedCount(id);
+          const progress = modules > 0 ? Math.round((done / modules) * 100) : 0;
+          const next = getNextIncompleteModuleInCourse(id, completed);
+          const courseHref =
+            !locked && next
+              ? `/courses/${id}/module/${next.moduleIndex}`
+              : `/courses/${id}`;
           return (
             <article key={id} className={`card course-card ${locked ? 'course-card-locked' : ''}`}>
               <div className="course-card-icon">
@@ -67,7 +75,7 @@ const Courses = () => {
               {locked ? (
                 <span className="course-locked-label">{t('course_premium_only')}</span>
               ) : (
-                <Link to={`/courses/${id}`} className="btn btn-outline btn-sm">
+                <Link to={courseHref} className="btn btn-outline btn-sm">
                   {progress > 0 ? t('course_continue') : t('course_start')}
                   <ArrowRight size={16} />
                 </Link>

@@ -25,6 +25,8 @@ Une visio Web utilise toujours **WebRTC** (caméra/micro) : le navigateur affich
 
 ## Configuration production (recommandée)
 
+Guide pas à pas (VPS + Vercel) : **[JITSI_PRODUCTION.md](./JITSI_PRODUCTION.md)**.
+
 1. Déployer **Jitsi Meet** sur un sous-domaine (Docker officiel ou hébergeur).
 2. Activer **JWT** dans Prosody (`JITSI_APP_ID` / `JITSI_APP_SECRET`).
 3. Dans `.env` de l’API TKV :
@@ -67,7 +69,7 @@ L’API renverra une salle sur `meet.jit.si` avec un nom **non devinable**, mais
 
 ## Suite possible
 
-- Salle d’attente (lobby) modérée par un animateur.
+- **Premium+** ou `profiles.can_host_visio` : droit d’ouvrir la visio (JWT modérateur). Les autres membres connectés rejoignent en participant.
 - Durée de vie du JWT plus courte (15 min) + renouvellement.
 - Enregistrement désactivé côté config Jitsi.
 - Remplacer Jitsi par **Livekit** si vous voulez une UI 100 % custom sans marque tierce.

@@ -90,12 +90,31 @@ function normalizeCountry(input) {
     .replace(/['']/g, "'");
 }
 
-/** @returns {[number, number] | null} lat, lng */
-export function coordsForCountry(country) {
-  if (!country?.trim()) return null;
-  const key = normalizeCountry(country);
-  return COUNTRY_COORDS[key] || null;
-}
+const COUNTRY_ALIASES = {
+  ci: "cote d'ivoire",
+  'cote divoire': "cote d'ivoire",
+  'ivory coast': "cote d'ivoire",
+  fr: 'france',
+  uk: 'united kingdom',
+  gb: 'united kingdom',
+  england: 'united kingdom',
+  usa: 'united states',
+  us: 'united states',
+  uae: 'united arab emirates',
+  holland: 'netherlands',
+  'the netherlands': 'netherlands',
+  br: 'brazil',
+  brasil: 'brazil',
+  de: 'germany',
+  es: 'spain',
+  it: 'italy',
+  sn: 'senegal',
+  cm: 'cameroon',
+  ng: 'nigeria',
+  ma: 'morocco',
+  cd: 'republique democratique du congo',
+  drc: 'republique democratique du congo',
+};
 
 function hashString(str) {
   let h = 0;
@@ -104,6 +123,36 @@ function hashString(str) {
     h |= 0;
   }
   return Math.abs(h);
+}
+
+export function resolveCountryKey(country) {
+  if (!country?.trim()) return '';
+  const key = normalizeCountry(country);
+  if (COUNTRY_COORDS[key]) return key;
+  if (COUNTRY_ALIASES[key]) return COUNTRY_ALIASES[key];
+  const alias = COUNTRY_ALIASES[key.replace(/\s+/g, ' ')];
+  if (alias) return alias;
+  for (const k of Object.keys(COUNTRY_COORDS)) {
+    if (k.includes(key) || key.includes(k)) return k;
+  }
+  return key;
+}
+
+export { normalizeCountry as normalizeCountryKey };
+
+/** @returns {[number, number] | null} lat, lng */
+export function coordsForCountry(country) {
+  if (!country?.trim()) return null;
+  const key = resolveCountryKey(country);
+  return COUNTRY_COORDS[key] || null;
+}
+
+/** Coordonnées de secours si le pays n'est pas dans la liste (membre toujours visible). */
+export function coordsForCountryOrFallback(country, seed = '') {
+  const exact = coordsForCountry(country);
+  if (exact) return exact;
+  const h = hashString(`${resolveCountryKey(country)}:${seed}`);
+  return [10 + (h % 50), -30 + (h % 120)];
 }
 
 /** Léger décalage pour la vie privée (~5–15 km) */

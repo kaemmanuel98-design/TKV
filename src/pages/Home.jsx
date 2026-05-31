@@ -1,11 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Volume2, ArrowRight, Compass } from 'lucide-react';
+import { Volume2, ArrowRight, Compass, GraduationCap, Headphones, DoorClosed } from 'lucide-react';
 import { getVerseOfDay } from '../data/dailyVerses';
 import { useAuthStore } from '../store/useAuthStore';
+import { useCourseProgressStore } from '../store/useCourseProgressStore';
+import { getNextIncompleteModule } from '../lib/courseStats';
 import { useSpeak } from '../hooks/useSpeak';
 import MimshackLogo from '../components/MimshackLogo';
+import HomeDashboard from '../components/HomeDashboard';
 import { LibraryLogo, CommunityLogo, BibleLogo, HeritageLogo } from '../components/SectionLogos';
 import './Home.css';
 
@@ -53,6 +56,24 @@ const startPaths = [
     titleKey: 'home_path_community_title',
     descKey: 'home_path_community_desc',
   },
+  {
+    to: '/confessional',
+    icon: DoorClosed,
+    titleKey: 'home_path_confessional_title',
+    descKey: 'home_path_confessional_desc',
+  },
+  {
+    to: '/courses',
+    icon: GraduationCap,
+    titleKey: 'home_path_courses_title',
+    descKey: 'home_path_courses_desc',
+  },
+  {
+    to: '/podcasts',
+    icon: Headphones,
+    titleKey: 'home_path_podcasts_title',
+    descKey: 'home_path_podcasts_desc',
+  },
 ];
 
 const Home = () => {
@@ -60,6 +81,9 @@ const Home = () => {
   const verse = getVerseOfDay(i18n.language);
   const { user } = useAuthStore();
   const { speak } = useSpeak();
+  const completed = useCourseProgressStore((s) => s.completed);
+  const nextModule = getNextIncompleteModule(completed);
+  const hasCourseProgress = Object.keys(completed).length > 0;
 
   const renderPathCard = ({ to, icon: Icon, titleKey, descKey, featured, mimshack, mark, pillar }) => {
     const MarkComponent = mark ? HOME_MARKS[mark] : null;
@@ -76,7 +100,7 @@ const Home = () => {
         aria-hidden="true"
       >
         {mimshack ? (
-          <MimshackLogo size={44} title="Mimshack" />
+          <MimshackLogo size={44} title="Mim" />
         ) : MarkComponent ? (
           <MarkComponent size={44} title={t(titleKey)} />
         ) : (
@@ -129,6 +153,29 @@ const Home = () => {
           )}
         </div>
       </section>
+
+      {user && <HomeDashboard />}
+
+      {hasCourseProgress && nextModule && (
+        <section className="container home-continue-section">
+          <Link
+            to={`/courses/${nextModule.courseId}/module/${nextModule.moduleIndex}`}
+            className="home-continue card"
+          >
+            <GraduationCap size={22} aria-hidden="true" />
+            <div>
+              <p className="home-continue-label">{t('home_continue_title')}</p>
+              <p className="home-continue-module">
+                {t(nextModule.courseTitleKey)} · {t(nextModule.moduleTitleKey)}
+              </p>
+            </div>
+            <span className="home-continue-cta">
+              {t('home_continue_cta')}
+              <ArrowRight size={16} aria-hidden="true" />
+            </span>
+          </Link>
+        </section>
+      )}
 
       <section className="container home-verse-section" aria-labelledby="home-verse-heading">
         <article className="home-verse card">

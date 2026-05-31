@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
-import { Send, Video, Loader2 } from 'lucide-react';
+import { Send, Loader2, Plus } from 'lucide-react';
 import PageHeader from '../components/PageHeader';
 import ProfileAvatar from '../components/ProfileAvatar';
 import { CELL_ROOMS } from '../data/cellsRooms';
-import { fetchJitsiJoin } from '../lib/jitsiApi';
+import { fetchCustomCells, createCell } from '../lib/cellsApi';
+import { canCreateCellFromProfile } from '../lib/cellHost';
+import PaywallModal from '../components/PaywallModal';
 import './Cells.css';
 
 async function enrichMessages(rows, t) {
@@ -39,39 +41,63 @@ const Cells = () => {
   const { user, session } = useAuthStore();
   const profile = useProfileStore((s) => s.profile);
   const fetchProfile = useProfileStore((s) => s.fetchProfile);
+  const [customCells, setCustomCells] = useState([]);
+  const [showCreateCell, setShowCreateCell] = useState(false);
+  const [createName, setCreateName] = useState('');
+  const [createDescription, setCreateDescription] = useState('');
+  const [createLanguage, setCreateLanguage] = useState(
+    () => i18n.language?.split('-')[0] || 'fr'
+  );
+  const [createBusy, setCreateBusy] = useState(false);
+  const [createNotice, setCreateNotice] = useState(null);
+  const [paywallOpen, setPaywallOpen] = useState(false);
 
   const defaultSlug =
     CELL_ROOMS.find((r) => r.slug === i18n.language?.split('-')[0])?.slug || 'global';
   const [activeSlug, setActiveSlug] = useState(defaultSlug);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [showVideo, setShowVideo] = useState(false);
-  const [embedUrl, setEmbedUrl] = useState(null);
-  const [videoLoading, setVideoLoading] = useState(false);
-  const [videoError, setVideoError] = useState(null);
-  const [videoFallback, setVideoFallback] = useState(false);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
   const messagesEndRef = useRef(null);
 
-  const activeRoom = CELL_ROOMS.find((r) => r.slug === activeSlug) || CELL_ROOMS[0];
+  const activeOfficialRoom = CELL_ROOMS.find((r) => r.slug === activeSlug);
+  const activeCustomRoom = customCells.find((c) => c.slug === activeSlug);
+  const activeRoomLabel = activeOfficialRoom
+    ? t(activeOfficialRoom.labelKey)
+    : activeCustomRoom?.name || activeSlug;
+
+  const allowCreateCell = canCreateCellFromProfile(profile);
 
   useEffect(() => {
     if (user?.id) fetchProfile(user.id);
   }, [user?.id, fetchProfile]);
 
+  const loadCustomCells = useCallback(async () => {
+    try {
+      const rows = await fetchCustomCells();
+      setCustomCells(rows);
+    } catch (err) {
+      console.error(err);
+      setCustomCells([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadCustomCells();
+  }, [loadCustomCells]);
+
   const loadMessages = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      let query = supabase
+      const { data, error: fetchError } = await supabase
         .from('messages')
         .select('id, created_at, content, user_id, cell_slug')
         .order('created_at', { ascending: true })
-        .limit(80);
-
-      const { data, error: fetchError } = await query.eq('cell_slug', activeSlug);
+        .limit(80)
+        .eq('cell_slug', activeSlug);
 
       if (fetchError?.message?.includes('cell_slug')) {
         const fallback = await supabase
@@ -172,49 +198,58 @@ const Cells = () => {
   const formatTime = (iso) =>
     new Date(iso).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
-  const closeVideo = () => {
-    setShowVideo(false);
-    setEmbedUrl(null);
-    setVideoError(null);
-    setVideoFallback(false);
-  };
-
-  const openVideo = async () => {
+  const openCreateCell = () => {
     if (!user) {
-      setVideoError(t('cells_video_login_required'));
+      setCreateNotice({ type: 'err', text: t('cells_create_login') });
       return;
     }
-    const token = session?.access_token;
-    if (!token) {
-      setVideoError(t('cells_video_login_required'));
+    if (!allowCreateCell) {
+      setPaywallOpen(true);
       return;
     }
+    setCreateNotice(null);
+    setCreateLanguage(i18n.language?.split('-')[0] || 'fr');
+    setShowCreateCell(true);
+  };
 
-    setVideoLoading(true);
-    setVideoError(null);
-    setVideoFallback(false);
+  const handleCreateCell = async (e) => {
+    e.preventDefault();
+    const name = createName.trim();
+    if (!name || !session?.access_token) return;
+
+    setCreateBusy(true);
+    setCreateNotice(null);
     try {
-      const join = await fetchJitsiJoin({ cellSlug: activeSlug, accessToken: token });
-      setEmbedUrl(join.embedUrl);
-      setVideoFallback(join.mode === 'fallback');
-      setShowVideo(true);
+      const cell = await createCell(
+        { name, description: createDescription.trim(), language: createLanguage },
+        session.access_token
+      );
+      await loadCustomCells();
+      setShowCreateCell(false);
+      setCreateName('');
+      setCreateDescription('');
+      setActiveSlug(cell.slug);
+      setCreateNotice({ type: 'ok', text: t('cells_create_success') });
     } catch (err) {
-      if (err.status === 503) {
-        setVideoError(t('cells_video_unavailable'));
+      if (err.data?.error === 'cells_create_forbidden' || err.status === 403) {
+        setCreateNotice({ type: 'err', text: t('cells_create_forbidden') });
       } else {
-        setVideoError(t('cells_video_error'));
+        setCreateNotice({ type: 'err', text: t('cells_create_error') });
       }
-      setShowVideo(false);
-      setEmbedUrl(null);
     } finally {
-      setVideoLoading(false);
+      setCreateBusy(false);
     }
   };
 
-  const toggleVideo = () => {
-    if (showVideo) closeVideo();
-    else openVideo();
-  };
+  const createLangOptions = [
+    { value: 'global', labelKey: 'cells_room_global' },
+    { value: 'fr', labelKey: 'cells_room_fr' },
+    { value: 'en', labelKey: 'cells_room_en' },
+    { value: 'es', labelKey: 'cells_room_es' },
+    { value: 'nl', labelKey: 'cells_room_nl' },
+    { value: 'pt', labelKey: 'cells_room_pt' },
+    { value: 'ar', labelKey: 'cells_room_ar' },
+  ];
 
   return (
     <div className="container animate-fade-in cells-page">
@@ -224,20 +259,22 @@ const Cells = () => {
         subtitle={t('cells_page_subtitle')}
         showLogo
         actions={
-          <button
-            type="button"
-            className={`btn btn-sm ${showVideo ? 'btn-outline' : 'btn-primary'}`}
-            onClick={toggleVideo}
-            disabled={videoLoading}
-          >
-            {videoLoading ? <Loader2 size={18} className="spin" /> : <Video size={18} />}
-            {showVideo ? t('chat_leave_video') : t('cells_video_start')}
-          </button>
+          user ? (
+            <button type="button" className="btn btn-outline btn-sm" onClick={openCreateCell}>
+              <Plus size={18} />
+              {t('cells_create')}
+            </button>
+          ) : null
         }
       />
 
+      {createNotice && (
+        <p className={`cells-notice cells-notice--${createNotice.type}`}>{createNotice.text}</p>
+      )}
+
       <p className="cells-pick-label text-muted">{t('cells_pick_room')}</p>
-      <div className="cells-room-picker" role="tablist" aria-label={t('cells_pick_room')}>
+      <p className="cells-section-label text-muted">{t('cells_section_official')}</p>
+      <div className="cells-room-picker" role="tablist" aria-label={t('cells_section_official')}>
         {CELL_ROOMS.map((room) => (
           <button
             key={room.slug}
@@ -245,14 +282,60 @@ const Cells = () => {
             role="tab"
             aria-selected={activeSlug === room.slug}
             className={`cells-room-btn ${activeSlug === room.slug ? 'active' : ''}`}
-            onClick={() => {
-              setActiveSlug(room.slug);
-              closeVideo();
-            }}
+            onClick={() => setActiveSlug(room.slug)}
           >
             {t(room.labelKey)}
           </button>
         ))}
+      </div>
+
+      <p className="cells-section-label text-muted">{t('cells_section_custom')}</p>
+      <div
+        className="cells-room-picker cells-room-picker--custom"
+        role="tablist"
+        aria-label={t('cells_section_custom')}
+      >
+        {user && allowCreateCell && (
+          <button type="button" className="cells-create-banner btn btn-outline" onClick={openCreateCell}>
+            <Plus size={20} />
+            <span>
+              <strong>{t('cells_create')}</strong>
+              <small>{t('cells_create_banner_hint')}</small>
+            </span>
+          </button>
+        )}
+
+        {customCells.length === 0 ? (
+          <p className="cells-custom-empty text-muted">{t('cells_custom_empty')}</p>
+        ) : (
+          customCells.map((cell) => (
+            <button
+              key={cell.id}
+              type="button"
+              role="tab"
+              aria-selected={activeSlug === cell.slug}
+              className={`cells-room-btn cells-room-btn--custom ${activeSlug === cell.slug ? 'active' : ''}`}
+              onClick={() => setActiveSlug(cell.slug)}
+              title={cell.description || undefined}
+            >
+              {cell.name}
+              {cell.created_by === user?.id && (
+                <span className="cells-room-host-badge">{t('cells_host_badge')}</span>
+              )}
+            </button>
+          ))
+        )}
+        {user ? (
+          <button type="button" className="cells-room-btn cells-room-btn--add" onClick={openCreateCell}>
+            <Plus size={16} />
+            {t('cells_create')}
+          </button>
+        ) : (
+          <Link to="/auth" className="cells-room-btn cells-room-btn--add">
+            <Plus size={16} />
+            {t('cells_create_login')}
+          </Link>
+        )}
       </div>
 
       {!user && (
@@ -264,65 +347,19 @@ const Cells = () => {
         </div>
       )}
 
-      {videoError && <p className="cells-error cells-video-error">{videoError}</p>}
+      {user && !allowCreateCell && (
+        <div className="cells-login-banner cells-login-banner--muted">
+          <span>{t('cells_create_forbidden')}</span>
+          <button type="button" className="btn btn-outline btn-sm" onClick={() => setPaywallOpen(true)}>
+            {t('cells_create_upgrade_premium_plus')}
+          </button>
+        </div>
+      )}
 
       <div className="cells-main">
-        <div className="cells-video-wrap flex-1 flex flex-col">
-          {videoFallback && showVideo && (
-            <p className="cells-video-warn text-muted">{t('cells_video_fallback_warning')}</p>
-          )}
-          <div className="card cells-video-card flex-1 flex items-stretch">
-            {showVideo && embedUrl ? (
-              <iframe
-                src={embedUrl}
-                allow="camera; microphone; fullscreen; display-capture; autoplay"
-                title={t('chat_join_video')}
-                referrerPolicy="no-referrer"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  flex: 1,
-                  minHeight: '320px',
-                  border: 'none',
-                  display: 'block',
-                }}
-              />
-            ) : (
-              <div className="cells-video-placeholder text-muted">
-                <Video size={48} style={{ opacity: 0.45, margin: '0 auto 1rem' }} />
-                <p>{t('chat_video_closed')}</p>
-                <p className="mt-2" style={{ fontSize: '0.9375rem' }}>
-                  {t('cells_video_room', { room: t(activeRoom.labelKey) })}
-                </p>
-                <p className="mt-2" style={{ fontSize: '0.875rem' }}>{t('cells_video_in_app')}</p>
-                {user ? (
-                  <button
-                    type="button"
-                    className="btn btn-primary cells-video-start-btn"
-                    onClick={openVideo}
-                    disabled={videoLoading}
-                  >
-                    {videoLoading ? (
-                      <Loader2 size={18} className="spin" />
-                    ) : (
-                      <Video size={18} />
-                    )}
-                    {t('cells_video_start')}
-                  </button>
-                ) : (
-                  <Link to="/auth" className="btn btn-primary cells-video-start-btn">
-                    {t('cells_video_login_cta')}
-                  </Link>
-                )}
-                <p className="mt-2" style={{ fontSize: '0.8125rem' }}>{t('chat_video_instruction')}</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="card cells-chat-panel">
+        <div className="card cells-chat-panel cells-chat-panel--full">
           <div className="cells-chat-head">
-            <h3>{t(activeRoom.labelKey)}</h3>
+            <h3>{activeRoomLabel}</h3>
             <span className="cells-chat-meta">
               {loading ? t('cells_loading') : t('cells_message_count', { count: messages.length })}
             </span>
@@ -386,6 +423,79 @@ const Cells = () => {
           </form>
         </div>
       </div>
+
+      {showCreateCell && (
+        <div className="cells-modal-backdrop" role="presentation" onClick={() => setShowCreateCell(false)}>
+          <div
+            className="card cells-create-card"
+            role="dialog"
+            aria-labelledby="cells-create-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="cells-create-title" className="cells-create-title">
+              {t('cells_create_title')}
+            </h2>
+            <form onSubmit={handleCreateCell} className="cells-create-form">
+              <label className="cells-create-label" htmlFor="cells-create-name">
+                {t('cells_create_name')}
+              </label>
+              <input
+                id="cells-create-name"
+                className="input"
+                value={createName}
+                onChange={(e) => setCreateName(e.target.value)}
+                placeholder={t('cells_create_name_placeholder')}
+                maxLength={80}
+                required
+                autoFocus
+              />
+              <label className="cells-create-label" htmlFor="cells-create-desc">
+                {t('cells_create_description')}
+              </label>
+              <textarea
+                id="cells-create-desc"
+                className="input cells-create-textarea"
+                value={createDescription}
+                onChange={(e) => setCreateDescription(e.target.value)}
+                placeholder={t('cells_create_description_placeholder')}
+                maxLength={280}
+                rows={3}
+              />
+              <label className="cells-create-label" htmlFor="cells-create-lang">
+                {t('cells_create_language')}
+              </label>
+              <select
+                id="cells-create-lang"
+                className="input"
+                value={createLanguage}
+                onChange={(e) => setCreateLanguage(e.target.value)}
+              >
+                {createLangOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>
+                    {t(opt.labelKey)}
+                  </option>
+                ))}
+              </select>
+              <div className="cells-create-actions">
+                <button
+                  type="button"
+                  className="btn btn-ghost"
+                  onClick={() => setShowCreateCell(false)}
+                  disabled={createBusy}
+                >
+                  {t('cells_create_cancel')}
+                </button>
+                <button type="submit" className="btn btn-primary" disabled={createBusy || !createName.trim()}>
+                  {createBusy ? <Loader2 size={18} className="spin" /> : <Plus size={18} />}
+                  {t('cells_create_submit')}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <PaywallModal isOpen={paywallOpen} onClose={() => setPaywallOpen(false)} />
     </div>
   );
 };

@@ -119,6 +119,8 @@ const GENERIC_GLOSS_RE =
 /** Sens principal — définition Strong si la traduction locale est un simple placeholder */
 export function getLexiconDisplayMeaning(entry, lang = 'fr') {
   if (!entry) return '';
+  if (entry.localizedMeaning?.trim()) return entry.localizedMeaning.trim();
+
   const gloss = entry.gloss || '';
   const strong = entry.definitionOriginal || '';
 
@@ -130,4 +132,10 @@ export function getLexiconDisplayMeaning(entry, lang = 'fr') {
 export async function getLexiconEntryAsync(strongId, lang = 'fr') {
   await ensureFullLexicon();
   return getLexiconEntry(strongId, lang);
+}
+
+export async function getLocalizedLexiconEntryAsync(strongId, lang = 'fr') {
+  const { localizeLexiconEntry } = await import('../../lib/bible/translateLexicon.js');
+  const entry = await getLexiconEntryAsync(strongId, lang);
+  return localizeLexiconEntry(entry, lang);
 }

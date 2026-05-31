@@ -1,7 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, Link, NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Heart, Globe, Map, UserPlus } from 'lucide-react';
+import {
+  Heart,
+  Globe,
+  Map,
+  UserPlus,
+  GraduationCap,
+  Headphones,
+  DoorClosed,
+  HeartHandshake,
+} from 'lucide-react';
 import { BibleNavIcon, HeritageNavIcon } from './SectionLogos';
 import { MimshackNavIcon } from './MimshackLogo';
 import { HomeNavIcon, LibraryNavIcon, CommunityNavIcon, ProfileNavIcon } from './SectionLogos';
@@ -12,6 +21,7 @@ import { LogoMark } from './Logo';
 import ProfileAvatar from './ProfileAvatar';
 import PaymentModal from './PaymentModal';
 import OnboardingGate from './OnboardingGate';
+import { useCompanionAccess } from '../hooks/useCompanionAccess';
 import './Layout.css';
 
 /** Navigation principale — CdC v3 §2.1 (5 onglets) */
@@ -34,6 +44,9 @@ const mobileNavItems = [
 const toolLinks = [
   { to: '/bible', icon: BibleNavIcon, labelKey: 'nav_bible' },
   { to: '/heritage', icon: HeritageNavIcon, labelKey: 'nav_heritage' },
+  { to: '/confessional', icon: DoorClosed, labelKey: 'nav_confessional' },
+  { to: '/courses', icon: GraduationCap, labelKey: 'course_page_title' },
+  { to: '/podcasts', icon: Headphones, labelKey: 'podcast_page_title' },
   { to: '/friends', icon: UserPlus, labelKey: 'friends_nav' },
   { to: '/map', icon: Map, labelKey: 'map' },
 ];
@@ -43,9 +56,18 @@ const Layout = () => {
   const { user, signOut } = useAuthStore();
   const fetchProfile = useProfileStore((s) => s.fetchProfile);
   const profile = useProfileStore((s) => s.profile);
+  const { isCompanion } = useCompanionAccess();
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
+
+  const visibleToolLinks = isCompanion
+    ? [
+        ...toolLinks.slice(0, 3),
+        { to: '/companion', icon: HeartHandshake, labelKey: 'nav_companion' },
+        ...toolLinks.slice(3),
+      ]
+    : toolLinks;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -102,7 +124,7 @@ const Layout = () => {
             </button>
             {toolsOpen && (
               <div className="nav-tools-dropdown card">
-                {toolLinks.map(({ to, icon: Icon, labelKey }) => (
+                {visibleToolLinks.map(({ to, icon: Icon, labelKey }) => (
                   <Link key={to} to={to} className="nav-tools-link" onClick={() => setToolsOpen(false)}>
                     <Icon size={16} />
                     {t(labelKey)}
@@ -182,6 +204,14 @@ const Layout = () => {
             <span className="footer-nav-sep" aria-hidden="true" />
             <Link to="/heritage" className="footer-nav-link">
               {t('heritage')}
+            </Link>
+            <span className="footer-nav-sep" aria-hidden="true" />
+            <Link to="/courses" className="footer-nav-link">
+              {t('course_page_title')}
+            </Link>
+            <span className="footer-nav-sep" aria-hidden="true" />
+            <Link to="/podcasts" className="footer-nav-link">
+              {t('podcast_page_title')}
             </Link>
             <span className="footer-nav-sep" aria-hidden="true" />
             <Link to="/cells" className="footer-nav-link">

@@ -5,6 +5,7 @@ import { heritageI18nKeys } from './i18n/heritageI18nKeys';
 import { heritageI18nKeysExpansion } from './i18n/heritageI18nKeysExpansion';
 import { heritageI18nKeysCharactersExtra } from './i18n/heritageI18nKeysCharactersExtra';
 import { gynoskoReaderKeys } from './i18n/gynoskoReaderKeys';
+import { confessionalI18n } from './i18n/confessionalI18n';
 
 const resources = {
   fr: {
@@ -97,8 +98,10 @@ const resources = {
       lib_premium_btn: 'Tout débloquer',
       lib_locked: 'Réservé aux membres Premium',
       lib_read: 'Commencer la lecture',
-      lib_download: 'Emporter chez moi',
+      lib_resume: 'Reprendre la lecture',
+      lib_progress_label: '{{percent}} % lu',
       lib_subtitle: 'Des livres choisis pour éveiller, consoler et fortifier votre foi.',
+      lib_coming_soon: 'Bientôt disponible',
       lib_book_essence_title: "L'Essence de la Foi",
       lib_book_masque_title: 'Le Masque de la Foi',
       lib_book_author_aek: 'Ange Emmanuel Kouamé',
@@ -156,7 +159,8 @@ const resources = {
       heritage_article_manuscripts_desc:
         'Des milliers de manuscrits du Nouveau Testament : une chaîne de fidélité exceptionnelle à travers les siècles.',
       heritage_read_article: 'Lire l’article',
-      bible_subtitle: 'Chaque mot compte — explorez les racines de la Parole.',
+      bible_subtitle:
+        'Texte fidèle à l’original, en mots simples. Touchez un mot pour le sens en français.',
       bible_listen_chapter: 'Écouter tout le chapitre',
       bible_stop_listening: 'Arrêter la lecture',
       bible_listen_verse: 'Écouter ce verset',
@@ -165,16 +169,17 @@ const resources = {
       bible_lexicon_code: 'Référence Strong',
       bible_lexicon_definition: 'Sens en français',
       bible_lexicon_original_meaning: 'Sens originel (Strong)',
+      bible_lexicon_strong_reference: 'Référence Strong (anglais)',
       bible_lexicon_pronunciation: 'Prononciation',
       bible_lexicon_derivation: 'Étymologie',
       bible_lexicon_kjv: 'Rendu KJV',
       bible_lexicon_listen_word: 'Écouter le mot',
-      bible_lexicon_meaning: 'Sens du mot',
+      bible_lexicon_meaning: 'Sens en langage simple',
       bible_lexicon_loading: 'Chargement du sens…',
       bible_lexicon_not_found: 'Définition non disponible pour ce numéro Strong.',
       bible_lexicon_fetch_hint:
         'Le lexique complet n’a pas pu être chargé. Rechargez la page ou vérifiez le déploiement (fichier bible/lexicon.json).',
-      bible_word_tooltip: 'Touchez pour découvrir le sens original',
+      bible_word_tooltip: 'Touchez pour le sens du mot en français',
       bible_tts_unsupported: 'La lecture vocale n’est pas disponible sur ce navigateur.',
       bible_select_book: 'Livre',
       bible_select_chapter: 'Chapitre',
@@ -183,7 +188,7 @@ const resources = {
       bible_next_chapter: 'Chapitre suivant',
       bible_chapter_unavailable: 'Ce chapitre n’est pas encore disponible dans Bible Strong.',
       bible_available_hint:
-        'Bible complète (66 livres) avec numéros Strong — FR, EN, ES, NL, PT et AR. Lecture audio selon la langue de l’app.',
+        'Bible complète (66 livres), texte accessible et numéros Strong. Les définitions au clic suivent la langue de l’app.',
       bible_build_missing: 'Ce chapitre n’est pas encore généré.',
       bible_build_missing_hint:
         'Exécutez npm run build:bible puis redéployez (ou relancez npm run build en local).',
@@ -368,8 +373,10 @@ const resources = {
       lib_premium_btn: 'Unlock everything',
       lib_locked: 'For Premium members',
       lib_read: 'Start reading',
-      lib_download: 'Take it with me',
+      lib_resume: 'Resume reading',
+      lib_progress_label: '{{percent}}% read',
       lib_subtitle: 'Books chosen to awaken, comfort, and strengthen your faith.',
+      lib_coming_soon: 'Coming soon',
       lib_book_essence_title: 'The Essence of Faith',
       lib_book_masque_title: 'The Mask of Faith',
       lib_book_author_aek: 'Ange Emmanuel Kouamé',
@@ -427,7 +434,8 @@ const resources = {
       heritage_article_manuscripts_desc:
         'Thousands of New Testament manuscripts: an exceptional chain of fidelity through the centuries.',
       heritage_read_article: 'Read with me',
-      bible_subtitle: 'Every word matters — explore the roots of Scripture.',
+      bible_subtitle:
+        'Faithful to the original text, in plain words. Tap a word for its meaning in English.',
       bible_listen_chapter: 'Listen to the whole chapter',
       bible_stop_listening: 'Stop playback',
       bible_listen_verse: 'Listen to this verse',
@@ -436,16 +444,17 @@ const resources = {
       bible_lexicon_code: 'Strong\'s reference',
       bible_lexicon_definition: 'Meaning in English',
       bible_lexicon_original_meaning: 'Original meaning (Strong)',
+      bible_lexicon_strong_reference: 'Strong reference (English)',
       bible_lexicon_pronunciation: 'Pronunciation',
       bible_lexicon_derivation: 'Etymology',
       bible_lexicon_kjv: 'KJV rendering',
       bible_lexicon_listen_word: 'Listen to word',
-      bible_lexicon_meaning: 'Word meaning',
+      bible_lexicon_meaning: 'Meaning in plain language',
       bible_lexicon_loading: 'Loading definition…',
       bible_lexicon_not_found: 'No definition available for this Strong number.',
       bible_lexicon_fetch_hint:
         'The full lexicon could not be loaded. Reload the page or check that bible/lexicon.json is deployed.',
-      bible_word_tooltip: 'Tap to discover the original sense',
+      bible_word_tooltip: 'Tap for the word meaning in English',
       bible_tts_unsupported: 'Text-to-speech is not available in this browser.',
       bible_select_book: 'Book',
       bible_select_chapter: 'Chapter',
@@ -637,8 +646,10 @@ const resources = {
       lib_premium_btn: 'Desbloquear todo',
       lib_locked: 'Reservado a Premium',
       lib_read: 'Empezar a leer',
-      lib_download: 'Llevármelo conmigo',
+      lib_resume: 'Reanudar lectura',
+      lib_progress_label: '{{percent}} % leído',
       lib_subtitle: 'Libros elegidos para despertar, consolar y fortalecer tu fe.',
+      lib_coming_soon: 'Próximamente',
       lib_book_essence_title: 'La esencia de la fe',
       lib_book_masque_title: 'La máscara de la fe',
       lib_book_author_aek: 'Ange Emmanuel Kouamé',
@@ -705,6 +716,7 @@ const resources = {
       bible_lexicon_code: 'Referencia Strong',
       bible_lexicon_definition: 'Sentido en tu idioma',
       bible_lexicon_original_meaning: 'Sentido original (Strong)',
+      bible_lexicon_strong_reference: 'Referencia Strong (inglés)',
       bible_lexicon_pronunciation: 'Pronunciación',
       bible_lexicon_derivation: 'Etimología',
       bible_lexicon_kjv: 'Traducción KJV',
@@ -903,8 +915,10 @@ const resources = {
       lib_premium_btn: 'Alles ontgrendelen',
       lib_locked: 'Voor Premium-leden',
       lib_read: 'Begin met lezen',
-      lib_download: 'Meenemen',
+      lib_resume: 'Lezen hervatten',
+      lib_progress_label: '{{percent}}% gelezen',
       lib_subtitle: 'Boeken die het geloof wekken, troosten en versterken.',
+      lib_coming_soon: 'Binnenkort beschikbaar',
       lib_book_essence_title: 'De essentie van het geloof',
       lib_book_masque_title: 'Het masker van het geloof',
       lib_book_author_aek: 'Ange Emmanuel Kouamé',
@@ -971,6 +985,7 @@ const resources = {
       bible_lexicon_code: 'Strong-referentie',
       bible_lexicon_definition: 'Betekenis in jouw taal',
       bible_lexicon_original_meaning: 'Oorspronkelijke betekenis (Strong)',
+      bible_lexicon_strong_reference: 'Strong-referentie (Engels)',
       bible_lexicon_pronunciation: 'Uitspraak',
       bible_lexicon_derivation: 'Etymologie',
       bible_lexicon_kjv: 'KJV-weergave',
@@ -1169,8 +1184,10 @@ const resources = {
       lib_premium_btn: 'Desbloquear tudo',
       lib_locked: 'Reservado a Premium',
       lib_read: 'Começar a ler',
-      lib_download: 'Levar comigo',
+      lib_resume: 'Retomar a leitura',
+      lib_progress_label: '{{percent}}% lido',
       lib_subtitle: 'Livros escolhidos para despertar, consolar e fortalecer a tua fé.',
+      lib_coming_soon: 'Em breve',
       lib_book_essence_title: 'A essência da fé',
       lib_book_masque_title: 'A máscara da fé',
       lib_book_author_aek: 'Ange Emmanuel Kouamé',
@@ -1237,6 +1254,7 @@ const resources = {
       bible_lexicon_code: 'Referência Strong',
       bible_lexicon_definition: 'Sentido no seu idioma',
       bible_lexicon_original_meaning: 'Sentido original (Strong)',
+      bible_lexicon_strong_reference: 'Referência Strong (inglês)',
       bible_lexicon_pronunciation: 'Pronúncia',
       bible_lexicon_derivation: 'Etimologia',
       bible_lexicon_kjv: 'Tradução KJV',
@@ -1435,8 +1453,10 @@ const resources = {
       lib_premium_btn: 'افتح كل المحتوى',
       lib_locked: 'للأعضاء المميزين',
       lib_read: 'ابدأ القراءة',
-      lib_download: 'احمله معي',
+      lib_resume: 'متابعة القراءة',
+      lib_progress_label: '{{percent}}٪ مقروء',
       lib_subtitle: 'كتب مختارة لإيقاظ الإيمان ومواساة القلب وتقويته.',
+      lib_coming_soon: 'قريباً',
       lib_book_essence_title: 'جوهر الإيمان',
       lib_book_masque_title: 'قناع الإيمان',
       lib_book_author_aek: 'أنج إيمانويل كوامي',
@@ -1502,6 +1522,7 @@ const resources = {
       bible_lexicon_code: 'مرجع سترونغ',
       bible_lexicon_definition: 'المعنى بلغتك',
       bible_lexicon_original_meaning: 'المعنى الأصلي (سترونغ)',
+      bible_lexicon_strong_reference: 'مرجع سترونغ (إنجليزي)',
       bible_lexicon_pronunciation: 'النطق',
       bible_lexicon_derivation: 'الاشتقاق',
       bible_lexicon_kjv: 'ترجمة KJV',
@@ -1637,6 +1658,11 @@ Object.keys(heritageI18nKeysCharactersExtra).forEach((lang) => {
 Object.keys(gynoskoReaderKeys).forEach((lang) => {
   if (resources[lang]?.translation) {
     Object.assign(resources[lang].translation, gynoskoReaderKeys[lang]);
+  }
+});
+Object.keys(confessionalI18n).forEach((lang) => {
+  if (resources[lang]?.translation) {
+    Object.assign(resources[lang].translation, confessionalI18n[lang]);
   }
 });
 

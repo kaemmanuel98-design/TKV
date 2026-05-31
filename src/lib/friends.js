@@ -114,7 +114,7 @@ export async function loadFriendMapMembers(userId, t) {
 
   const { data: profiles, error } = await supabase
     .from('profiles')
-    .select('id, name, country, avatar_url, last_seen_at')
+    .select('id, name, country, city, bio, avatar_url, last_seen_at')
     .in('id', friendIds)
     .not('country', 'is', null);
 
@@ -124,6 +124,8 @@ export async function loadFriendMapMembers(userId, t) {
     id: p.id,
     name: p.name || t('community_author_anonymous'),
     country: p.country,
+    city: p.city,
+    bio: p.bio,
     avatarUrl: p.avatar_url,
     lastSeenAt: p.last_seen_at,
     isFriend: true,

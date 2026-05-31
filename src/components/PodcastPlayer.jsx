@@ -3,17 +3,34 @@ import { Play, Pause, SkipBack, SkipForward } from 'lucide-react';
 import { formatDuration } from '../data/podcastsCatalog';
 import './PodcastPlayer.css';
 
-const PodcastPlayer = ({ src, title, onProgress }) => {
+const PodcastPlayer = ({ src, title, initialPosition = 0, onProgress }) => {
   const audioRef = useRef(null);
   const [playing, setPlaying] = useState(false);
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
+  const resumeRef = useRef(Math.max(0, initialPosition || 0));
+
+  useEffect(() => {
+    resumeRef.current = Math.max(0, initialPosition || 0);
+  }, [initialPosition, src]);
 
   useEffect(() => {
     setPlaying(false);
-    setCurrent(0);
+    setCurrent(resumeRef.current);
     setDuration(0);
   }, [src]);
+
+  const applyResume = () => {
+    const el = audioRef.current;
+    if (!el || !resumeRef.current) return;
+    const max = el.duration && Number.isFinite(el.duration) ? el.duration - 1 : resumeRef.current;
+    const target = Math.min(resumeRef.current, Math.max(0, max));
+    if (target > 1) {
+      el.currentTime = target;
+      setCurrent(target);
+    }
+    resumeRef.current = 0;
+  };
 
   const toggle = () => {
     const el = audioRef.current;
@@ -44,10 +61,16 @@ const PodcastPlayer = ({ src, title, onProgress }) => {
         onTimeUpdate={() => {
           const t = audioRef.current?.currentTime || 0;
           setCurrent(t);
-          onProgress?.(t);
+          onProgress?.(t, audioRef.current?.duration || 0);
         }}
-        onLoadedMetadata={() => setDuration(audioRef.current?.duration || 0)}
-        onEnded={() => setPlaying(false)}
+        onLoadedMetadata={() => {
+          setDuration(audioRef.current?.duration || 0);
+          applyResume();
+        }}
+        onEnded={() => {
+          setPlaying(false);
+          onProgress?.(audioRef.current?.duration || 0, audioRef.current?.duration || 0, true);
+        }}
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
       />

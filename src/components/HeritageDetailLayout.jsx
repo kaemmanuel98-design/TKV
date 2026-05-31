@@ -7,7 +7,7 @@ import HeritageRichBody from './HeritageRichBody';
 import HeritageImg from './HeritageImg';
 import { resolveHeritageImage } from '../lib/heritageMedia';
 import { HERITAGE_TIMELINE } from '../data/heritage/heritageTimelineCatalog';
-import { resolveHeritageLang, pickLocalized } from '../lib/heritageLang';
+import { useHeritageBlocks } from '../hooks/useHeritageBlocks';
 import '../pages/Heritage.css';
 
 function resolveContentKind(item, slug) {
@@ -27,8 +27,7 @@ function resolveContentKind(item, slug) {
 
 export default function HeritageDetailLayout({ item, slug, backPath = '/heritage', backTab }) {
   const { t, i18n } = useTranslation();
-  const lang = resolveHeritageLang(i18n);
-  const blocks = pickLocalized(item.blocks, lang);
+  const { blocks, translating, translateError } = useHeritageBlocks(item.blocks, i18n, slug);
   const contentKind = resolveContentKind(item, slug);
   const { primary, fallback } = resolveHeritageImage({
     slug,
@@ -73,6 +72,16 @@ export default function HeritageDetailLayout({ item, slug, backPath = '/heritage
       />
 
       <article className="card heritage-detail-body">
+        {translating && (
+          <p className="heritage-translate-notice" role="status">
+            {t('content_translating')}
+          </p>
+        )}
+        {translateError && !translating && (
+          <p className="heritage-translate-notice" role="status">
+            {t('content_translate_error')}
+          </p>
+        )}
         <HeritageRichBody blocks={blocks} contentSlug={slug} contentKind={contentKind} />
       </article>
     </div>

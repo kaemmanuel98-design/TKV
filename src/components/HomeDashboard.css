@@ -1,0 +1,122 @@
+.home-dashboard-section {
+  padding-bottom: 1.5rem;
+}
+
+.home-dashboard-title {
+  margin: 0 0 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.home-dashboard-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.home-dashboard-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
+}
+
+.home-dashboard-stat-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--gold-bright);
+}
+
+.home-dashboard-stat-value {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.home-dashboard-stat-meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.home-dashboard-progress {
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.home-dashboard-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--gold-bright));
+  transition: width 0.35s ease;
+}
+
+.home-dashboard-feature {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.home-dashboard-feature:hover {
+  border-color: var(--gold-bright);
+  transform: translateY(-1px);
+}
+
+.home-dashboard-feature h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.home-dashboard-feature p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.home-dashboard-badge {
+  align-self: flex-start;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: rgba(220, 80, 80, 0.2);
+  color: #f0a0a0;
+}
+
+.home-dashboard-feature--live {
+  border-color: rgba(220, 80, 80, 0.25);
+}
+
+.home-dashboard-feature--ia {
+  border-color: rgba(124, 92, 191, 0.35);
+}
+
+.home-dashboard-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.home-dashboard-cta {
+  margin-top: auto;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--gold-bright);
+}

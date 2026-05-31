@@ -7,7 +7,7 @@ import { BibleLogo } from '../components/SectionLogos';
 import { BIBLE_BOOKS, getBookName } from '../data/bible/catalog';
 import { loadBibleChapter, isChapterAvailable } from '../data/bible/loadChapter';
 import {
-  getLexiconEntryAsync,
+  getLocalizedLexiconEntryAsync,
   getLexiconDisplayMeaning,
   isLexiconLoadFailed,
   preloadLexicon,
@@ -120,8 +120,16 @@ const BibleStrong = () => {
     scrollToLexiconPanel();
 
     try {
-      const entry = await getLexiconEntryAsync(resolvedId, lang);
+      const entry = await getLocalizedLexiconEntryAsync(resolvedId, lang);
       setLexiconSelection({ ...entry, surface, loading: false });
+    } catch {
+      setLexiconSelection({
+        strongId: resolvedId,
+        surface,
+        loading: false,
+        missing: true,
+        gloss: '',
+      });
     } finally {
       setLexiconLoading(false);
     }
@@ -371,10 +379,11 @@ const BibleStrong = () => {
                 </button>
               )}
 
-              {lexicon.definitionOriginal &&
+              {lexicon.showEnglishReference &&
+                lexicon.definitionOriginal &&
                 lexicon.definitionOriginal !== lexiconMeaning && (
                 <div className="lexicon-block">
-                  <strong>{t('bible_lexicon_original_meaning')}:</strong>
+                  <strong>{t('bible_lexicon_strong_reference')}:</strong>
                   <p className="text-muted">{lexicon.definitionOriginal}</p>
                 </div>
               )}

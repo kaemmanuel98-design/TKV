@@ -1,6 +1,6 @@
 # THE KINGDOM'S VOICE (TKV)
 
-Application web (PWA) pour explorer la foi : Bible Strong, agent IA, cellules mondiales (chat + visio), communauté, cours, bibliothèque, carte du Royaume.
+Application web (PWA) pour explorer la foi : Bible Strong, agent IA, cellules mondiales (chat), communauté, cours, bibliothèque, carte du Royaume.
 
 ## Démarrage rapide (local)
 
@@ -10,7 +10,7 @@ npm run dev          # frontend → http://localhost:5173
 npm run dev:api      # API Express → http://localhost:3001
 ```
 
-Copiez `.env.example` vers `.env` et renseignez Supabase + OpenAI. Pour la visio locale, voir `docs/JITSI_INSTALL_WINDOWS.md` et `jitsi-local-credentials.txt`.
+Copiez `.env.example` vers `.env` et renseignez Supabase + OpenAI.
 
 ## Déploiement
 
@@ -23,8 +23,7 @@ Copiez `.env.example` vers `.env` et renseignez Supabase + OpenAI. Pour la visio
 | Route | Description |
 |-------|-------------|
 | `GET /api/health` | Santé API |
-| `GET /api/jitsi/status` | Visio disponible |
-| `POST /api/jitsi/join` | URL visio (JWT) |
+| `GET /api/cells/capabilities` | Droits création de cellule |
 | `POST /api/agent/chat` | Agent IA |
 | `POST /api/agent/perspectives` | Perspectives |
 | `POST /api/tts` | Synthèse vocale |
@@ -44,6 +43,21 @@ Exécuter les scripts SQL dans cet ordre :
 9. `supabase_map_patch.sql`
 10. `supabase_pgvector.sql`
 11. `supabase_security_patch.sql` (réactions communauté + quota IA en lecture seule côté client)
+12. `supabase_phase1b_patch.sql` (podcasts + modules de cours)
+13. `supabase_course_progress.sql` (progression parcours)
+14. `supabase_gamification_patch.sql` (badges + progression lecture sur profil)
+15. `supabase_podcasts_seed.sql` (catalogue épisodes pour sync cloud)
+16. `supabase_certificates_payments.sql` (certificats parcours + commandes Premium)
+17. `supabase_profiles_location.sql` (pays/ville profil + cache carte)
+18. `supabase_confessional.sql` (confessionnal — base)
+19. `supabase_confessional_cdc.sql` (Confessionnal CdC : messages, prières, accompagnateurs, crise)
+20. `supabase_companion_dashboard.sql` (dashboard accompagnateur + chat privé)
+21. `supabase_confessional_phase_c.sql` (quota Confessionnal dédié)
+22. `supabase_confessional_support_groups.sql` (cercles de soutien)
+23. `supabase_confessional_support_messages.sql` (chat anonyme des cercles)
+24. `supabase_confessional_support_groups_en.sql` (catalogue cercles EN, optionnel)
+
+Paiements **PayPal** : voir [docs/PAYMENTS.md](docs/PAYMENTS.md).
 
 Agent RAG (optionnel) : `npm run ingest:knowledge:embed` puis `npm run upload:chunks`.
 
@@ -63,3 +77,4 @@ Agent RAG (optionnel) : `npm run ingest:knowledge:embed` puis `npm run upload:ch
 | `npm run build:bible` | Régénérer Bible Strong (local, Windows) |
 | `npm run ingest:knowledge` | Préparer chunks RAG |
 | `npm run lint` | ESLint |
+| `node scripts/mark-order-paid.mjs TKV-…` | Activer Premium manuellement (secours admin) |
