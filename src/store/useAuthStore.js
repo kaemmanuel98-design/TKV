@@ -50,6 +50,20 @@ export const useAuthStore = create((set) => ({
     return data;
   },
 
+  signInWithProvider: async (provider) => {
+    if (!isSupabaseConfigured()) {
+      throw Object.assign(new Error('Supabase not configured'), { code: 'supabase_not_configured' });
+    }
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: authRedirectTo(),
+      },
+    });
+    if (error) throw error;
+    return data;
+  },
+
   signUp: async (email, password, metadata = {}) => {
     if (!isSupabaseConfigured()) {
       throw Object.assign(new Error('Supabase not configured'), { code: 'supabase_not_configured' });

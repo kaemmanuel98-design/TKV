@@ -102,7 +102,7 @@ const Community = () => {
   const [reactingId, setReactingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   const [reactedIds, setReactedIds] = useState(() => new Set());
-  const [feedCounts, setFeedCounts] = useState({ all: 0, testimony: 0 });
+  const [feedCounts, setFeedCounts] = useState({ all: 0, testimony: 0, question: 0 });
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(0);
@@ -146,14 +146,18 @@ const Community = () => {
 
   const refreshFeedCounts = useCallback(async () => {
     try {
-      const [{ count: all }, { count: testimony }] = await Promise.all([
+      const [{ count: all }, { count: testimony }, { count: question }] = await Promise.all([
         supabase.from('community_posts').select('*', { count: 'exact', head: true }),
         supabase
           .from('community_posts')
           .select('*', { count: 'exact', head: true })
           .eq('post_type', 'testimony'),
+        supabase
+          .from('community_posts')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_type', 'question'),
       ]);
-      setFeedCounts({ all: all ?? 0, testimony: testimony ?? 0 });
+      setFeedCounts({ all: all ?? 0, testimony: testimony ?? 0, question: question ?? 0 });
     } catch {
       /* ignore count errors */
     }
@@ -171,6 +175,8 @@ const Community = () => {
 
       if (feedFilter === 'testimony') {
         query = query.eq('post_type', 'testimony');
+      } else if (feedFilter === 'question') {
+        query = query.eq('post_type', 'question');
       }
       query = query.eq('moderation_status', 'approved');
 
@@ -231,6 +237,8 @@ const Community = () => {
 
       if (feedFilter === 'testimony') {
         query = query.eq('post_type', 'testimony');
+      } else if (feedFilter === 'question') {
+        query = query.eq('post_type', 'question');
       }
       query = query.eq('moderation_status', 'approved');
 
@@ -262,6 +270,7 @@ const Community = () => {
           const post = enriched[0];
           if (!post) return;
           if (feedFilter === 'testimony' && post.post_type !== 'testimony') return;
+          if (feedFilter === 'question' && post.post_type !== 'question') return;
           setPosts((prev) => {
             if (prev.some((p) => p.id === post.id)) return prev;
             return [post, ...prev];
@@ -356,7 +365,7 @@ const Community = () => {
       const payload = {
         user_id: user.id,
         content: text,
-        post_type: composeType === 'testimony' ? 'testimony' : 'post',
+        post_type: composeType === 'testimony' ? 'testimony' : composeType === 'question' ? 'question' : 'post',
         moderation_status: 'pending',
       };
       const { data, error: insertError } = await supabase
@@ -382,6 +391,10 @@ const Community = () => {
       setSuccess(
         composeType === 'testimony'
           ? t('community_post_pending_review_testimony')
+          : composeType === 'question'
+            ? t('community_post_pending_review_question', {
+              defaultValue: 'Votre question est envoyee et sera publiee apres validation.',
+            })
           : t('community_post_pending_review')
       );
       refreshFeedCounts();
@@ -496,7 +509,11 @@ const Community = () => {
   const filteredEmpty =
     !loading &&
     posts.length === 0 &&
-    (feedFilter === 'testimony' ? t('community_no_testimonies') : t('community_no_posts'));
+    (feedFilter === 'testimony'
+      ? t('community_no_testimonies')
+      : feedFilter === 'question'
+        ? t('community_no_questions', { defaultValue: 'Aucune question pour le moment.' })
+        : t('community_no_posts'));
 
   return (
     <div className="community-page animate-fade-in">
@@ -549,6 +566,18 @@ const Community = () => {
               <span className="community-tab-count">{feedCounts.testimony}</span>
             )}
           </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={feedFilter === 'question'}
+            className={`community-tab ${feedFilter === 'question' ? 'is-active' : ''}`}
+            onClick={() => setFeedFilter('question')}
+          >
+            {t('community_filter_questions', { defaultValue: 'Questions' })}
+            {!loading && (
+              <span className="community-tab-count">{feedCounts.question}</span>
+            )}
+          </button>
         </div>
 
         <section className="community-compose" aria-label={t('community_create_post')}>
@@ -561,6 +590,12 @@ const Community = () => {
                     {t('community_badge_testimony')}
                   </p>
                 )}
+                {composeType === 'question' && (
+                  <p className="community-compose-kind">
+                    <MessageCircle size={16} aria-hidden />
+                    {t('community_badge_question', { defaultValue: 'Question' })}
+                  </p>
+                )}
                 <textarea
                   className="community-textarea"
                   value={draft}
@@ -568,6 +603,10 @@ const Community = () => {
                   placeholder={
                     composeType === 'testimony'
                       ? t('community_testimony_placeholder')
+                      : composeType === 'question'
+                        ? t('community_question_placeholder', {
+                          defaultValue: 'Pose ta question, ton doute ou ton besoin de clarte...',
+                        })
                       : t('community_post_placeholder')
                   }
                   rows={4}
@@ -597,6 +636,8 @@ const Community = () => {
                     {submitting ? <Loader2 size={16} className="community-spin" /> : null}
                     {composeType === 'testimony'
                       ? t('community_testimony_submit')
+                      : composeType === 'question'
+                        ? t('community_question_submit', { defaultValue: 'Publier la question' })
                       : t('community_post_submit')}
                   </button>
                 </div>
@@ -622,6 +663,14 @@ const Community = () => {
                   >
                     <Quote size={16} aria-hidden />
                     {t('community_create_testimony')}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-outline btn-sm"
+                    onClick={() => openCompose('question')}
+                  >
+                    <MessageCircle size={16} aria-hidden />
+                    {t('community_create_question', { defaultValue: 'Poser une question' })}
                   </button>
                 </div>
               </div>
@@ -680,6 +729,11 @@ const Community = () => {
                         <span className="community-post-author">{post.authorName}</span>
                         {post.post_type === 'testimony' && (
                           <span className="community-post-badge">{t('community_badge_testimony')}</span>
+                        )}
+                        {post.post_type === 'question' && (
+                          <span className="community-post-badge">
+                            {t('community_badge_question', { defaultValue: 'Question' })}
+                          </span>
                         )}
                       </div>
                     </div>
