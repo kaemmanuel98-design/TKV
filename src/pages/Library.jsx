@@ -64,7 +64,11 @@ function BookCard({ book, isPremiumUser, progressPercent, t, variant = 'featured
   );
 
   return (
-    <article className={`library-book ${isSoon ? 'library-book--soon' : ''}`}>
+    <article
+      className={`library-book ${isSoon ? 'library-book--soon' : ''} ${
+        book.slug === 'masque-foi' ? 'library-book--masque-foi' : ''
+      }`}
+    >
       <div className="library-book-cover">
         <img
           src={book.coverUrl}
@@ -215,6 +219,7 @@ const Library = () => {
                   progressPercent={progressPercent}
                   t={t}
                   variant="soon"
+                  priority={book.slug === 'masque-foi'}
                 />
               ))}
             </div>
