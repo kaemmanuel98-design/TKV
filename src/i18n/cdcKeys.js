@@ -4,6 +4,7 @@ import { courseKeysExtended } from './courseKeysExtended';
 export const cdcKeys = {
   fr: {
     tab_home: 'Accueil',
+    layout_back: 'Retour',
     tab_agent: 'Mim',
     tab_library: 'Bibliothèque',
     tab_community: 'Communauté',
@@ -957,6 +958,7 @@ export const cdcKeys = {
   },
   en: {
     tab_home: 'Home',
+    layout_back: 'Back',
     tab_agent: 'Mim',
     tab_library: 'Library',
     tab_community: 'Community',
@@ -1889,6 +1891,7 @@ export const cdcKeys = {
   },
   es: {
     tab_home: 'Inicio',
+    layout_back: 'Volver',
     tab_agent: 'Mim',
     tab_library: 'Biblioteca',
     tab_community: 'Comunidad',
@@ -2569,6 +2572,7 @@ export const cdcKeys = {
   },
   nl: {
     tab_home: 'Home',
+    layout_back: 'Terug',
     tab_agent: 'Mim',
     tab_library: 'Bibliotheek',
     tab_community: 'Gemeenschap',
@@ -3251,6 +3255,7 @@ export const cdcKeys = {
   },
   pt: {
     tab_home: 'Início',
+    layout_back: 'Voltar',
     tab_agent: 'Mim',
     tab_library: 'Biblioteca',
     tab_community: 'Comunidade',
@@ -3935,6 +3940,7 @@ export const cdcKeys = {
   },
   ar: {
     tab_home: 'الرئيسية',
+    layout_back: 'رجوع',
     tab_agent: 'Mim',
     tab_library: 'المكتبة',
     tab_community: 'المجتمع',

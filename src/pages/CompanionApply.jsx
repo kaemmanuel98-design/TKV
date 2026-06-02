@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, CheckCircle2, HeartHandshake, Loader2 } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
@@ -19,6 +19,12 @@ const CHARTER_KEYS = [
 
 export default function CompanionApply() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const goBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/profile');
+  };
+
   const session = useAuthStore((s) => s.session);
   const token = session?.access_token;
 
@@ -116,9 +122,9 @@ export default function CompanionApply() {
 
   return (
     <div className="companion-apply container">
-      <Link to="/profile" className="btn btn-ghost btn-sm">
-        <ArrowLeft size={16} /> {t('tab_profile')}
-      </Link>
+      <button type="button" className="btn btn-ghost btn-sm" onClick={goBack}>
+        <ArrowLeft size={16} /> {t('layout_back')}
+      </button>
 
       <header className="companion-apply-header">
         <HeartHandshake size={28} />

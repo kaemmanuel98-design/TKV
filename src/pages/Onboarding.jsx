@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronRight, Sparkles, Brain, Flame } from 'lucide-react';
+import { ArrowLeft, ChevronRight, Sparkles, Brain, Flame } from 'lucide-react';
 import { LogoMark } from '../components/Logo';
 import MimshackLogo from '../components/MimshackLogo';
 import { useAuthStore } from '../store/useAuthStore';
@@ -29,6 +29,11 @@ const Onboarding = () => {
   const [step, setStep] = useState(0);
   const [userType, setUserType] = useState('curious');
 
+  const goBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
+
   const finish = async () => {
     localStorage.setItem(ONBOARDING_KEY, 'true');
     localStorage.setItem(PROFILE_TYPE_KEY, userType);
@@ -46,6 +51,9 @@ const Onboarding = () => {
   return (
     <div className="onboarding animate-fade-in">
       <div className="onboarding-inner">
+        <button type="button" className="btn btn-ghost btn-sm onboarding-back-btn" onClick={goBack}>
+          <ArrowLeft size={16} /> {t('layout_back')}
+        </button>
         <div className="onboarding-logo">
           <LogoMark size={64} />
         </div>

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   AlertTriangle,
@@ -52,6 +52,7 @@ const AVAIL = ['online', 'busy', 'offline'];
 
 export default function CompanionDashboard() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const lang = i18n.language?.split('-')[0] || 'fr';
   const session = useAuthStore((s) => s.session);
   const token = session?.access_token;
@@ -473,12 +474,17 @@ export default function CompanionDashboard() {
     }
   };
 
+  const goBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
+
   return (
     <div className="companion-dash">
       <header className="companion-dash-header">
-        <Link to="/" className="btn btn-ghost btn-sm">
+        <button type="button" className="btn btn-ghost btn-sm" onClick={goBack}>
           <ArrowLeft size={16} /> TKV
-        </Link>
+        </button>
         <div>
           <h1>{t('companion_dashboard_title')}</h1>
           <p className="text-muted">{t('companion_dashboard_subtitle')}</p>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ArrowLeft } from 'lucide-react';
 import { LogoMark } from '../components/Logo';
 import { getAuthErrorKey } from '../lib/authErrors';
 import { isSupabaseConfigured, pingSupabaseAuth } from '../lib/supabase';
@@ -37,6 +38,11 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { t } = useTranslation();
+
+  const goBack = useCallback(() => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  }, [navigate]);
 
   const refreshResendCooldown = useCallback((address) => {
     const ms = getResendCooldownMs(address);
@@ -229,6 +235,9 @@ const AuthPage = () => {
         style={{ minHeight: 'calc(100vh - var(--header-height) - 8rem)' }}
       >
         <div className="card card-glass" style={{ width: '100%', maxWidth: '420px' }}>
+          <button type="button" className="btn btn-ghost btn-sm mb-4" onClick={goBack}>
+            <ArrowLeft size={16} /> {t('layout_back')}
+          </button>
           <div className="text-center mb-6">
             <LogoMark size={64} title="TKV" />
             <h2 className="page-title" style={{ fontSize: '1.75rem', marginTop: '1rem' }}>
@@ -264,6 +273,9 @@ const AuthPage = () => {
         style={{ minHeight: 'calc(100vh - var(--header-height) - 8rem)' }}
       >
         <div className="card card-glass" style={{ width: '100%', maxWidth: '420px' }}>
+          <button type="button" className="btn btn-ghost btn-sm mb-4" onClick={goBack}>
+            <ArrowLeft size={16} /> {t('layout_back')}
+          </button>
           <div className="text-center mb-6">
             <div className="auth-logo-wrap">
               <LogoMark size={64} title="TKV" />
@@ -316,6 +328,9 @@ const AuthPage = () => {
       style={{ minHeight: 'calc(100vh - var(--header-height) - 8rem)' }}
     >
       <div className="card card-glass" style={{ width: '100%', maxWidth: '420px' }}>
+        <button type="button" className="btn btn-ghost btn-sm mb-4" onClick={goBack}>
+          <ArrowLeft size={16} /> {t('layout_back')}
+        </button>
         <div className="text-center mb-6">
           <div className="auth-logo-wrap">
             <LogoMark size={64} title="TKV" />

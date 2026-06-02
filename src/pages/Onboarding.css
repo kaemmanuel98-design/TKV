@@ -17,6 +17,11 @@
   text-align: center;
 }
 
+.onboarding-back-btn {
+  margin-bottom: 0.75rem;
+  align-self: flex-start;
+}
+
 .onboarding-logo {
   margin-bottom: 2rem;
   display: flex;

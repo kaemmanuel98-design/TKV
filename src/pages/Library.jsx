@@ -12,15 +12,6 @@ import './Library.css';
 
 const BOOK_CATALOG = [
   {
-    id: 1,
-    slug: 'essence-foi',
-    titleKey: 'lib_book_essence_title',
-    authorKey: 'lib_book_author_aek',
-    isPremium: false,
-    readable: false,
-    coverUrl: 'https://placehold.co/300x440/121214/c9a962?text=Essence',
-  },
-  {
     id: 2,
     slug: 'gynosko',
     title: 'GYNOSKO',
@@ -45,11 +36,11 @@ const BOOK_CATALOG = [
     authorKey: 'lib_book_author_aek',
     isPremium: true,
     readable: false,
-    coverUrl: 'https://placehold.co/300x440/121214/c9a962?text=Masque',
+    coverUrl: '/covers/masque-foi-cover.png',
   },
 ];
 
-function BookCard({ book, isPremiumUser, progressPercent, t, variant = 'featured' }) {
+function BookCard({ book, isPremiumUser, progressPercent, t, variant = 'featured', priority = false }) {
   const pct = book.readable ? progressPercent(book.slug) : 0;
   const locked = book.isPremium && !isPremiumUser;
   const hasProgress = pct > 0 && pct < 100;
@@ -75,7 +66,17 @@ function BookCard({ book, isPremiumUser, progressPercent, t, variant = 'featured
   return (
     <article className={`library-book ${isSoon ? 'library-book--soon' : ''}`}>
       <div className="library-book-cover">
-        <img src={book.coverUrl} alt="" loading="lazy" />
+        <img
+          src={book.coverUrl}
+          alt={book.title}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          fetchPriority={priority ? 'high' : 'low'}
+          onError={(e) => {
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = 'https://placehold.co/300x440/121214/c9a962?text=TKV';
+          }}
+        />
         {locked && book.readable && (
           <div className="library-book-lock" aria-hidden>
             <Lock size={28} />
@@ -193,6 +194,7 @@ const Library = () => {
                   progressPercent={progressPercent}
                   t={t}
                   variant="featured"
+                  priority={book.slug === 'gynosko'}
                 />
               ))}
             </div>

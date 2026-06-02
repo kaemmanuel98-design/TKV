@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, Link, NavLink } from 'react-router-dom';
+import { Outlet, Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Heart,
   Globe,
   Moon,
   Sun,
+  ArrowLeft,
   Headphones,
   DoorClosed,
   HeartHandshake,
@@ -70,6 +71,8 @@ const footerLinks = [
 
 const Layout = () => {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const { user, signOut } = useAuthStore();
   const { theme, toggleTheme } = useTheme();
   const fetchProfile = useProfileStore((s) => s.fetchProfile);
@@ -101,6 +104,12 @@ const Layout = () => {
     i18n.changeLanguage(e.target.value);
   };
 
+  const canGoBack = location.pathname !== '/';
+  const handleBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
+
   return (
     <div className="layout-container">
       {user && <FriendPresenceToasts />}
@@ -114,6 +123,13 @@ const Layout = () => {
             <span>The Kingdom&apos;s Voice</span>
           </div>
         </Link>
+
+        {canGoBack && (
+          <button type="button" className="btn btn-ghost btn-sm header-back-btn" onClick={handleBack}>
+            <ArrowLeft size={16} />
+            <span className="hide-mobile">{t('layout_back')}</span>
+          </button>
+        )}
 
         <nav className="nav-desktop" aria-label="Navigation principale">
           {mainNavItems.map(({ to, icon: Icon, labelKey, end }) => (

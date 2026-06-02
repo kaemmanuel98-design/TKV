@@ -232,6 +232,10 @@
   flex-shrink: 0;
 }
 
+.header-back-btn {
+  margin-left: auto;
+}
+
 .lang-switcher {
   display: flex;
   align-items: center;
@@ -436,6 +440,10 @@
 
   .header-actions .btn span.hide-mobile {
     display: none;
+  }
+
+  .header-back-btn {
+    margin-left: 0;
   }
 
   .lang-switcher .hide-mobile-icon {
