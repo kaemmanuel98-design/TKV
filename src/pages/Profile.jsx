@@ -8,10 +8,6 @@ import {
   Loader2,
   Flame,
   TrendingUp,
-  MessageCircle,
-  BookOpen,
-  MapPin,
-  GraduationCap,
   DoorClosed,
   HeartHandshake,
   Users,
@@ -33,7 +29,14 @@ import { CERTIFICATE_COURSES } from '../lib/courseCertificates';
 import { fetchUserCertificates } from '../lib/certificateSync';
 import { supabase } from '../lib/supabase';
 import MimshackLogo from '../components/MimshackLogo';
-import { LibraryLogo } from '../components/SectionLogos';
+import {
+  LibraryLogo,
+  BibleLogo,
+  CoursesLogo,
+  CellsLogo,
+  FriendsLogo,
+  MapLogo,
+} from '../components/SectionLogos';
 import { useCompanionAccess } from '../hooks/useCompanionAccess';
 import './Profile.css';
 
@@ -52,11 +55,11 @@ const profileTypes = ['believer', 'skeptic', 'curious'];
 
 const primaryLinks = [
   { to: '/library', mark: 'library', labelKey: 'tab_library' },
-  { to: '/bible', icon: BookOpen, labelKey: 'nav_bible' },
+  { to: '/bible', mark: 'bible', labelKey: 'nav_bible' },
   { to: '/agent', mimshack: true, labelKey: 'tab_agent' },
   { to: '/confessional', icon: DoorClosed, labelKey: 'nav_confessional' },
-  { to: '/courses', icon: GraduationCap, labelKey: 'course_page_title' },
-  { to: '/cells', icon: MessageCircle, labelKey: 'cells' },
+  { to: '/courses', mark: 'courses', labelKey: 'course_page_title' },
+  { to: '/cells', mark: 'cells', labelKey: 'cells' },
 ];
 
 const TABS = ['overview', 'account', 'more'];
@@ -373,6 +376,12 @@ const Profile = () => {
                         <MimshackLogo size={20} />
                       ) : mark === 'library' ? (
                         <LibraryLogo size={20} />
+                      ) : mark === 'bible' ? (
+                        <BibleLogo size={20} />
+                      ) : mark === 'courses' ? (
+                        <CoursesLogo size={20} />
+                      ) : mark === 'cells' ? (
+                        <CellsLogo size={20} />
                       ) : (
                         <Icon size={20} aria-hidden />
                       )}
@@ -539,7 +548,7 @@ const Profile = () => {
             <div className="profile-action-cards">
               {user && (
                 <Link to="/friends" className="profile-action-card">
-                  <Users size={20} aria-hidden />
+                  <FriendsLogo size={20} title={t('friends_nav')} />
                   <div>
                     <strong>{t('friends_nav')}</strong>
                     <p>{t('friends_subtitle')}</p>
@@ -549,7 +558,7 @@ const Profile = () => {
               )}
               {user && (
                 <Link to="/map" className="profile-action-card">
-                  <MapPin size={20} aria-hidden />
+                  <MapLogo size={20} title={t('map')} />
                   <div>
                     <strong>{t('map')}</strong>
                     <p>{t('profile_show_on_map_hint')}</p>
@@ -559,7 +568,7 @@ const Profile = () => {
               )}
               {cellHost && (
                 <Link to="/cells" className="profile-action-card profile-action-card--accent">
-                  <MessageCircle size={20} aria-hidden />
+                  <CellsLogo size={20} title={t('cells')} />
                   <div>
                     <strong>{t('profile_cell_host_title')}</strong>
                     <p>{t('profile_cell_host_desc')}</p>

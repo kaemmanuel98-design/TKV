@@ -247,6 +247,23 @@
   letter-spacing: 0.04em;
 }
 
+@media (max-width: 768px) {
+  .book-content p {
+    text-align: start;
+    line-height: 1.8;
+  }
+
+  .book-chapter-head {
+    gap: 0.65rem;
+    padding-bottom: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .book-nav {
+    gap: 0.6rem;
+  }
+}
+
 /* ——— Cells ——— */
 .cells-layout {
   display: flex;

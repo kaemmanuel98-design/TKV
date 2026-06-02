@@ -3,6 +3,10 @@
   flex-shrink: 0;
 }
 
+.tkv-mark-svg * {
+  vector-effect: non-scaling-stroke;
+}
+
 .tkv-mark-nav {
   display: block;
 }
@@ -10,6 +14,39 @@
 .nav-link .tkv-mark-nav,
 .mobile-nav-link .tkv-mark-nav {
   margin: 0 auto;
+}
+
+.nav-link .tkv-mark-nav,
+.nav-tools-link .tkv-mark-nav,
+.mobile-nav-link .tkv-mark-nav {
+  width: 1.15em;
+  height: 1.15em;
+}
+
+.page-hero-mark .tkv-mark-svg,
+.community-hero-mark .tkv-mark-svg,
+.cells-hero-mark .tkv-mark-svg,
+.friends-hero-mark .tkv-mark-svg,
+.map-hero-mark .tkv-mark-svg,
+.library-hero-mark .tkv-mark-svg,
+.courses-hero-mark .tkv-mark-svg {
+  filter: drop-shadow(0 4px 14px rgba(201, 169, 98, 0.14));
+}
+
+.community-toolbar-link .tkv-mark-svg,
+.cells-sidebar-label .tkv-mark-svg,
+.friends-panel-title .tkv-mark-svg,
+.friends-guest-card .tkv-mark-svg,
+.profile-shortcut-icon .tkv-mark-svg,
+.profile-action-card .tkv-mark-svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.community-toolbar-link .tkv-mark-svg,
+.profile-shortcut-icon .tkv-mark-svg,
+.profile-action-card .tkv-mark-svg {
+  filter: drop-shadow(0 2px 8px rgba(201, 169, 98, 0.16));
 }
 
 .home-path-icon--mark {
@@ -26,4 +63,23 @@
 
 .page-header-mark .tkv-mark-svg {
   filter: drop-shadow(0 4px 12px rgba(201, 169, 98, 0.12));
+}
+
+@media (max-width: 640px) {
+  .nav-link .tkv-mark-nav,
+  .nav-tools-link .tkv-mark-nav,
+  .mobile-nav-link .tkv-mark-nav {
+    width: 1.1em;
+    height: 1.1em;
+  }
+
+  .community-toolbar-link .tkv-mark-svg,
+  .cells-sidebar-label .tkv-mark-svg,
+  .friends-panel-title .tkv-mark-svg,
+  .friends-guest-card .tkv-mark-svg,
+  .profile-shortcut-icon .tkv-mark-svg,
+  .profile-action-card .tkv-mark-svg {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
 }

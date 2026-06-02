@@ -29,6 +29,7 @@ const BookReader = () => {
   const [translating, setTranslating] = useState(false);
   const [translateError, setTranslateError] = useState(false);
   const [displayChapter, setDisplayChapter] = useState(null);
+  const [focusMode, setFocusMode] = useState(false);
   const isRtl = i18n.dir() === 'rtl';
 
   useEffect(() => {
@@ -200,13 +201,21 @@ const BookReader = () => {
 
   return (
     <div
-      className={`container book-reader book-reader--${book.theme || 'gynosko'} animate-fade-in`}
+      className={`container book-reader book-reader--${book.theme || 'gynosko'} ${focusMode ? 'book-reader--focus' : ''} animate-fade-in`}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
-      <div className="mb-4">
+      <div className="mb-4 book-reader-topbar">
         <Link to="/library" className="btn btn-outline btn-sm">
           <ArrowLeft size={16} /> {t('book_back')}
         </Link>
+        <button
+          type="button"
+          className={`btn btn-sm ${focusMode ? 'btn-primary' : 'btn-outline'}`}
+          onClick={() => setFocusMode((v) => !v)}
+        >
+          <BookOpen size={16} />
+          {focusMode ? 'Mode normal' : 'Mode focus'}
+        </button>
       </div>
 
       <header className="book-reader-hero">
@@ -247,17 +256,17 @@ const BookReader = () => {
         </nav>
 
         <div className="book-reader-main">
-          {translating && (
+          {!focusMode && translating && (
             <p className="book-reader-notice" role="status">
               {t('content_translating')}
             </p>
           )}
-          {translateError && !translating && (
+          {!focusMode && translateError && !translating && (
             <p className="book-reader-notice" role="status">
               {t('content_translate_error')}
             </p>
           )}
-          {showTranslationNotice && !translating && !translateError && (
+          {!focusMode && showTranslationNotice && !translating && !translateError && (
             <p className="book-reader-notice" role="status">
               {t('book_translation_notice')}
             </p>

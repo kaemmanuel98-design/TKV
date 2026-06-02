@@ -3,10 +3,6 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   MessageCircle,
-  Users,
-  UserPlus,
-  Map,
-  Clock,
   Heart,
   Loader2,
   Quote,
@@ -14,7 +10,12 @@ import {
   Sparkles,
   ChevronRight,
 } from 'lucide-react';
-import { CommunityLogo } from '../components/SectionLogos';
+import {
+  CommunityLogo,
+  FriendsLogo,
+  MapLogo,
+  HeritageLogo,
+} from '../components/SectionLogos';
 import ProfileAvatar from '../components/ProfileAvatar';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
@@ -24,10 +25,9 @@ import { hasReacted, markReacted, unmarkReacted } from '../lib/communityReaction
 import './Community.css';
 
 const shortcuts = [
-  { to: '/friends', icon: UserPlus, labelKey: 'friends_nav' },
-  { to: '/cells', icon: Users, labelKey: 'community_cells_cta' },
-  { to: '/map', icon: Map, labelKey: 'community_map_cta' },
-  { to: '/heritage', icon: Clock, labelKey: 'community_heritage_cta' },
+  { to: '/friends', mark: FriendsLogo, labelKey: 'friends_nav' },
+  { to: '/map', mark: MapLogo, labelKey: 'community_map_cta' },
+  { to: '/heritage', mark: HeritageLogo, labelKey: 'community_heritage_cta' },
 ];
 
 const PAGE_SIZE = 20;
@@ -61,6 +61,7 @@ async function enrichCommunityPosts(rows, t) {
     return {
       ...p,
       post_type: p.post_type || 'post',
+      moderation_status: p.moderation_status || 'approved',
       authorName: prof?.name || t('community_author_anonymous'),
       authorAvatar: prof?.avatar_url || null,
     };
@@ -105,6 +106,39 @@ const Community = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const [page, setPage] = useState(0);
+  const [commentsByPost, setCommentsByPost] = useState({});
+  const [commentDraftByPost, setCommentDraftByPost] = useState({});
+  const [commentSubmittingPostId, setCommentSubmittingPostId] = useState('');
+
+  const loadCommentsForPosts = useCallback(async (rows) => {
+    const ids = [...new Set((rows || []).map((p) => p.id).filter(Boolean))];
+    if (!ids.length) return;
+    const { data, error: commentsError } = await supabase
+      .from('community_comments')
+      .select('id, post_id, user_id, content, created_at')
+      .in('post_id', ids)
+      .order('created_at', { ascending: true });
+    if (commentsError) return;
+    const userIds = [...new Set((data || []).map((c) => c.user_id).filter(Boolean))];
+    let profilesMap = {};
+    if (userIds.length) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, name, avatar_url')
+        .in('id', userIds);
+      profilesMap = Object.fromEntries((profiles || []).map((p) => [p.id, p]));
+    }
+    const grouped = {};
+    for (const c of data || []) {
+      if (!grouped[c.post_id]) grouped[c.post_id] = [];
+      grouped[c.post_id].push({
+        ...c,
+        authorName: profilesMap[c.user_id]?.name || t('community_author_anonymous'),
+        authorAvatar: profilesMap[c.user_id]?.avatar_url || null,
+      });
+    }
+    setCommentsByPost((prev) => ({ ...prev, ...grouped }));
+  }, [t]);
 
   useEffect(() => {
     if (user?.id) fetchProfile(user.id);
@@ -131,18 +165,22 @@ const Community = () => {
     try {
       let query = supabase
         .from('community_posts')
-        .select('id, created_at, content, reactions_count, user_id, post_type')
+        .select('id, created_at, content, reactions_count, user_id, post_type, moderation_status')
         .order('created_at', { ascending: false })
         .range(0, PAGE_SIZE - 1);
 
       if (feedFilter === 'testimony') {
         query = query.eq('post_type', 'testimony');
       }
+      query = query.eq('moderation_status', 'approved');
 
       const { data: rows, error: fetchError } = await query;
 
       if (fetchError) {
-        if (fetchError.message?.includes('post_type')) {
+        if (
+          fetchError.message?.includes('post_type') ||
+          fetchError.message?.includes('moderation_status')
+        ) {
           const fallback = await supabase
             .from('community_posts')
             .select('id, created_at, content, reactions_count, user_id')
@@ -162,6 +200,7 @@ const Community = () => {
       const safeRows = rows || [];
       const enriched = await enrichCommunityPosts(safeRows, t);
       setPosts(enriched);
+      await loadCommentsForPosts(safeRows);
       setPage(1);
       setHasMore(safeRows.length === PAGE_SIZE);
       await refreshFeedCounts();
@@ -186,19 +225,21 @@ const Community = () => {
       const to = from + PAGE_SIZE - 1;
       let query = supabase
         .from('community_posts')
-        .select('id, created_at, content, reactions_count, user_id, post_type')
+        .select('id, created_at, content, reactions_count, user_id, post_type, moderation_status')
         .order('created_at', { ascending: false })
         .range(from, to);
 
       if (feedFilter === 'testimony') {
         query = query.eq('post_type', 'testimony');
       }
+      query = query.eq('moderation_status', 'approved');
 
       const { data: rows, error: fetchError } = await query;
       if (fetchError) throw fetchError;
       const safeRows = rows || [];
       const enriched = await enrichCommunityPosts(safeRows, t);
       setPosts((prev) => [...prev, ...enriched.filter((p) => !prev.some((e) => e.id === p.id))]);
+      await loadCommentsForPosts(safeRows);
       setPage((p) => p + 1);
       setHasMore(safeRows.length === PAGE_SIZE);
     } catch (err) {
@@ -216,6 +257,7 @@ const Community = () => {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'community_posts' },
         async (payload) => {
+          if ((payload.new?.moderation_status || 'approved') !== 'approved') return;
           const enriched = await enrichCommunityPosts([payload.new], t);
           const post = enriched[0];
           if (!post) return;
@@ -233,6 +275,41 @@ const Community = () => {
         (payload) => {
           setPosts((prev) => prev.filter((p) => p.id !== payload.old.id));
           refreshFeedCounts();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'community_comments' },
+        async (payload) => {
+          const row = payload.new;
+          if (!row?.post_id) return;
+          let authorName = t('community_author_anonymous');
+          let authorAvatar = null;
+          if (row.user_id) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('name, avatar_url')
+              .eq('id', row.user_id)
+              .maybeSingle();
+            authorName = profile?.name || authorName;
+            authorAvatar = profile?.avatar_url || null;
+          }
+          setCommentsByPost((prev) => ({
+            ...prev,
+            [row.post_id]: [...(prev[row.post_id] || []), { ...row, authorName, authorAvatar }],
+          }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'community_comments' },
+        (payload) => {
+          const row = payload.old;
+          if (!row?.post_id) return;
+          setCommentsByPost((prev) => ({
+            ...prev,
+            [row.post_id]: (prev[row.post_id] || []).filter((c) => c.id !== row.id),
+          }));
         }
       )
       .subscribe();
@@ -280,16 +357,17 @@ const Community = () => {
         user_id: user.id,
         content: text,
         post_type: composeType === 'testimony' ? 'testimony' : 'post',
+        moderation_status: 'pending',
       };
       const { data, error: insertError } = await supabase
         .from('community_posts')
         .insert(payload)
-        .select('id, created_at, content, reactions_count, user_id, post_type')
+        .select('id, created_at, content, reactions_count, user_id, post_type, moderation_status')
         .single();
       if (insertError) throw insertError;
 
       const enriched = await enrichCommunityPosts([data], t);
-      if (enriched[0]) {
+      if (enriched[0] && (enriched[0].moderation_status || 'approved') === 'approved') {
         setPosts((prev) => {
           if (prev.some((p) => p.id === enriched[0].id)) return prev;
           return [enriched[0], ...prev];
@@ -302,7 +380,9 @@ const Community = () => {
       awardBadge('community');
       incrementCommunityPosts();
       setSuccess(
-        composeType === 'testimony' ? t('community_testimony_published') : t('community_post_published')
+        composeType === 'testimony'
+          ? t('community_post_pending_review_testimony')
+          : t('community_post_pending_review')
       );
       refreshFeedCounts();
     } catch (err) {
@@ -385,6 +465,34 @@ const Community = () => {
     }
   };
 
+  const handleSubmitComment = async (postId) => {
+    if (!user?.id || !postId || commentSubmittingPostId) return;
+    const text = String(commentDraftByPost[postId] || '').trim();
+    if (!text) return;
+    setCommentSubmittingPostId(postId);
+    setError(null);
+    try {
+      const { data, error: insertError } = await supabase
+        .from('community_comments')
+        .insert({ post_id: postId, user_id: user.id, content: text })
+        .select('id, post_id, user_id, content, created_at')
+        .single();
+      if (insertError) throw insertError;
+      const myName = useProfileStore.getState().profile?.name || t('community_author_anonymous');
+      const myAvatar = useProfileStore.getState().profile?.avatar_url || null;
+      setCommentsByPost((prev) => ({
+        ...prev,
+        [postId]: [...(prev[postId] || []), { ...data, authorName: myName, authorAvatar: myAvatar }],
+      }));
+      setCommentDraftByPost((prev) => ({ ...prev, [postId]: '' }));
+    } catch (err) {
+      console.error(err);
+      setError(t('community_error_comment'));
+    } finally {
+      setCommentSubmittingPostId('');
+    }
+  };
+
   const filteredEmpty =
     !loading &&
     posts.length === 0 &&
@@ -408,9 +516,9 @@ const Community = () => {
 
       <div className="container community-body">
         <nav className="community-toolbar" aria-label={t('community_title')}>
-          {shortcuts.map(({ to, icon: Icon, labelKey }) => (
+          {shortcuts.map(({ to, mark: Mark, labelKey }) => (
             <Link key={to} to={to} className="community-toolbar-link">
-              <Icon size={20} strokeWidth={1.5} aria-hidden />
+              <Mark size={20} title={t(labelKey)} />
               <span>{t(labelKey)}</span>
             </Link>
           ))}
@@ -553,9 +661,6 @@ const Community = () => {
                   <button type="button" className="btn btn-primary btn-sm" onClick={() => openCompose('post')}>
                     {t('community_create_post')}
                   </button>
-                  <Link to="/cells" className="btn btn-outline btn-sm">
-                    {t('community_cells_cta')}
-                  </Link>
                 </div>
               )}
             </div>
@@ -601,16 +706,59 @@ const Community = () => {
                   </header>
                   <p className="community-post-content">{post.content}</p>
                   <footer className="community-post-footer">
-                    <button
-                      type="button"
-                      className={`community-reaction-btn ${reacted ? 'community-reaction-btn--active' : ''}`}
-                      onClick={() => handleReaction(post)}
-                      disabled={reactingId === post.id || !user}
-                      title={user ? undefined : t('community_login_to_react')}
-                    >
-                      <Heart size={16} fill={reacted ? 'currentColor' : 'none'} aria-hidden />
-                      {t('community_reactions', { count: post.reactions_count || 0 })}
-                    </button>
+                    <div className="community-post-actions">
+                      <button
+                        type="button"
+                        className={`community-reaction-btn ${reacted ? 'community-reaction-btn--active' : ''}`}
+                        onClick={() => handleReaction(post)}
+                        disabled={reactingId === post.id || !user}
+                        title={user ? undefined : t('community_login_to_react')}
+                      >
+                        <Heart size={16} fill={reacted ? 'currentColor' : 'none'} aria-hidden />
+                        {t('community_reactions', { count: post.reactions_count || 0 })}
+                      </button>
+                      <span className="community-comment-count">
+                        <MessageCircle size={14} aria-hidden />
+                        {t('community_comments_count', { count: (commentsByPost[post.id] || []).length })}
+                      </span>
+                    </div>
+                    <div className="community-comments">
+                      {(commentsByPost[post.id] || []).map((comment) => (
+                        <div key={comment.id} className="community-comment-item">
+                          <ProfileAvatar src={comment.authorAvatar} name={comment.authorName} size={28} />
+                          <div className="community-comment-body">
+                            <strong>{comment.authorName}</strong>
+                            <p>{comment.content}</p>
+                          </div>
+                        </div>
+                      ))}
+                      {user ? (
+                        <div className="community-comment-form">
+                          <input
+                            className="input"
+                            value={commentDraftByPost[post.id] || ''}
+                            onChange={(e) =>
+                              setCommentDraftByPost((prev) => ({ ...prev, [post.id]: e.target.value }))
+                            }
+                            placeholder={t('community_comment_placeholder')}
+                            maxLength={1000}
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-outline btn-sm"
+                            onClick={() => handleSubmitComment(post.id)}
+                            disabled={
+                              commentSubmittingPostId === post.id ||
+                              !String(commentDraftByPost[post.id] || '').trim()
+                            }
+                          >
+                            {t('community_comment_submit')}
+                          </button>
+                        </div>
+                      ) : (
+                        <p className="text-muted community-comment-login">{t('community_login_to_comment')}</p>
+                      )}
+                    </div>
                   </footer>
                 </article>
               );

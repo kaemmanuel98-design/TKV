@@ -20,14 +20,25 @@ import {
 } from '../hooks/useCompanionCrisisAlerts';
 import {
   assignCompanionRequest,
+  cancelCompanionAdminInvite,
+  deleteCompanionAdminPost,
+  fetchCompanionAdminAudit,
+  fetchCompanionAdminInvites,
+  fetchCompanionAdminPosts,
+  fetchCompanionAdminUsers,
   fetchCompanionChatMessages,
   fetchCompanionCrises,
   fetchCompanionMe,
   fetchCompanionQueue,
   fetchCompanionRequest,
   fetchCompanionApplications,
+  searchCompanionAdminUsersByName,
   fetchCompanionTeam,
   patchCompanionApplication,
+  patchCompanionAdminPostModeration,
+  patchCompanionAdminUserRoles,
+  patchCompanionAdminUserRolesByEmail,
+  inviteCompanionAdminUser,
   transferCompanionRequest,
   patchCompanionAvailability,
   patchCompanionRequestStatus,
@@ -56,10 +67,28 @@ export default function CompanionDashboard() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
+  const [adminNotice, setAdminNotice] = useState('');
   const [team, setTeam] = useState([]);
   const [transferTo, setTransferTo] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isModerator, setIsModerator] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [applications, setApplications] = useState([]);
+  const [adminPosts, setAdminPosts] = useState([]);
+  const [adminUsers, setAdminUsers] = useState([]);
+  const [adminAuditLogs, setAdminAuditLogs] = useState([]);
+  const [adminInvites, setAdminInvites] = useState([]);
+  const [adminUserSearch, setAdminUserSearch] = useState('');
+  const [adminAddEmail, setAdminAddEmail] = useState('');
+  const [adminAddName, setAdminAddName] = useState('');
+  const [adminNameMatches, setAdminNameMatches] = useState([]);
+  const [adminNameCountry, setAdminNameCountry] = useState('');
+  const [adminNameAvailability, setAdminNameAvailability] = useState('');
+  const [adminNameSort, setAdminNameSort] = useState('name_asc');
+  const [adminInviteRole, setAdminInviteRole] = useState('companion');
+  const [adminPostNote, setAdminPostNote] = useState('');
+  const [adminPostFilter, setAdminPostFilter] = useState('pending');
+  const [adminBusyKey, setAdminBusyKey] = useState('');
   const chatEndRef = useRef(null);
   const [notifyState, setNotifyState] = useState(
     typeof Notification !== 'undefined' ? Notification.permission : 'unsupported'
@@ -78,12 +107,34 @@ export default function CompanionDashboard() {
       ]);
       setMe(meRes.me);
       setIsAdmin(Boolean(meRes.isAdmin));
+      setIsModerator(Boolean(meRes.isModerator));
+      setIsSuperAdmin(Boolean(meRes.isSuperAdmin));
       setQueue(queueRes.queue || []);
       setCrises(crisisRes.crises || []);
-      if (meRes.isAdmin) {
-        fetchCompanionApplications(token)
-          .then((data) => setApplications(data.applications || []))
-          .catch(() => setApplications([]));
+      if (meRes.isAdmin || meRes.isModerator || meRes.isSuperAdmin) {
+        const tasks = [fetchCompanionAdminAudit(token)];
+        if (meRes.isSuperAdmin) tasks.unshift(fetchCompanionAdminPosts(token));
+        if (meRes.isAdmin) {
+          tasks.push(fetchCompanionApplications(token), fetchCompanionAdminUsers(token), fetchCompanionAdminInvites(token));
+        }
+        Promise.all(tasks)
+          .then((results) => {
+            const [first, second, appsRes, usersRes, invitesRes] = results;
+            const postsRes = meRes.isSuperAdmin ? first : null;
+            const auditRes = meRes.isSuperAdmin ? second : first;
+            setAdminPosts(postsRes?.posts || []);
+            setAdminAuditLogs(auditRes?.logs || []);
+            setApplications(appsRes?.applications || []);
+            setAdminUsers(usersRes?.users || []);
+            setAdminInvites(invitesRes?.invites || []);
+          })
+          .catch(() => {
+            setApplications([]);
+            setAdminPosts([]);
+            setAdminUsers([]);
+            setAdminAuditLogs([]);
+            setAdminInvites([]);
+          });
       }
     } catch {
       setError(t('companion_error_load'));
@@ -221,6 +272,207 @@ export default function CompanionDashboard() {
   const selected = queue.find((q) => q.id === selectedId);
   const canChat = detail?.request?.status === 'assigned' || detail?.request?.status === 'in_progress';
 
+  const refreshAdminData = useCallback(async () => {
+    if (!token || (!isAdmin && !isModerator && !isSuperAdmin)) return;
+    const tasks = [fetchCompanionAdminAudit(token)];
+    if (isSuperAdmin) tasks.unshift(fetchCompanionAdminPosts(token));
+    if (isAdmin) {
+      tasks.push(
+        fetchCompanionApplications(token),
+        fetchCompanionAdminUsers(token, 120, adminUserSearch),
+        fetchCompanionAdminInvites(token)
+      );
+    }
+    const [first, second, apps, users, invites] = await Promise.all(tasks);
+    const posts = isSuperAdmin ? first : null;
+    const audit = isSuperAdmin ? second : first;
+    setAdminPosts(posts?.posts || []);
+    setAdminAuditLogs(audit?.logs || []);
+    setApplications(apps?.applications || []);
+    setAdminUsers(users?.users || []);
+    setAdminInvites(invites?.invites || []);
+  }, [token, isAdmin, isModerator, isSuperAdmin, adminUserSearch]);
+
+  const refreshAdminUsers = useCallback(async () => {
+    if (!token || !isAdmin) return;
+    const users = await fetchCompanionAdminUsers(token, 120, adminUserSearch);
+    setAdminUsers(users.users || []);
+  }, [token, isAdmin, adminUserSearch]);
+
+  const displayedAdminPosts =
+    adminPostFilter === 'all'
+      ? adminPosts
+      : adminPosts.filter((p) => (p.moderation_status || 'approved') === adminPostFilter);
+  const pendingPostsCount = adminPosts.filter(
+    (p) => (p.moderation_status || 'approved') === 'pending'
+  ).length;
+
+  const handleAdminPostModeration = async (postId, status) => {
+    if (!token || !isSuperAdmin || !postId) return;
+    const confirmKey = status === 'approved' ? 'companion_admin_approve_post_confirm' : 'companion_admin_reject_post_confirm';
+    if (!window.confirm(t(confirmKey))) return;
+    setAdminBusyKey(`post:${postId}:${status}`);
+    try {
+      await patchCompanionAdminPostModeration(postId, status, adminPostNote, token);
+      setAdminPostNote('');
+      await refreshAdminData();
+    } catch {
+      setError(t('companion_error_action'));
+    } finally {
+      setAdminBusyKey('');
+    }
+  };
+
+  const handleAdminDeletePost = async (postId) => {
+    if (!token || !isSuperAdmin || !postId) return;
+    if (!window.confirm(t('companion_admin_delete_post_confirm'))) return;
+    setAdminBusyKey(`post:${postId}:delete`);
+    try {
+      await deleteCompanionAdminPost(postId, token);
+      await refreshAdminData();
+    } catch {
+      setError(t('companion_error_action'));
+    } finally {
+      setAdminBusyKey('');
+    }
+  };
+
+  const handleAdminToggleRole = async (userId, roleKey, nextValue) => {
+    if (!token || !isAdmin || !userId) return;
+    const payload =
+      roleKey === 'companion'
+        ? { isConfessionalCompanion: nextValue }
+        : roleKey === 'superadmin'
+          ? { isCompanionSuperAdmin: nextValue }
+        : roleKey === 'host'
+          ? { canHostVisio: nextValue }
+          : roleKey === 'moderator'
+            ? { isCompanionModerator: nextValue }
+            : roleKey === 'admin'
+              ? { isCompanionAdmin: nextValue }
+          : {};
+    if (Object.keys(payload).length === 0) return;
+    setAdminBusyKey(`user:${userId}:${roleKey}`);
+    try {
+      const res = await patchCompanionAdminUserRoles(userId, payload, token);
+      setAdminUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, ...res.user } : u)));
+      await refreshAdminData();
+    } catch (err) {
+      const key = String(err?.message || '').trim();
+      if (key === 'forbidden_admin_role') setError(t('companion_admin_super_required'));
+      else if (key === 'forbidden_super_admin_role') setError(t('companion_admin_super_required'));
+      else if (key === 'last_super_admin_forbidden') setError(t('companion_admin_last_super_forbidden'));
+      else if (key === 'self_admin_demotion_forbidden') setError(t('companion_admin_self_demotion_forbidden'));
+      else setError(t('companion_error_action'));
+    } finally {
+      setAdminBusyKey('');
+    }
+  };
+
+  const handleAdminAddByEmail = async (roleKey) => {
+    if (!token || !isAdmin || !adminAddEmail.trim()) return;
+    const payload =
+      roleKey === 'companion'
+        ? { isConfessionalCompanion: true }
+        : roleKey === 'moderator'
+          ? { isCompanionModerator: true }
+          : roleKey === 'admin'
+            ? { isCompanionAdmin: true }
+            : roleKey === 'superadmin'
+              ? { isCompanionSuperAdmin: true }
+              : {};
+    if (Object.keys(payload).length === 0) return;
+    setAdminBusyKey(`add:${roleKey}`);
+    try {
+      await patchCompanionAdminUserRolesByEmail(adminAddEmail.trim(), payload, token);
+      setAdminAddEmail('');
+      await refreshAdminData();
+    } catch (err) {
+      const key = String(err?.message || '').trim();
+      if (key === 'user_not_found') setError(t('companion_admin_user_not_found'));
+      else if (key === 'invalid_email') setError(t('companion_admin_invalid_email'));
+      else if (key === 'forbidden_admin_role' || key === 'forbidden_super_admin_role') {
+        setError(t('companion_admin_super_required'));
+      } else {
+        setError(t('companion_error_action'));
+      }
+    } finally {
+      setAdminBusyKey('');
+    }
+  };
+
+  const handleAdminInvite = async () => {
+    if (!token || !isAdmin || !adminAddEmail.trim()) return;
+    setAdminBusyKey('invite');
+    try {
+      const res = await inviteCompanionAdminUser(adminAddEmail.trim(), adminInviteRole, token);
+      setAdminAddEmail('');
+      const msg = res?.emailSkipped ? t('companion_admin_invite_skipped') : t('companion_admin_invite_sent');
+      setError(null);
+      setAdminNotice(msg);
+      await refreshAdminData();
+    } catch (err) {
+      const key = String(err?.message || '').trim();
+      if (key === 'user_already_exists') setError(t('companion_admin_user_exists'));
+      else if (key === 'invalid_email') setError(t('companion_admin_invalid_email'));
+      else if (key === 'forbidden_super_admin_role') setError(t('companion_admin_super_required'));
+      else setError(t('companion_error_action'));
+      setAdminNotice('');
+    } finally {
+      setAdminBusyKey('');
+    }
+  };
+
+  const handleSearchByName = async () => {
+    if (!token || !isAdmin || adminAddName.trim().length < 2) return;
+    setAdminBusyKey('search-name');
+    try {
+      const res = await searchCompanionAdminUsersByName(adminAddName.trim(), token, {
+        limit: 12,
+        country: adminNameCountry,
+        availability: adminNameAvailability,
+        sort: adminNameSort,
+      });
+      setAdminNameMatches(res.users || []);
+    } catch {
+      setError(t('companion_error_action'));
+    } finally {
+      setAdminBusyKey('');
+    }
+  };
+
+  const handleAddCompanionByName = async (userId) => {
+    if (!token || !isAdmin || !userId) return;
+    setAdminBusyKey(`add-by-name:${userId}`);
+    try {
+      await patchCompanionAdminUserRoles(userId, { isConfessionalCompanion: true }, token);
+      setAdminNotice(t('companion_admin_add_by_name_success'));
+      setAdminNameMatches((prev) =>
+        prev.map((u) => (u.id === userId ? { ...u, is_confessional_companion: true } : u))
+      );
+      await refreshAdminData();
+    } catch {
+      setError(t('companion_error_action'));
+    } finally {
+      setAdminBusyKey('');
+    }
+  };
+
+  const handleCancelInvite = async (inviteId) => {
+    if (!token || !isAdmin || !inviteId) return;
+    if (!window.confirm(t('companion_admin_invite_cancel_confirm'))) return;
+    setAdminBusyKey(`invite:${inviteId}`);
+    try {
+      await cancelCompanionAdminInvite(inviteId, token);
+      setAdminInvites((prev) => prev.filter((i) => i.id !== inviteId));
+      setAdminNotice(t('companion_admin_invite_cancelled'));
+    } catch {
+      setError(t('companion_error_action'));
+    } finally {
+      setAdminBusyKey('');
+    }
+  };
+
   return (
     <div className="companion-dash">
       <header className="companion-dash-header">
@@ -316,7 +568,396 @@ export default function CompanionDashboard() {
         </section>
       )}
 
+      {(isAdmin || isModerator) && (
+        <section className="card companion-admin-panel">
+          <div className="companion-admin-head">
+            <h2>{t('companion_admin_title')}</h2>
+            <button
+              type="button"
+              className="btn btn-sm btn-outline"
+              onClick={refreshAdminData}
+              disabled={Boolean(adminBusyKey)}
+            >
+              {t('companion_admin_refresh')}
+            </button>
+          </div>
+
+          <div className="companion-admin-grid">
+            {isAdmin && (
+              <section className="companion-admin-block">
+              <h3>{t('companion_admin_roles_title')}</h3>
+              <div className="companion-admin-add-row">
+                <input
+                  className="input"
+                  value={adminAddEmail}
+                  onChange={(e) => setAdminAddEmail(e.target.value)}
+                  placeholder={t('companion_admin_add_email_ph')}
+                />
+                <select
+                  className="input companion-admin-role-select"
+                  value={adminInviteRole}
+                  onChange={(e) => setAdminInviteRole(e.target.value)}
+                >
+                  <option value="companion">{t('companion_admin_add_companion')}</option>
+                  <option value="moderator">{t('companion_admin_add_moderator')}</option>
+                  <option value="admin">{t('companion_admin_add_admin')}</option>
+                  {isSuperAdmin && (
+                    <option value="superadmin">{t('companion_admin_add_super_admin')}</option>
+                  )}
+                </select>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline"
+                  onClick={() => handleAdminAddByEmail('companion')}
+                  disabled={!adminAddEmail.trim() || Boolean(adminBusyKey)}
+                >
+                  {t('companion_admin_add_companion')}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline"
+                  onClick={() => handleAdminAddByEmail('moderator')}
+                  disabled={!adminAddEmail.trim() || Boolean(adminBusyKey)}
+                >
+                  {t('companion_admin_add_moderator')}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline"
+                  onClick={() => handleAdminAddByEmail('admin')}
+                  disabled={!adminAddEmail.trim() || !isSuperAdmin || Boolean(adminBusyKey)}
+                >
+                  {t('companion_admin_add_admin')}
+                </button>
+                {isSuperAdmin && (
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-outline"
+                    onClick={() => handleAdminAddByEmail('superadmin')}
+                    disabled={!adminAddEmail.trim() || Boolean(adminBusyKey)}
+                  >
+                    {t('companion_admin_add_super_admin')}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="btn btn-sm btn-primary"
+                  onClick={handleAdminInvite}
+                  disabled={
+                    !adminAddEmail.trim() ||
+                    Boolean(adminBusyKey) ||
+                    ((adminInviteRole === 'admin' || adminInviteRole === 'superadmin') && !isSuperAdmin)
+                  }
+                >
+                  {t('companion_admin_invite_cta')}
+                </button>
+              </div>
+              <div className="companion-admin-add-row">
+                <input
+                  className="input"
+                  value={adminAddName}
+                  onChange={(e) => setAdminAddName(e.target.value)}
+                  placeholder={t('companion_admin_add_name_ph')}
+                />
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline"
+                  onClick={handleSearchByName}
+                  disabled={adminAddName.trim().length < 2 || Boolean(adminBusyKey)}
+                >
+                  {t('companion_admin_search_by_name')}
+                </button>
+              </div>
+              <div className="companion-admin-add-row">
+                <input
+                  className="input"
+                  value={adminNameCountry}
+                  onChange={(e) => setAdminNameCountry(e.target.value)}
+                  placeholder={t('companion_admin_filter_country_ph')}
+                />
+                <select
+                  className="input companion-admin-role-select"
+                  value={adminNameAvailability}
+                  onChange={(e) => setAdminNameAvailability(e.target.value)}
+                >
+                  <option value="">{t('companion_admin_filter_availability_all')}</option>
+                  <option value="online">{t('companion_avail_online')}</option>
+                  <option value="busy">{t('companion_avail_busy')}</option>
+                  <option value="offline">{t('companion_avail_offline')}</option>
+                </select>
+                <select
+                  className="input companion-admin-role-select"
+                  value={adminNameSort}
+                  onChange={(e) => setAdminNameSort(e.target.value)}
+                >
+                  <option value="name_asc">{t('companion_admin_sort_name')}</option>
+                  <option value="availability">{t('companion_admin_sort_availability')}</option>
+                  <option value="recent">{t('companion_admin_sort_recent')}</option>
+                </select>
+              </div>
+              {adminNameMatches.length > 0 && (
+                <ul className="companion-admin-name-match-list">
+                  {adminNameMatches.map((u) => (
+                    <li key={u.id} className="companion-admin-name-match-item">
+                      <div>
+                        <strong>{u.name || u.email || u.id}</strong>
+                        <span className="text-muted companion-admin-post-meta">{u.email || u.id}</span>
+                      </div>
+                      <button
+                        type="button"
+                        className={`btn btn-sm ${u.is_confessional_companion ? 'btn-primary' : 'btn-outline'}`}
+                        onClick={() => handleAddCompanionByName(u.id)}
+                        disabled={u.is_confessional_companion || adminBusyKey === `add-by-name:${u.id}`}
+                      >
+                        {u.is_confessional_companion
+                          ? t('companion_admin_already_companion')
+                          : t('companion_admin_add_companion')}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <div className="companion-admin-search">
+                <input
+                  className="input"
+                  value={adminUserSearch}
+                  onChange={(e) => setAdminUserSearch(e.target.value)}
+                  placeholder={t('companion_admin_search_users_ph')}
+                />
+                <button type="button" className="btn btn-sm btn-outline" onClick={refreshAdminUsers}>
+                  {t('companion_admin_search')}
+                </button>
+              </div>
+              {adminUsers.length === 0 ? (
+                <p className="text-muted">{t('companion_admin_empty_users')}</p>
+              ) : (
+                <ul className="companion-admin-user-list">
+                  {adminUsers.map((u) => (
+                    <li key={u.id} className="companion-admin-user-item">
+                      <div className="companion-admin-user-meta">
+                        <strong>{u.name || u.email || u.id}</strong>
+                        <span className="text-muted">{u.email || u.id}</span>
+                      </div>
+                      <div className="companion-admin-user-actions">
+                        {isSuperAdmin && (
+                          <button
+                            type="button"
+                            className={`btn btn-sm ${u.is_companion_super_admin ? 'btn-primary' : 'btn-outline'}`}
+                            onClick={() =>
+                              handleAdminToggleRole(u.id, 'superadmin', !u.is_companion_super_admin)
+                            }
+                            disabled={adminBusyKey === `user:${u.id}:superadmin`}
+                          >
+                            {u.is_companion_super_admin
+                              ? t('companion_admin_role_super_admin_on')
+                              : t('companion_admin_role_super_admin_off')}
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className={`btn btn-sm ${u.is_companion_admin ? 'btn-primary' : 'btn-outline'}`}
+                          onClick={() => handleAdminToggleRole(u.id, 'admin', !u.is_companion_admin)}
+                          disabled={
+                            adminBusyKey === `user:${u.id}:admin` ||
+                            !isSuperAdmin ||
+                            (u.id === me?.id && u.is_companion_admin)
+                          }
+                          title={
+                            !isSuperAdmin
+                              ? t('companion_admin_super_required')
+                              : u.id === me?.id && u.is_companion_admin
+                                ? t('companion_admin_self_demotion_forbidden')
+                                : undefined
+                          }
+                        >
+                          {u.is_companion_admin
+                            ? t('companion_admin_role_admin_on')
+                            : t('companion_admin_role_admin_off')}
+                        </button>
+                        <button
+                          type="button"
+                          className={`btn btn-sm ${u.is_companion_moderator ? 'btn-primary' : 'btn-outline'}`}
+                          onClick={() =>
+                            handleAdminToggleRole(u.id, 'moderator', !u.is_companion_moderator)
+                          }
+                          disabled={adminBusyKey === `user:${u.id}:moderator`}
+                        >
+                          {u.is_companion_moderator
+                            ? t('companion_admin_role_moderator_on')
+                            : t('companion_admin_role_moderator_off')}
+                        </button>
+                        <button
+                          type="button"
+                          className={`btn btn-sm ${u.is_confessional_companion ? 'btn-primary' : 'btn-outline'}`}
+                          onClick={() =>
+                            handleAdminToggleRole(u.id, 'companion', !u.is_confessional_companion)
+                          }
+                          disabled={adminBusyKey === `user:${u.id}:companion`}
+                        >
+                          {u.is_confessional_companion
+                            ? t('companion_admin_role_companion_on')
+                            : t('companion_admin_role_companion_off')}
+                        </button>
+                        <button
+                          type="button"
+                          className={`btn btn-sm ${u.can_host_visio ? 'btn-primary' : 'btn-outline'}`}
+                          onClick={() => handleAdminToggleRole(u.id, 'host', !u.can_host_visio)}
+                          disabled={adminBusyKey === `user:${u.id}:host`}
+                        >
+                          {u.can_host_visio
+                            ? t('companion_admin_role_host_on')
+                            : t('companion_admin_role_host_off')}
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              </section>
+            )}
+
+            {isAdmin && (
+              <section className="companion-admin-block">
+                <h3>{t('companion_admin_invites_title')}</h3>
+                {adminInvites.length === 0 ? (
+                  <p className="text-muted">{t('companion_admin_invites_empty')}</p>
+                ) : (
+                  <ul className="companion-admin-invite-list">
+                    {adminInvites.map((invite) => (
+                      <li key={invite.id} className="companion-admin-invite-item">
+                        <div>
+                          <strong>{invite.invitee_email}</strong>
+                          <span className="text-muted companion-admin-post-meta">
+                            {invite.invited_role} · {new Date(invite.created_at).toLocaleString()}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline"
+                          onClick={() => handleCancelInvite(invite.id)}
+                          disabled={adminBusyKey === `invite:${invite.id}`}
+                        >
+                          {t('companion_admin_invite_cancel')}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )}
+
+            {isSuperAdmin && (
+            <section className="companion-admin-block">
+              <h3>{t('companion_admin_posts_title')}</h3>
+              <div className="companion-admin-post-filters">
+                <button
+                  type="button"
+                  className={`btn btn-sm ${adminPostFilter === 'pending' ? 'btn-primary' : 'btn-outline'}`}
+                  onClick={() => setAdminPostFilter('pending')}
+                >
+                  {t('companion_admin_filter_pending')} ({pendingPostsCount})
+                </button>
+                <button
+                  type="button"
+                  className={`btn btn-sm ${adminPostFilter === 'approved' ? 'btn-primary' : 'btn-outline'}`}
+                  onClick={() => setAdminPostFilter('approved')}
+                >
+                  {t('companion_admin_filter_approved')}
+                </button>
+                <button
+                  type="button"
+                  className={`btn btn-sm ${adminPostFilter === 'rejected' ? 'btn-primary' : 'btn-outline'}`}
+                  onClick={() => setAdminPostFilter('rejected')}
+                >
+                  {t('companion_admin_filter_rejected')}
+                </button>
+                <button
+                  type="button"
+                  className={`btn btn-sm ${adminPostFilter === 'all' ? 'btn-primary' : 'btn-outline'}`}
+                  onClick={() => setAdminPostFilter('all')}
+                >
+                  {t('companion_admin_filter_all')}
+                </button>
+              </div>
+              <textarea
+                className="input companion-admin-note"
+                rows={2}
+                value={adminPostNote}
+                onChange={(e) => setAdminPostNote(e.target.value)}
+                placeholder={t('companion_admin_post_note_ph')}
+              />
+              {displayedAdminPosts.length === 0 ? (
+                <p className="text-muted">{t('companion_admin_empty_posts')}</p>
+              ) : (
+                <ul className="companion-admin-post-list">
+                  {displayedAdminPosts.map((post) => (
+                    <li key={post.id} className="companion-admin-post-item">
+                      <div>
+                        <strong>{post.author_name || post.author_email || '—'}</strong>
+                        <span className="text-muted companion-admin-post-meta">
+                          {new Date(post.created_at).toLocaleString()} · {post.moderation_status || 'approved'}
+                        </span>
+                        <p className="companion-admin-post-content">{post.content}</p>
+                      </div>
+                      <div className="companion-admin-post-actions">
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-primary"
+                          onClick={() => handleAdminPostModeration(post.id, 'approved')}
+                          disabled={adminBusyKey === `post:${post.id}:approved`}
+                        >
+                          {t('companion_admin_approve_post')}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleAdminPostModeration(post.id, 'rejected')}
+                          disabled={adminBusyKey === `post:${post.id}:rejected`}
+                        >
+                          {t('companion_admin_reject_post')}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleAdminDeletePost(post.id)}
+                          disabled={adminBusyKey === `post:${post.id}:delete`}
+                        >
+                          {t('companion_admin_delete_post')}
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+            )}
+
+            <section className="companion-admin-block">
+              <h3>{t('companion_admin_audit_title')}</h3>
+              {adminAuditLogs.length === 0 ? (
+                <p className="text-muted">{t('companion_admin_empty_audit')}</p>
+              ) : (
+                <ul className="companion-admin-audit-list">
+                  {adminAuditLogs.map((log) => (
+                    <li key={log.id} className="companion-admin-audit-item">
+                      <strong>{log.action_type}</strong>
+                      <span className="text-muted">
+                        {log.admin_email || log.admin_user_id || '—'} · {new Date(log.created_at).toLocaleString()}
+                      </span>
+                      <p className="companion-admin-audit-target">
+                        {log.target_type} · {log.target_id}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
+        </section>
+      )}
+
       {error && <p className="confessional-error">{error}</p>}
+      {adminNotice && <p className="community-notice community-notice--ok">{adminNotice}</p>}
 
       <section className="companion-resources card">
         <h2>

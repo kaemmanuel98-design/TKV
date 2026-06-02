@@ -310,7 +310,9 @@ export async function getCompanionMe(companionId) {
   const admin = getSupabaseAdmin();
   const { data } = await admin
     .from('profiles')
-    .select('id, name, companion_availability, is_confessional_companion')
+    .select(
+      'id, name, companion_availability, is_confessional_companion, is_companion_moderator, is_companion_admin'
+    )
     .eq('id', companionId)
     .maybeSingle();
   return data;

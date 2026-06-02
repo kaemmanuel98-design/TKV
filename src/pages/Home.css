@@ -178,10 +178,10 @@
   color: var(--gold-bright);
 }
 
-/* —— 4 tuiles principales —— */
+/* —— tuiles principales —— */
 .home-tiles {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
 }
@@ -231,69 +231,6 @@
 }
 
 /* —— Explorer plus —— */
-.home-more {
-  margin-bottom: 0.75rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-surface);
-  overflow: hidden;
-}
-
-.home-more summary {
-  padding: 0.7rem 0.9rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  cursor: pointer;
-  list-style: none;
-  user-select: none;
-}
-
-.home-more summary::-webkit-details-marker {
-  display: none;
-}
-
-.home-more summary::after {
-  content: '+';
-  float: right;
-  color: var(--gold);
-  font-weight: 400;
-}
-
-.home-more[open] summary::after {
-  content: '−';
-}
-
-.home-more-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  padding: 0 0.75rem 0.75rem;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.home-more-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.6rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-elevated);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition:
-    border-color var(--duration-fast),
-    color var(--duration-fast);
-}
-
-.home-more-link:hover {
-  border-color: var(--border-gold-hover);
-  color: var(--gold-bright);
-}
-
 /* —— Verset repliable —— */
 .home-verse-fold {
   margin-bottom: 1rem;
@@ -303,7 +240,7 @@
   overflow: hidden;
 }
 
-.home-verse-fold summary {
+.home-verse-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -314,15 +251,9 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-tertiary);
-  cursor: pointer;
-  list-style: none;
 }
 
-.home-verse-fold summary::-webkit-details-marker {
-  display: none;
-}
-
-.home-verse-fold summary cite {
+.home-verse-head cite {
   font-size: 0.72rem;
   font-style: normal;
   font-weight: 500;
@@ -343,24 +274,6 @@
 
 .home-verse-fold .btn {
   margin: 0.65rem 0.75rem 0.75rem;
-}
-
-/* —— Pied —— */
-.home-foot {
-  text-align: center;
-}
-
-.home-foot-about {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.78rem;
-  color: var(--text-tertiary);
-  text-decoration: none;
-}
-
-.home-foot-about:hover {
-  color: var(--gold-bright);
 }
 
 @media (min-width: 480px) {

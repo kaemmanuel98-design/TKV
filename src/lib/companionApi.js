@@ -160,3 +160,104 @@ export async function patchCompanionApplication(id, status, accessToken) {
   });
   return parseApiResponse(res);
 }
+
+export async function fetchCompanionAdminPosts(accessToken, limit = 80) {
+  const res = await fetch(`${API_BASE}/api/companion/admin/posts?limit=${encodeURIComponent(String(limit))}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return parseApiResponse(res);
+}
+
+export async function patchCompanionAdminPostModeration(postId, status, note, accessToken) {
+  const res = await fetch(`${API_BASE}/api/companion/admin/posts/${postId}/moderate`, {
+    method: 'PATCH',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ status, note }),
+  });
+  return parseApiResponse(res);
+}
+
+export async function deleteCompanionAdminPost(postId, accessToken) {
+  const res = await fetch(`${API_BASE}/api/companion/admin/posts/${postId}`, {
+    method: 'DELETE',
+    headers: authHeaders(accessToken),
+  });
+  return parseApiResponse(res);
+}
+
+export async function fetchCompanionAdminUsers(accessToken, limit = 120, q = '') {
+  const search = q ? `&q=${encodeURIComponent(String(q))}` : '';
+  const res = await fetch(
+    `${API_BASE}/api/companion/admin/users?limit=${encodeURIComponent(String(limit))}${search}`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }
+  );
+  return parseApiResponse(res);
+}
+
+export async function fetchCompanionAdminAudit(accessToken, limit = 120) {
+  const res = await fetch(`${API_BASE}/api/companion/admin/audit?limit=${encodeURIComponent(String(limit))}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return parseApiResponse(res);
+}
+
+export async function patchCompanionAdminUserRoles(userId, payload, accessToken) {
+  const res = await fetch(`${API_BASE}/api/companion/admin/users/${userId}`, {
+    method: 'PATCH',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify(payload),
+  });
+  return parseApiResponse(res);
+}
+
+export async function patchCompanionAdminUserRolesByEmail(email, payload, accessToken) {
+  const res = await fetch(`${API_BASE}/api/companion/admin/users/by-email`, {
+    method: 'PATCH',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ email, ...payload }),
+  });
+  return parseApiResponse(res);
+}
+
+export async function inviteCompanionAdminUser(email, role, accessToken) {
+  const res = await fetch(`${API_BASE}/api/companion/admin/invite`, {
+    method: 'POST',
+    headers: authHeaders(accessToken),
+    body: JSON.stringify({ email, role }),
+  });
+  return parseApiResponse(res);
+}
+
+export async function fetchCompanionAdminInvites(accessToken, limit = 120) {
+  const res = await fetch(`${API_BASE}/api/companion/admin/invites?limit=${encodeURIComponent(String(limit))}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return parseApiResponse(res);
+}
+
+export async function cancelCompanionAdminInvite(inviteId, accessToken) {
+  const res = await fetch(`${API_BASE}/api/companion/admin/invites/${inviteId}/cancel`, {
+    method: 'PATCH',
+    headers: authHeaders(accessToken),
+  });
+  return parseApiResponse(res);
+}
+
+export async function searchCompanionAdminUsersByName(query, accessToken, options = {}) {
+  const q = encodeURIComponent(String(query || ''));
+  const l = encodeURIComponent(String(options.limit || 12));
+  const country = options.country ? `&country=${encodeURIComponent(String(options.country))}` : '';
+  const availability = options.availability
+    ? `&availability=${encodeURIComponent(String(options.availability))}`
+    : '';
+  const sort = options.sort ? `&sort=${encodeURIComponent(String(options.sort))}` : '';
+  const res = await fetch(
+    `${API_BASE}/api/companion/admin/users/search-by-name?q=${q}&limit=${l}${country}${availability}${sort}`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }
+  );
+  return parseApiResponse(res);
+}

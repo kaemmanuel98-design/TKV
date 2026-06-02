@@ -1,17 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Volume2,
-  ChevronRight,
-  Compass,
-  GraduationCap,
-  Headphones,
-  DoorClosed,
-  Flame,
-  BookOpen,
-  Users,
-} from 'lucide-react';
+import { Volume2, ChevronRight, Flame, BookOpen } from 'lucide-react';
 import { getVerseOfDay } from '../data/dailyVerses';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCourseProgressStore } from '../store/useCourseProgressStore';
@@ -19,29 +9,19 @@ import { useGamificationStore } from '../store/useGamificationStore';
 import { getNextIncompleteModule } from '../lib/courseStats';
 import { useSpeak } from '../hooks/useSpeak';
 import MimshackLogo from '../components/MimshackLogo';
-import { LibraryLogo, CommunityLogo, BibleLogo, HeritageLogo } from '../components/SectionLogos';
+import { LibraryLogo, BibleLogo, CoursesLogo } from '../components/SectionLogos';
 import './Home.css';
 
 const HOME_MARKS = {
   library: LibraryLogo,
-  community: CommunityLogo,
   bible: BibleLogo,
-  heritage: HeritageLogo,
+  courses: CoursesLogo,
 };
 
 const primaryTiles = [
   { to: '/library', mark: 'library', titleKey: 'home_path_library_title' },
   { to: '/bible', mark: 'bible', titleKey: 'bible' },
-  { to: '/courses', icon: GraduationCap, titleKey: 'home_path_courses_title' },
-  { to: '/community', mark: 'community', titleKey: 'home_path_community_title' },
-];
-
-const moreLinks = [
-  { to: '/agent', mimshack: true, titleKey: 'home_path_mimshack_title' },
-  { to: '/heritage', mark: 'heritage', titleKey: 'heritage' },
-  { to: '/confessional', icon: DoorClosed, titleKey: 'home_path_confessional_title' },
-  { to: '/podcasts', icon: Headphones, titleKey: 'home_path_podcasts_title' },
-  { to: '/cells', icon: Users, titleKey: 'community_cells_cta' },
+  { to: '/courses', mark: 'courses', titleKey: 'home_path_courses_title' },
 ];
 
 const Home = () => {
@@ -69,22 +49,6 @@ const Home = () => {
           )}
         </span>
         <span className="home-tile-label">{t(titleKey)}</span>
-      </Link>
-    );
-  };
-
-  const renderMoreLink = ({ to, icon: Icon, titleKey, mimshack, mark }) => {
-    const Mark = mark ? HOME_MARKS[mark] : null;
-    return (
-      <Link key={to} to={to} className="home-more-link">
-        {mimshack ? (
-          <MimshackLogo size={18} title="Mim" />
-        ) : Mark ? (
-          <Mark size={18} title={t(titleKey)} />
-        ) : (
-          <Icon size={16} strokeWidth={1.5} aria-hidden />
-        )}
-        <span>{t(titleKey)}</span>
       </Link>
     );
   };
@@ -152,29 +116,17 @@ const Home = () => {
           {primaryTiles.map(renderTile)}
         </nav>
 
-        <details className="home-more">
-          <summary>{t('home_explore_more')}</summary>
-          <div className="home-more-grid">{moreLinks.map(renderMoreLink)}</div>
-        </details>
-
-        <details className="home-verse-fold">
-          <summary>
+        <section className="home-verse-fold" aria-label={t('dashboard_verse_label')}>
+          <div className="home-verse-head">
             <span>{t('dashboard_verse_label')}</span>
             <cite>{verse.ref}</cite>
-          </summary>
+          </div>
           <blockquote>&ldquo;{verse.text}&rdquo;</blockquote>
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => speak(verse.text)}>
             <Volume2 size={16} aria-hidden />
             {t('listen')}
           </button>
-        </details>
-
-        <footer className="home-foot">
-          <Link to="/about" className="home-foot-about">
-            <Compass size={15} aria-hidden />
-            {t('home_about_cta')}
-          </Link>
-        </footer>
+        </section>
       </div>
     </div>
   );

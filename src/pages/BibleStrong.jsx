@@ -35,7 +35,11 @@ const BibleStrong = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [lexiconLoading, setLexiconLoading] = useState(false);
   const [lexiconFetchFailed, setLexiconFetchFailed] = useState(false);
+  const [lexiconLargeText, setLexiconLargeText] = useState(false);
+  const [lexiconPrewarming, setLexiconPrewarming] = useState(false);
+  const [lexiconPrewarmProgress, setLexiconPrewarmProgress] = useState({ done: 0, total: 0 });
   const lexiconPanelRef = useRef(null);
+  const prewarmKeyRef = useRef('');
 
   useEffect(() => {
     preloadLexicon().then(() => setLexiconFetchFailed(isLexiconLoadFailed()));
@@ -67,11 +71,75 @@ const BibleStrong = () => {
 
   useEffect(() => {
     loadChapter();
+  }, [loadChapter]);
+
+  useEffect(() => {
     clearLexicon();
-  }, [loadChapter, clearLexicon]);
+  }, [bookId, currentChapter, clearLexicon]);
 
   const verses = chapterData?.verses || [];
   const { speak, stop } = useSpeak();
+
+  useEffect(() => {
+    if (!verses.length) return;
+
+    const prewarmKey = `${bookId}:${currentChapter}:${lang}`;
+    if (prewarmKeyRef.current === prewarmKey) return;
+    prewarmKeyRef.current = prewarmKey;
+
+    const strongSet = new Set();
+    for (const verse of verses) {
+      for (const seg of verse.segments || []) {
+        if (!seg?.s || !seg?.t) continue;
+        const resolvedId = resolveStrongForSurface(seg.t.trim(), lang, seg.s);
+        if (resolvedId) strongSet.add(resolvedId);
+      }
+    }
+
+    const strongIds = Array.from(strongSet);
+    if (!strongIds.length) return;
+
+    let cancelled = false;
+    const connection = typeof navigator !== 'undefined' ? navigator.connection : null;
+    const saveData = Boolean(connection?.saveData);
+    const effectiveType = String(connection?.effectiveType || '').toLowerCase();
+    const avoidPrewarm = saveData || effectiveType === 'slow-2g' || effectiveType === '2g';
+    if (avoidPrewarm) {
+      setLexiconPrewarming(false);
+      setLexiconPrewarmProgress({ done: 0, total: 0 });
+      return;
+    }
+
+    const prewarm = async () => {
+      setLexiconPrewarming(true);
+      setLexiconPrewarmProgress({ done: 0, total: strongIds.length });
+      const chunkSize = 12;
+      try {
+        for (let i = 0; i < strongIds.length; i += chunkSize) {
+          if (cancelled) return;
+          const chunk = strongIds.slice(i, i + chunkSize);
+          await Promise.allSettled(chunk.map((id) => getLocalizedLexiconEntryAsync(id, lang)));
+          if (!cancelled) {
+            const done = Math.min(i + chunk.length, strongIds.length);
+            setLexiconPrewarmProgress({ done, total: strongIds.length });
+          }
+        }
+      } finally {
+        if (!cancelled) {
+          setLexiconPrewarming(false);
+          setLexiconPrewarmProgress({ done: 0, total: 0 });
+        }
+      }
+    };
+
+    prewarm();
+
+    return () => {
+      cancelled = true;
+      setLexiconPrewarming(false);
+      setLexiconPrewarmProgress({ done: 0, total: 0 });
+    };
+  }, [bookId, currentChapter, lang, verses]);
 
   const readWholeChapter = async () => {
     if (isSpeaking) {
@@ -134,6 +202,38 @@ const BibleStrong = () => {
       setLexiconLoading(false);
     }
   };
+
+  useEffect(() => {
+    const current = lexiconSelection;
+    if (!current?.strongId || current.loading) return;
+
+    let cancelled = false;
+    setLexiconLoading(true);
+    setLexiconSelection({ ...current, loading: true });
+
+    getLocalizedLexiconEntryAsync(current.strongId, lang)
+      .then((entry) => {
+        if (cancelled) return;
+        setLexiconSelection({ ...entry, surface: current.surface, loading: false });
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setLexiconSelection({
+          strongId: current.strongId,
+          surface: current.surface,
+          loading: false,
+          missing: true,
+          gloss: '',
+        });
+      })
+      .finally(() => {
+        if (!cancelled) setLexiconLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [lang, lexiconSelection?.strongId]);
 
   const lexicon = lexiconSelection;
   const lexiconMeaning =
@@ -252,6 +352,18 @@ const BibleStrong = () => {
             </div>
           </div>
 
+          {lexiconPrewarming && (
+            <p className="lexicon-prewarm-hint text-muted" aria-live="polite">
+              <Loader2 size={14} className="spin" />
+              {t('bible_lexicon_prewarming')}
+              {lexiconPrewarmProgress.total > 0 ? (
+                <span className="lexicon-prewarm-count">
+                  {lexiconPrewarmProgress.done}/{lexiconPrewarmProgress.total}
+                </span>
+              ) : null}
+            </p>
+          )}
+
           {buildMissing && !loading && (
             <div className="card bible-unavailable">
               <p>{t('bible_build_missing')}</p>
@@ -307,22 +419,31 @@ const BibleStrong = () => {
         {lexicon && (
           <aside
             ref={lexiconPanelRef}
-            className="card lexicon-panel lexicon-panel--open animate-fade-in"
+            className={`card lexicon-panel lexicon-panel--open animate-fade-in ${
+              lexiconLargeText ? 'lexicon-panel--large' : ''
+            }`}
             aria-live="polite"
           >
-            <div className="flex justify-between items-center mb-4">
-              <h3 style={{ margin: 0, color: 'var(--gold-bright)', fontFamily: 'var(--font-display)' }}>
-                {t('bible_lexicon_title')}
-              </h3>
-              <button
-                type="button"
-                onClick={clearLexicon}
-                className="modal-close"
-                style={{ position: 'static' }}
-                aria-label={t('payment_close_aria')}
-              >
-                &times;
-              </button>
+            <div className="lexicon-head">
+              <h3 className="lexicon-title">{t('bible_lexicon_title')}</h3>
+              <div className="lexicon-head-actions">
+                <button
+                  type="button"
+                  className={`btn btn-sm ${lexiconLargeText ? 'btn-primary' : 'btn-outline'} lexicon-large-toggle`}
+                  onClick={() => setLexiconLargeText((v) => !v)}
+                  aria-pressed={lexiconLargeText}
+                >
+                  A+
+                </button>
+                <button
+                  type="button"
+                  onClick={clearLexicon}
+                  className="modal-close lexicon-close-btn"
+                  aria-label={t('payment_close_aria')}
+                >
+                  &times;
+                </button>
+              </div>
             </div>
             <div className="lexicon-body">
               <p className="lexicon-lang-badge">
@@ -330,8 +451,9 @@ const BibleStrong = () => {
               </p>
 
               <p className="lexicon-surface-line">
-                <strong>{t('bible_lexicon_word')}:</strong> {lexicon.surface}
-                <span className="text-muted"> · {lexicon.strongId}</span>
+                <strong>{t('bible_lexicon_word')}:</strong>{' '}
+                <span className="lexicon-surface-word">{lexicon.surface}</span>
+                <span className="text-muted lexicon-strong-id"> · {lexicon.strongId}</span>
               </p>
 
               {(lexicon.loading || lexiconLoading) && (
@@ -384,21 +506,21 @@ const BibleStrong = () => {
                 lexicon.definitionOriginal !== lexiconMeaning && (
                 <div className="lexicon-block">
                   <strong>{t('bible_lexicon_strong_reference')}:</strong>
-                  <p className="text-muted">{lexicon.definitionOriginal}</p>
+                  <p className="text-muted lexicon-block-text">{lexicon.definitionOriginal}</p>
                 </div>
               )}
 
               {lexicon.derivation && (
                 <div className="lexicon-block">
                   <strong>{t('bible_lexicon_derivation')}:</strong>
-                  <p className="text-muted lexicon-derivation">{lexicon.derivation}</p>
+                  <p className="text-muted lexicon-block-text lexicon-derivation">{lexicon.derivation}</p>
                 </div>
               )}
 
               {lexicon.kjvDef && (
                 <div className="lexicon-block">
                   <strong>{t('bible_lexicon_kjv')}:</strong>
-                  <p className="text-muted">{lexicon.kjvDef}</p>
+                  <p className="text-muted lexicon-block-text">{lexicon.kjvDef}</p>
                 </div>
               )}
 

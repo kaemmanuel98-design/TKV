@@ -299,3 +299,215 @@
   color: #fff;
   border: none;
 }
+
+.companion-admin-panel {
+  margin-bottom: 1rem;
+}
+
+.companion-admin-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.companion-admin-head h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.companion-admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+.companion-admin-block {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.75rem;
+}
+
+.companion-admin-block h3 {
+  margin: 0 0 0.65rem;
+  font-size: 0.9rem;
+}
+
+.companion-admin-search {
+  display: flex;
+  gap: 0.45rem;
+  margin-bottom: 0.65rem;
+}
+
+.companion-admin-search .input {
+  flex: 1;
+}
+
+.companion-admin-add-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.6rem;
+}
+
+.companion-admin-add-row .input {
+  flex: 1;
+  min-width: 220px;
+}
+
+.companion-admin-role-select {
+  max-width: 230px;
+  min-width: 180px;
+}
+
+.companion-admin-note {
+  width: 100%;
+  margin-bottom: 0.6rem;
+}
+
+.companion-admin-post-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.6rem;
+}
+
+.companion-admin-user-list,
+.companion-admin-post-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  max-height: 360px;
+  overflow: auto;
+}
+
+.companion-admin-user-item,
+.companion-admin-post-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.55rem 0.6rem;
+}
+
+.companion-admin-user-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.companion-admin-user-meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.companion-admin-user-meta span {
+  font-size: 0.76rem;
+  overflow-wrap: anywhere;
+}
+
+.companion-admin-user-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.companion-admin-post-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+  align-items: flex-start;
+}
+
+.companion-admin-post-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.companion-admin-post-content {
+  margin: 0.35rem 0 0;
+  font-size: 0.86rem;
+  white-space: pre-wrap;
+}
+
+.companion-admin-post-meta {
+  display: block;
+  font-size: 0.74rem;
+  margin-top: 0.15rem;
+}
+
+.companion-admin-audit-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.companion-admin-audit-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.companion-admin-audit-target {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.companion-admin-invite-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.companion-admin-invite-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.55rem 0.6rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.companion-admin-name-match-list {
+  list-style: none;
+  margin: 0 0 0.6rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.companion-admin-name-match-item {
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.5rem 0.6rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+@media (max-width: 860px) {
+  .companion-admin-grid {
+    grid-template-columns: 1fr;
+  }
+}

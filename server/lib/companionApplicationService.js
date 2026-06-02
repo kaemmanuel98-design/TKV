@@ -2,9 +2,18 @@ import { config } from '../config.js';
 import { getSupabaseAdmin } from './supabaseAdmin.js';
 import { sendTransactionalEmail } from './sendEmail.js';
 
-export function isCompanionAdmin(user) {
+export function isCompanionModerator(user, profile) {
+  return Boolean(profile?.is_companion_moderator || isCompanionAdmin(user, profile));
+}
+
+export function isCompanionSuperAdmin(user, profile) {
+  if (profile?.is_companion_super_admin === true) return true;
   const email = (user?.email || '').toLowerCase();
   return Boolean(email && config.companionEmails.includes(email));
+}
+
+export function isCompanionAdmin(user, profile) {
+  return Boolean(profile?.is_companion_admin === true || isCompanionSuperAdmin(user, profile));
 }
 
 export async function getOwnCompanionApplication(userId) {

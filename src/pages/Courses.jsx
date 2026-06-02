@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { GraduationCap, Lock, CheckCircle, ChevronRight } from 'lucide-react';
+import { Lock, CheckCircle, ChevronRight } from 'lucide-react';
 import { useProfileStore } from '../store/useProfileStore';
 import { useCourseProgressStore } from '../store/useCourseProgressStore';
 import { getNextIncompleteModuleInCourse } from '../lib/courseStats';
 import { COURSE_MODULES } from '../data/courseModules';
+import { CoursesLogo } from '../components/SectionLogos';
 import './Courses.css';
 
 const courses = [
@@ -41,7 +42,7 @@ const Courses = () => {
         <div className="courses-hero-glow" aria-hidden />
         <div className="courses-hero-inner container">
           <div className="courses-hero-mark" aria-hidden>
-            <GraduationCap size={28} strokeWidth={1.5} />
+            <CoursesLogo size={44} title={t('course_page_title')} />
           </div>
           <div className="courses-hero-copy">
             <p className="courses-hero-eyebrow">{t('course_eyebrow')}</p>
@@ -67,7 +68,7 @@ const Courses = () => {
             return (
               <article key={id} className={`courses-card ${locked ? 'is-locked' : ''}`}>
                 <div className="courses-card-icon" aria-hidden>
-                  {locked ? <Lock size={20} /> : <GraduationCap size={20} strokeWidth={1.5} />}
+                  {locked ? <Lock size={20} /> : <CoursesLogo size={20} title={t(titleKey)} />}
                 </div>
                 <div className="courses-card-body">
                   <h2 className="courses-card-title">{t(titleKey)}</h2>

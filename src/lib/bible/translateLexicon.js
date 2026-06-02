@@ -151,6 +151,16 @@ async function translateStrongLine(text, lang) {
   return cleaned;
 }
 
+async function translateField(text, lang, fallback = '') {
+  const src = String(text || fallback || '').trim();
+  if (!src) return '';
+  try {
+    return await translateStrongLine(src, lang);
+  } catch {
+    return src;
+  }
+}
+
 /**
  * Adapte une entrée lexique pour l'affichage (définition + étymologie en langue du lecteur).
  */
@@ -162,29 +172,33 @@ export async function localizeLexiconEntry(entry, lang) {
   const baseGloss = (entry.gloss || '').trim();
   const sourceForTranslate = englishDef || baseGloss;
 
+  // Always localize all textual fields to the active app language.
+  // This guarantees consistent translation for any clicked Strong entry.
+  const shouldTranslateAll = l !== 'en';
+
   let meaning = baseGloss;
-  if (glossNeedsTranslation(meaning, l, englishDef)) {
-    try {
-      meaning = await translateStrongLine(sourceForTranslate, l);
-    } catch {
-      meaning = baseGloss || englishDef;
-    }
+  if (shouldTranslateAll) {
+    meaning = await translateField(sourceForTranslate, l, baseGloss || englishDef);
+  } else if (glossNeedsTranslation(meaning, l, englishDef)) {
+    meaning = await translateField(sourceForTranslate, l, baseGloss || englishDef);
   }
 
-  let derivation = entry.derivation || '';
-  if (derivation && glossNeedsTranslation(derivation, l, derivation) && looksEnglish(derivation)) {
-    try {
-      derivation = await translateStrongLine(derivation, l);
-    } catch {
-      /* garde l'original */
-    }
-  }
+  const derivation = shouldTranslateAll
+    ? await translateField(entry.derivation, l)
+    : entry.derivation || '';
+
+  const localizedKjvDef = shouldTranslateAll ? await translateField(entry.kjvDef, l) : entry.kjvDef || '';
+  const localizedDefinitionOriginal = shouldTranslateAll
+    ? await translateField(entry.definitionOriginal, l)
+    : entry.definitionOriginal || '';
 
   return {
     ...entry,
     gloss: meaning,
     localizedMeaning: meaning,
     derivation,
-    showEnglishReference: l !== 'en' && Boolean(englishDef) && englishDef !== meaning,
+    kjvDef: localizedKjvDef,
+    definitionOriginal: localizedDefinitionOriginal || entry.definitionOriginal,
+    showEnglishReference: false,
   };
 }

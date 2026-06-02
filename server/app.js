@@ -59,7 +59,23 @@ import {
   listCompanionApplicationsForAdmin,
   patchCompanionApplicationStatus,
   isCompanionAdmin,
+  isCompanionModerator,
+  isCompanionSuperAdmin,
 } from './lib/companionApplicationService.js';
+import {
+  listAdminCommunityPosts,
+  listAdminAuditLogs,
+  listAdminRoleUsers,
+  deleteAdminCommunityPost,
+  moderateAdminCommunityPost,
+  inviteAdminUserByEmail,
+  applyPendingInviteForUser,
+  cancelPendingInvite,
+  listPendingInvites,
+  searchUsersByName,
+  patchAdminUserRolesByEmail,
+  patchAdminUserRoles,
+} from './lib/companionAdminService.js';
 import { rateLimit, securityHeaders, safeErrorMessage } from './lib/security.js';
 import {
   createSubscriptionOrder,
@@ -106,7 +122,9 @@ async function authMiddleware(req, res, next) {
   const token = header.replace(/^Bearer\s+/i, '');
   req.user = token ? await verifyUser(token) : null;
   if (req.user) {
-    const profile = await getUserProfile(req.user.id);
+    let profile = await getUserProfile(req.user.id);
+    const claimed = await applyPendingInviteForUser(req.user.id, req.user.email);
+    if (claimed) profile = claimed;
     req.profile = enrichProfileWithFounderAccess(profile, req.user.email);
   } else {
     req.profile = null;
@@ -498,7 +516,7 @@ app.post('/api/companion/apply', authMiddleware, async (req, res) => {
 app.get('/api/companion/applications', authMiddleware, async (req, res) => {
   try {
     if (!requireCompanion(req, res)) return;
-    if (!isCompanionAdmin(req.user)) return res.status(403).json({ error: 'forbidden' });
+    if (!isCompanionAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
     const applications = await listCompanionApplicationsForAdmin();
     res.json({ applications });
   } catch (err) {
@@ -510,7 +528,7 @@ app.get('/api/companion/applications', authMiddleware, async (req, res) => {
 app.patch('/api/companion/applications/:id', authMiddleware, async (req, res) => {
   try {
     if (!requireCompanion(req, res)) return;
-    if (!isCompanionAdmin(req.user)) return res.status(403).json({ error: 'forbidden' });
+    if (!isCompanionAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
     const row = await patchCompanionApplicationStatus(req.params.id, req.body?.status);
     res.json({ application: row });
   } catch (err) {
@@ -528,7 +546,9 @@ app.get('/api/companion/me', authMiddleware, async (req, res) => {
       me,
       encryption: Boolean(config.confessionalEncryptionKey),
       webPush: webPushConfigured(),
-      isAdmin: isCompanionAdmin(req.user),
+      isAdmin: isCompanionAdmin(req.user, req.profile),
+      isModerator: isCompanionModerator(req.user, req.profile),
+      isSuperAdmin: isCompanionSuperAdmin(req.user, req.profile),
     });
   } catch (err) {
     console.error('companion me error', err);
@@ -789,6 +809,195 @@ app.post('/api/companion/requests/:id/transfer', authMiddleware, async (req, res
     if (err.code === 'forbidden') return res.status(403).json({ error: 'forbidden' });
     if (err.code === 'invalid_target') return res.status(400).json({ error: 'invalid_target' });
     console.error('companion transfer error', err);
+    res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.get('/api/companion/admin/posts', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionSuperAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
+    const posts = await listAdminCommunityPosts(req.query?.limit);
+    res.json({ posts });
+  } catch (err) {
+    console.error('companion admin posts error', err);
+    res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.patch('/api/companion/admin/posts/:id/moderate', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionSuperAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
+    const post = await moderateAdminCommunityPost(
+      req.params.id,
+      req.body?.status,
+      req.body?.note,
+      req.user.id
+    );
+    if (!post) return res.status(404).json({ error: 'not_found' });
+    res.json({ ok: true, post });
+  } catch (err) {
+    if (err.code === 'invalid_status') return res.status(400).json({ error: 'invalid_status' });
+    console.error('companion admin post moderation error', err);
+    res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.delete('/api/companion/admin/posts/:id', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionSuperAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
+    const post = await deleteAdminCommunityPost(req.params.id, req.user.id);
+    if (!post) return res.status(404).json({ error: 'not_found' });
+    res.json({ ok: true, post });
+  } catch (err) {
+    console.error('companion admin post delete error', err);
+    res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.get('/api/companion/admin/users', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
+    const users = await listAdminRoleUsers(req.query?.limit, req.query?.q);
+    res.json({ users });
+  } catch (err) {
+    console.error('companion admin users error', err);
+    res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.patch('/api/companion/admin/users/:id', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
+    const user = await patchAdminUserRoles(req.params.id, req.body || {}, {
+      adminUserId: req.user.id,
+      isSuperAdmin: isCompanionSuperAdmin(req.user, req.profile),
+    });
+    res.json({ ok: true, user });
+  } catch (err) {
+    if (err.code === 'invalid_user') return res.status(400).json({ error: 'invalid_user' });
+    if (err.code === 'empty_patch') return res.status(400).json({ error: 'empty_patch' });
+    if (err.code === 'forbidden_admin_role') return res.status(403).json({ error: 'forbidden_admin_role' });
+    if (err.code === 'forbidden_super_admin_role') {
+      return res.status(403).json({ error: 'forbidden_super_admin_role' });
+    }
+    if (err.code === 'last_super_admin_forbidden') {
+      return res.status(403).json({ error: 'last_super_admin_forbidden' });
+    }
+    if (err.code === 'self_admin_demotion_forbidden') {
+      return res.status(403).json({ error: 'self_admin_demotion_forbidden' });
+    }
+    console.error('companion admin user patch error', err);
+    res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.patch('/api/companion/admin/users/by-email', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
+    const user = await patchAdminUserRolesByEmail(req.body?.email, req.body || {}, {
+      adminUserId: req.user.id,
+      isSuperAdmin: isCompanionSuperAdmin(req.user, req.profile),
+    });
+    res.json({ ok: true, user });
+  } catch (err) {
+    if (err.code === 'invalid_email') return res.status(400).json({ error: 'invalid_email' });
+    if (err.code === 'user_not_found') return res.status(404).json({ error: 'user_not_found' });
+    if (err.code === 'invalid_user') return res.status(400).json({ error: 'invalid_user' });
+    if (err.code === 'empty_patch') return res.status(400).json({ error: 'empty_patch' });
+    if (err.code === 'forbidden_admin_role') return res.status(403).json({ error: 'forbidden_admin_role' });
+    if (err.code === 'forbidden_super_admin_role') {
+      return res.status(403).json({ error: 'forbidden_super_admin_role' });
+    }
+    if (err.code === 'last_super_admin_forbidden') {
+      return res.status(403).json({ error: 'last_super_admin_forbidden' });
+    }
+    if (err.code === 'self_admin_demotion_forbidden') {
+      return res.status(403).json({ error: 'self_admin_demotion_forbidden' });
+    }
+    console.error('companion admin user by-email patch error', err);
+    res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.get('/api/companion/admin/users/search-by-name', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
+    const users = await searchUsersByName(req.query?.q, {
+      limit: req.query?.limit,
+      country: req.query?.country,
+      availability: req.query?.availability,
+      sort: req.query?.sort,
+    });
+    res.json({ users });
+  } catch (err) {
+    console.error('companion admin search-by-name error', err);
+    res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.post('/api/companion/admin/invite', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
+    const role = req.body?.role;
+    if ((role === 'admin' || role === 'superadmin') && !isCompanionSuperAdmin(req.user, req.profile)) {
+      return res.status(403).json({ error: 'forbidden_super_admin_role' });
+    }
+    const result = await inviteAdminUserByEmail(req.body?.email, role, {
+      adminUserId: req.user.id,
+      isSuperAdmin: isCompanionSuperAdmin(req.user, req.profile),
+    });
+    res.json(result);
+  } catch (err) {
+    if (err.code === 'invalid_email') return res.status(400).json({ error: 'invalid_email' });
+    if (err.code === 'invalid_role') return res.status(400).json({ error: 'invalid_role' });
+    if (err.code === 'user_already_exists') return res.status(409).json({ error: 'user_already_exists' });
+    if (err.code === 'invite_send_failed') return res.status(502).json({ error: 'invite_send_failed' });
+    console.error('companion admin invite error', err);
+    res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.get('/api/companion/admin/invites', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
+    const invites = await listPendingInvites(req.query?.limit);
+    res.json({ invites });
+  } catch (err) {
+    console.error('companion admin invites error', err);
+    res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.patch('/api/companion/admin/invites/:id/cancel', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionAdmin(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
+    const invite = await cancelPendingInvite(req.params.id, { adminUserId: req.user.id });
+    if (!invite) return res.status(404).json({ error: 'not_found' });
+    res.json({ ok: true, invite });
+  } catch (err) {
+    console.error('companion admin invite cancel error', err);
+    res.status(500).json({ error: 'companion_error' });
+  }
+});
+
+app.get('/api/companion/admin/audit', authMiddleware, async (req, res) => {
+  try {
+    if (!requireCompanion(req, res)) return;
+    if (!isCompanionModerator(req.user, req.profile)) return res.status(403).json({ error: 'forbidden' });
+    const logs = await listAdminAuditLogs(req.query?.limit);
+    res.json({ logs });
+  } catch (err) {
+    console.error('companion admin audit error', err);
     res.status(500).json({ error: 'companion_error' });
   }
 });

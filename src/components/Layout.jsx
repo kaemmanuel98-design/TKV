@@ -4,18 +4,24 @@ import { useTranslation } from 'react-i18next';
 import {
   Heart,
   Globe,
-  Map,
-  UserPlus,
-  GraduationCap,
+  Moon,
+  Sun,
   Headphones,
   DoorClosed,
   HeartHandshake,
   Info,
-  Users,
 } from 'lucide-react';
-import { BibleNavIcon, HeritageNavIcon } from './SectionLogos';
+import {
+  BibleNavIcon,
+  HeritageNavIcon,
+  CoursesNavIcon,
+  CommunityNavIcon,
+  CellsNavIcon,
+  FriendsNavIcon,
+  MapNavIcon,
+} from './SectionLogos';
 import { MimshackNavIcon } from './MimshackLogo';
-import { HomeNavIcon, LibraryNavIcon, CommunityNavIcon, ProfileNavIcon } from './SectionLogos';
+import { HomeNavIcon, LibraryNavIcon, ProfileNavIcon } from './SectionLogos';
 import FriendPresenceToasts from './FriendPresenceToasts';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
@@ -24,47 +30,48 @@ import ProfileAvatar from './ProfileAvatar';
 import PaymentModal from './PaymentModal';
 import OnboardingGate from './OnboardingGate';
 import { useCompanionAccess } from '../hooks/useCompanionAccess';
+import { useTheme } from '../hooks/useTheme';
 import './Layout.css';
 
-/** Navigation principale — CdC v3 §2.1 (5 onglets) */
+/** Navigation principale simplifiée (inspiration lecture-first). */
 const mainNavItems = [
   { to: '/', icon: HomeNavIcon, labelKey: 'tab_home', end: true },
-  { to: '/agent', icon: MimshackNavIcon, labelKey: 'tab_agent' },
   { to: '/library', icon: LibraryNavIcon, labelKey: 'tab_library' },
-  { to: '/community', icon: CommunityNavIcon, labelKey: 'tab_community' },
+  { to: '/courses', icon: CoursesNavIcon, labelKey: 'course_page_title' },
   { to: '/profile', icon: ProfileNavIcon, labelKey: 'tab_profile' },
 ];
 
 const mobileNavItems = [
   { ...mainNavItems[0], mobileLabelKey: 'nav_mobile_home' },
-  { ...mainNavItems[1], mobileLabelKey: 'nav_mobile_agent' },
-  { ...mainNavItems[2], mobileLabelKey: 'nav_mobile_library' },
-  { ...mainNavItems[3], mobileLabelKey: 'nav_mobile_community' },
-  { ...mainNavItems[4], mobileLabelKey: 'nav_mobile_profile' },
+  { ...mainNavItems[1], mobileLabelKey: 'nav_mobile_library' },
+  { ...mainNavItems[2], mobileLabelKey: 'course_page_title' },
 ];
 
 const toolLinks = [
+  { to: '/agent', icon: MimshackNavIcon, labelKey: 'tab_agent' },
+  { to: '/community', icon: CommunityNavIcon, labelKey: 'tab_community' },
   { to: '/bible', icon: BibleNavIcon, labelKey: 'nav_bible' },
   { to: '/heritage', icon: HeritageNavIcon, labelKey: 'nav_heritage' },
   { to: '/confessional', icon: DoorClosed, labelKey: 'nav_confessional' },
-  { to: '/courses', icon: GraduationCap, labelKey: 'course_page_title' },
   { to: '/podcasts', icon: Headphones, labelKey: 'podcast_page_title' },
-  { to: '/friends', icon: UserPlus, labelKey: 'friends_nav' },
-  { to: '/map', icon: Map, labelKey: 'map' },
+  { to: '/friends', icon: FriendsNavIcon, labelKey: 'friends_nav' },
+  { to: '/map', icon: MapNavIcon, labelKey: 'map' },
+  { to: '/cells', icon: CellsNavIcon, labelKey: 'footer_link_cells' },
 ];
 
 const footerLinks = [
   { to: '/about', icon: Info, labelKey: 'footer_link_about' },
   { to: '/bible', icon: BibleNavIcon, labelKey: 'footer_link_bible' },
   { to: '/heritage', icon: HeritageNavIcon, labelKey: 'footer_link_heritage' },
-  { to: '/courses', icon: GraduationCap, labelKey: 'footer_link_courses' },
+  { to: '/courses', icon: CoursesNavIcon, labelKey: 'footer_link_courses' },
   { to: '/podcasts', icon: Headphones, labelKey: 'footer_link_podcasts' },
-  { to: '/cells', icon: Users, labelKey: 'footer_link_cells' },
+  { to: '/cells', icon: CellsNavIcon, labelKey: 'footer_link_cells' },
 ];
 
 const Layout = () => {
   const { t, i18n } = useTranslation();
   const { user, signOut } = useAuthStore();
+  const { theme, toggleTheme } = useTheme();
   const fetchProfile = useProfileStore((s) => s.fetchProfile);
   const profile = useProfileStore((s) => s.profile);
   const { isCompanion } = useCompanionAccess();
@@ -174,6 +181,17 @@ const Layout = () => {
             </select>
           </div>
 
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="btn btn-ghost btn-sm theme-toggle-btn"
+            aria-label={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}
+            title={theme === 'dark' ? 'Mode clair' : 'Mode sombre'}
+          >
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            <span className="hide-mobile">{theme === 'dark' ? 'Clair' : 'Sombre'}</span>
+          </button>
+
           {user ? (
             <Link to="/profile" className="header-profile-link" title={t('tab_profile')}>
               <ProfileAvatar
@@ -204,20 +222,12 @@ const Layout = () => {
             <p className="footer-brand">THE KINGDOM&apos;S VOICE</p>
           </div>
           <p className="footer-tagline">{t('home_subtitle')}</p>
-          <nav className="footer-nav" aria-label={t('footer_nav_label')}>
-            <p className="footer-nav-title">{t('footer_nav_title')}</p>
-            <ul className="footer-nav-grid">
-              {footerLinks.map(({ to, icon: Icon, labelKey }) => (
-                <li key={to}>
-                  <Link to={to} className="footer-nav-item">
-                    <span className="footer-nav-icon" aria-hidden="true">
-                      <Icon size={18} strokeWidth={1.75} />
-                    </span>
-                    <span className="footer-nav-label">{t(labelKey)}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <nav className="footer-nav-simple" aria-label={t('footer_nav_label')}>
+            {footerLinks.slice(0, 4).map(({ to, labelKey }) => (
+              <Link key={to} to={to} className="footer-nav-simple-link">
+                {t(labelKey)}
+              </Link>
+            ))}
           </nav>
           <p className="footer-copy">&copy; {new Date().getFullYear()} TKV. {t('footer_rights')}</p>
         </div>

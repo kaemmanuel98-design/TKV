@@ -1,0 +1,976 @@
+﻿
+
+
+THE KINGDOM'S VOICE
+Application Mobile Native — Intelligence Artificielle
+Cahier des Charges — Version 3.0
+
+Plateforme d'enseignement biblique augmentee par l'IA
+Agent IA LangChain · Base Vectorielle pgvector · Analyseur de Perspectives
+Python (Pandas/NumPy) · PostgreSQL · Node.js · React Native · RGPD · BPMN
+
+
+Version
+3.0 — Avril 2026
+Site web
+https://thekingdomsvoice.com
+Plateformes
+iOS 15+ (App Store) · Android 10+ (Google Play)
+Tarification
+Gratuit / Premium 9,99 GBP / Premium+ 14,99 GBP/mois
+Moteur IA
+OpenAI GPT-4o · LangChain · pgvector (RAG)
+Conformite
+RGPD · ATT Apple · BPMN 2.0
+Document
+Confidentiel — Usage interne
+
+Table des Matieres
+1.  Vision et Positionnement Strategique  ..............  p.3
+2.  Fonctionnalites et Navigation Mobile  ..............  p.4
+3.  Agent IA Biblique (LangChain + RAG)  ..............  p.6
+4.  Base de Connaissances Vectorielle (pgvector)  ..............  p.8
+5.  Analyseur de Perspectives — Mediateur IA  ..............  p.10
+6.  Personnalisation IA par Profil Utilisateur  ..............  p.11
+7.  Gamification et Retention Utilisateur  ..............  p.12
+8.  Architecture de Paiement (StoreKit)  ..............  p.13
+9.  Architecture Technique Complete  ..............  p.15
+10.  Schemas BPMN des Processus Metier  ..............  p.18
+11.  Conformite RGPD  ..............  p.19
+12.  Design et Experience Utilisateur  ..............  p.20
+13.  Roadmap et Phases de Developpement  ..............  p.21
+14.  Budget Estimatif  ..............  p.22
+15.  Prochaines Etapes Immediates  ..............  p.23
+
+1. Vision et Positionnement Strategique
+1.1 Mission
+The Kingdom's Voice (TKV) est une plateforme numerique spirituelle et intellectuelle accessible a croyants, non-croyants, sceptiques et curieux. Ce n'est ni une eglise en ligne ni un empire religieux : c'est un espace bienveillant et rigoureux pour apprendre, questionner et se rapprocher de Dieu.
+La version 3.0 marque un tournant majeur : TKV devient une plateforme augmentee par l'intelligence artificielle, avec un agent RAG (Retrieval-Augmented Generation) base sur LangChain, une base vectorielle PostgreSQL, et un Analyseur de Perspectives unique sur le marche.
+
+&quot;Une IA au service de la foi, pas un remplacement du discernement humain — mais un outil pour mieux comprendre, questionner et grandir.&quot;
+
+1.2 Avantages Competitifs v3.0
+Differenciateur
+Description
+Agent IA RAG
+Repond aux questions en s'appuyant sur tes livres, cours et podcasts. Impossible a copier sans ta base de connaissances.
+Analyseur de Perspectives
+IA mediateur neutre : analyse les arguments croyants vs sceptiques et produit un resume equilibre. Unique sur le marche.
+Personnalisation profil
+L'agent adapte ses reponses selon le profil : croyant, sceptique ou curieux. Experience sur-mesure.
+Base vectorielle propre
+pgvector sur PostgreSQL : la base de connaissance grandit avec chaque nouveau contenu publie sur TKV.
+Contenu exclusif auteur
+Livres, cours et podcasts originaux impossibles a trouver ailleurs.
+
+2. Fonctionnalites et Navigation Mobile
+2.1 Structure Tab Bar (5 onglets)
+Pos.
+Onglet
+Contenu principal
+Acces
+1
+Accueil
+Verset du jour, streak, progression, live banner, recommandations IA
+Gratuit
+2
+Agent IA
+Chat agent RAG, Analyseur de Perspectives, historique, suggestions
+Premium
+3
+Bibliotheque
+Livres, cours, podcasts, filtres, telechargement hors-ligne
+Mixte
+4
+Communaute
+Posts, cellules de priere, lives, Analyseur de debats
+Mixte
+5
+Profil
+Badges, abonnement, historique IA, objectifs, parametres
+Gratuit
+
+L'onglet 'Agent IA' remplace 'IA Biblique' : il regroupe le chat RAG ET l'Analyseur de Perspectives. C'est la fonctionnalite premium differenciante numero 1.
+
+2.2 Tableau de Prioritisation (24 fonctionnalites)
+Fonctionnalite
+Priorite
+Version
+Acces
+Authentification (inscription / connexion)
+Indispensable
+v1.0
+Gratuit
+Profil utilisateur (pays, bio, type)
+Indispensable
+v1.0
+Gratuit
+Verset du jour + streak quotidien
+Indispensable
+v1.0
+Gratuit
+Fil communautaire (posts + reactions)
+Indispensable
+v1.0
+Gratuit
+Agent IA RAG (LangChain + pgvector)
+Indispensable
+v1.0
+3 req/j gratuit - Premium illimite
+Analyseur de Perspectives (mediateur IA)
+Indispensable
+v1.0
+Premium
+Lecteur de podcasts integre
+Indispensable
+v1.0
+3/mois gratuit - Premium illimite
+Bibliotheque livres et articles
+Indispensable
+v1.0
+Extraits gratuit - Premium complet
+Cours modules avec progression
+Indispensable
+v1.0
+1 cours gratuit - Premium tous
+Gamification (badges, objectifs, quiz)
+Indispensable
+v1.0
+Gratuit
+Notifications push intelligentes
+Important
+v1.0
+Gratuit
+Personnalisation IA selon profil utilisateur
+Important
+v1.0
+Premium
+Cellules de priere (audio en direct)
+Important
+v1.1
+Premium
+Lives (streaming video)
+Important
+v1.1
+Premium
+Mode hors-ligne (telechargement contenu)
+Important
+v1.1
+Premium+
+Suivi d'autres membres
+Important
+v1.1
+Gratuit
+Quiz hebdomadaires et classements
+Important
+v1.2
+Gratuit
+Analytics utilisateur (Python/Pandas)
+Important
+v1.2
+Admin uniquement
+Certificats de completion de cours
+Secondaire
+v1.2
+Premium
+Export PDF des conversations IA
+Secondaire
+v1.2
+Premium+
+API publique pour eglises partenaires
+Secondaire
+v2.0
+B2B
+Carte des membres par pays
+Secondaire
+v2.0
+Gratuit
+Multilangue (EN, ES, PT, SW)
+Secondaire
+v2.0
+Gratuit
+IA vocale (questions par dictee)
+Secondaire
+v2.0
+Premium+
+
+3. Agent IA Biblique (LangChain + RAG)
+3.1 Architecture de l'Agent
+L'agent utilise le pattern RAG (Retrieval-Augmented Generation) : avant de repondre, il cherche les passages les plus pertinents dans la base de connaissances vectorielle de TKV, puis les injecte dans le prompt envoyé a GPT-4o. Cela garantit des reponses ancrees dans les contenus de la plateforme.
+
+L'agent ne repond pas 'de lui-meme' : il cite et s'appuie sur les livres, cours et podcasts de TKV. Cela renforce l'autorite de l'auteur et justifie le contenu exclusif.
+
+3.2 Flux de Traitement d'une Question
+Etape
+Composant
+Action
+1
+Utilisateur
+Pose une question dans l'app mobile (React Native)
+2
+API Node.js
+Recoit la requete, verifie le quota (3/j gratuit, illimite premium), authentifie via Supabase JWT
+3
+LangChain Agent
+Reformule la question en embedding vectoriel via OpenAI text-embedding-3-small
+4
+pgvector (PostgreSQL)
+Recherche cosinus des 5 chunks les plus proches dans knowledge_chunks. Seuil : similarite &gt; 0.75
+5
+Context Builder
+Assemble le contexte : [profil utilisateur] + [chunks pertinents] + [historique conversation]
+6
+GPT-4o
+Genere la reponse en respectant le prompt systeme (ton bienveillant, cite les sources TKV)
+7
+Post-processing
+Ajoute les references aux livres/cours, sauvegarde en base, decremente le quota si gratuit
+8
+App mobile
+Affiche la reponse avec references cliquables vers les contenus TKV
+
+3.3 Outils (Tools) de l'Agent LangChain
+L'agent dispose de 5 outils qu'il peut appeler de maniere autonome :
+
+Outil
+Technologie
+Description
+search_knowledge_base
+pgvector + LangChain
+Recherche semantique dans les livres, cours et podcasts de TKV
+get_user_profile
+Supabase / PostgreSQL
+Recupere le profil utilisateur pour personnaliser le ton et le niveau de reponse
+get_bible_verse
+API externe (API.Bible)
+Recupere des versets bibliques avec references et differentes traductions
+analyze_perspectives
+Module Python interne
+Active l'Analyseur de Perspectives sur une question sensible ou un debat
+recommend_content
+PostgreSQL + logique Python
+Recommande les cours, livres ou podcasts les plus pertinents pour l'utilisateur
+
+3.4 Prompt Systeme de l'Agent
+  Prompt systeme GPT-4o (extrait)  
+
+Tu es l'Assistant Biblique de 'The Kingdom's Voice'. Tu aides croyants, sceptiques et curieux a explorer la foi chretienne avec bienveillance et rigueur intellectuelle. Tes reponses s'appuient exclusivement sur la base de connaissances TKV (livres, cours, podcasts de l'auteur).
+Regles : (1) Cite toujours tes sources TKV. (2) Si la question depasse ta base de connaissances, dis-le honnêtement. (3) Adapte ton ton au profil : croyant actif = approfondissement ; sceptique = preuves et logique ; curieux = pedagogie bienveillante. (4) Ne prends jamais position politique. (5) Signale que tu es une IA.
+
+3.5 Modele Freemium de l'Agent IA
+Fonctionnalite
+Gratuit
+Premium 9,99 GBP
+Premium+ 14,99 GBP
+Requetes agent par jour
+3
+30
+Illimite
+Analyseur de Perspectives
+Non
+2 analyses/j
+Illimite
+Historique conversations
+24h
+30 jours
+Illimite
+Sources citees (livres TKV)
+Non
+Oui
+Oui
+Personnalisation par profil
+Non
+Oui
+Oui
+Mode etude (refs croisees)
+Non
+Non
+Oui
+Export PDF conversation
+Non
+Non
+Oui
+IA vocale (dictee)
+Non
+Non
+v2.0
+
+4. Base de Connaissances Vectorielle (pgvector)
+4.1 Principe
+La base vectorielle est le coeur de l'intelligence de TKV. Chaque contenu (livre, chapitre, cours, episode de podcast, article) est decoupé en chunks de 500 tokens, convertis en vecteurs d'embedding (1536 dimensions avec text-embedding-3-small d'OpenAI), puis stockes dans PostgreSQL avec l'extension pgvector.
+Lors d'une question, le systeme calcule la similarite cosinus entre le vecteur de la question et tous les chunks, et retourne les 5 plus proches. Ce mecanisme garantit des reponses pertinentes et sourcees.
+
+4.2 Schema de la Table knowledge_chunks
+  PostgreSQL + pgvector  
+
+id (UUID, PRIMARY KEY)
+content_id (UUID, FK vers la table contents)
+content_type (TEXT : 'book' | 'course' | 'podcast' | 'article')
+chunk_index (INTEGER : position du chunk dans le document)
+chunk_text (TEXT : texte brut du chunk, 500 tokens max)
+embedding (VECTOR(1536) : vecteur OpenAI text-embedding-3-small)
+metadata (JSONB : titre, auteur, chapitre, langue, date de publication)
+language (TEXT : 'fr' | 'en' | 'es')
+created_at (TIMESTAMPTZ)
+
+INDEX : CREATE INDEX ON knowledge_chunks USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+
+4.3 Pipeline d'Ingestion du Contenu
+Etape
+Outil
+Action
+1
+Sanity CMS / Upload
+L'auteur publie ou importe un nouveau livre, cours ou episode
+2
+Python (LangChain TextSplitter)
+Le texte est nettoye et decoupé en chunks de 500 tokens avec 50 tokens de chevauchement
+3
+OpenAI Embeddings API
+Chaque chunk est converti en vecteur 1536D via text-embedding-3-small
+4
+PostgreSQL / pgvector
+Les vecteurs et metadonnees sont inseres dans knowledge_chunks
+5
+Verification (Python)
+Script de validation : coherence des embeddings, doublons, seuils de qualite
+
+4.4 Contenu Initial de la Base
+Livres de l'auteur : chaque chapitre = 10-30 chunks selon la longueur
+Cours : chaque module = 5-15 chunks (contenu textuel + transcription audio)
+Podcasts : transcription automatique via Whisper API, puis chunking
+Articles du site web : migration automatique depuis thekingdomsvoice.com
+Versets bibliques : integration de l'API.Bible (Louis Segond, NEG, English Standard)
+Objectif v1.0 : minimum 10 000 chunks pour des reponses de qualite
+
+5. Analyseur de Perspectives — Mediateur IA
+5.1 Vision et Unicite
+L'Analyseur de Perspectives est la fonctionnalite la plus innovante de TKV v3.0. Sur une question sensible (existence de Dieu, miracles, evolution vs creation, souffrance et foi...), l'IA agit comme un mediateur neutre : elle presente les arguments des croyants ET des sceptiques de maniere equilibree, puis propose une synthese intellectuellement honnete.
+
+Aucune application chretienne sur le marche ne propose cela. C'est un argument de vente unique et puissant pour attirer les sceptiques et les curieux, qui representent 60% du public potentiel de TKV.
+
+5.2 Fonctionnement
+Phase
+Description
+Detection de la question
+L'agent detecte si la question est 'controversee' (existence de Dieu, preuves historiques, miracles, souffrance...) et active automatiquement le module Analyseur
+Recherche bi-perspectiviste
+pgvector cherche des chunks pertinents dans 2 categoies : arguments 'pro-foi' ET arguments 'sceptiques / scientifiques'
+Structuration GPT-4o
+GPT-4o produit une reponse en 3 parties : (1) Perspective croyante, (2) Perspective sceptique, (3) Synthese equilibree de l'auteur TKV
+Affichage dans l'app
+Carte interactive avec 3 onglets : Croyants / Sceptiques / Synthese. L'utilisateur navigue librement.
+Invitation communautaire
+L'utilisateur peut poster l'analyse dans le fil communautaire pour continuer le debat avec d'autres membres
+
+5.3 Exemples de Questions Declencheurs
+&quot;Est-ce que Dieu existe vraiment ? Quelles sont les preuves ?&quot;
+&quot;Comment concilier l'evolution et la creation biblique ?&quot;
+&quot;Pourquoi Dieu permet-il la souffrance innocente ?&quot;
+&quot;Est-ce que Jesús a vraiment existe historiquement ?&quot;
+&quot;La Bible est-elle fiable historiquement ?&quot;
+&quot;Peut-on etre moral sans croire en Dieu ?&quot;
+
+5.4 Regles de Neutralite (Guardrails)
+L'IA ne prend jamais parti au-dela des contenus de l'auteur TKV
+La partie 'Synthese' reflète toujours la vision de l'auteur, clairement identifiee
+Aucun contenu politique ou partisan ne peut etre genere
+Un avertissement clair indique que l'analyse est produite par une IA
+L'utilisateur peut signaler une analyse incorrecte ou biaisee
+
+6. Personnalisation IA par Profil Utilisateur
+6.1 Les 3 Profils
+A l'onboarding, l'utilisateur choisit son profil. L'agent IA adapte automatiquement son ton, son niveau de detail et ses sources en fonction de ce profil. Le profil peut etre change a tout moment dans les parametres.
+
+Profil
+Comportement de l'agent
+Sources privilegiees
+Croyant actif
+Approfondissement theologique, references bibliques avancees, langage familier de la foi
+Livres de l'auteur, cours avances, versets bibliques
+Sceptique
+Preuves historiques, argumentation logique, references academiques, ton neutre et rigoureux
+Cours 'Preuves historiques', sources externes citees, Analyseur de Perspectives
+Curieux
+Pedagogie bienveillante, langage accessible, pas de jargon theologiques, invite au questionnement
+Cours introductif, podcasts accessibles, articles courts
+
+6.2 Donnees de Personnalisation (PostgreSQL)
+L'agent utilise les donnees suivantes pour personnaliser ses reponses :
+Profil declare (croyant / sceptique / curieux)
+Cours termines et en cours (niveau de connaissance)
+Livres lus et passages surlignés
+Historique des questions posees a l'IA (sujets d'interet)
+Pays d'origine (contexte culturel)
+Langue preferee
+Streaks et engagement (frequence d'utilisation)
+
+7. Gamification et Retention Utilisateur
+7.1 Systeme de Streaks
+Flamme quotidienne alimentee par : verset lu, question IA, podcast ecoutee 5 min, post communautaire
+Rappel push 2h avant minuit si la serie est en danger
+Records personnels affiches sur le profil : 'Meilleure serie : 47 jours'
+Freeze de serie : 1 grace day/semaine pour Premium, illimite pour Premium+
+
+7.2 Badges
+Badge
+Condition
+Categorie
+Chercheur de Verite
+10 questions posees a l'agent IA
+IA
+Mediateur
+5 Analyses de Perspectives consultees
+IA
+Flamme Vivante
+7 jours consecutifs
+Streaks
+Fidele de Fer
+30 jours consecutifs
+Streaks
+Temoin Fidele
+100 jours total
+Streaks
+Lecteur Assidu
+1 livre termine
+Bibliotheque
+Historien
+1 cours d'histoire complete
+Cours
+Encyclopediste
+3 cours completes
+Cours
+Intercesseur
+5 cellules de priere rejointes
+Communaute
+Ambassadeur
+3 amis invites
+Communaute
+
+8. Architecture de Paiement (Apple StoreKit)
+8.1 Modele Freemium Complet
+Fonctionnalite
+Gratuit
+Premium 9,99 GBP
+Premium+ 14,99 GBP
+Verset du jour + streak
+Oui
+Oui
+Oui
+Fil communautaire
+Oui
+Oui
+Oui
+1 cours introductif
+Oui
+Oui
+Oui
+Agent IA RAG
+3 requetes/jour
+30 requetes/jour
+Illimite
+Analyseur de Perspectives
+Non
+2 analyses/jour
+Illimite
+Personnalisation IA profil
+Non
+Oui
+Oui
+Tous les cours
+Non
+Oui
+Oui
+Tous les livres
+Extraits
+Oui
+Oui
+Podcasts
+3/mois
+Illimite
+Illimite
+Lives + cellules
+Viewer
+Participant
+Host
+Mode hors-ligne
+Non
+Non
+Oui
+Export PDF conversations IA
+Non
+Non
+Oui
+Freeze de serie
+Non
+1/semaine
+Illimite
+
+8.2 Product IDs et Small Business Program
+tkv.premium.monthly         — 9,99 GBP/mois
+tkv.premium.yearly          — 79,99 GBP/an (remise 33%)
+tkv.premium_plus.monthly    — 14,99 GBP/mois
+tkv.premium_plus.yearly     — 119,99 GBP/an (remise 33%)
+tkv.book.unit               — 2,99 a 7,99 GBP (achat unique)
+
+PRIORITE ABSOLUE : S'inscrire au Small Business Program Apple AVANT toute premiere vente. Commission 15% au lieu de 30%. Sur 14,99 GBP : +2,25 GBP de revenu net par abonne par mois.
+
+8.3 Simulation de Revenus
+Scenario
+Prem.
+Prem+
+Revenu brut
+Revenu net*
+Lancement (mois 3)
+100
+50
+1 748 GBP
+~1 485 GBP
+Croissance (mois 6)
+500
+200
+7 993 GBP
+~6 794 GBP
+Maturite (mois 12)
+2 000
+800
+31 990 GBP
+~27 192 GBP
+* Apres 15% Apple (Small Business) et 30% Google.
+
+9. Architecture Technique Complete
+9.1 Stack Technologique
+Couche
+Technologie
+Role
+Frontend mobile
+React Native (Expo SDK 51)
+iOS + Android avec une seule codebase
+Navigation
+Expo Router (file-based)
+Tab Bar native, deep linking, navigation stack
+Backend API
+Node.js + Express
+REST API principale, orchestration des agents
+Base de donnees
+PostgreSQL (Supabase)
+Donnees utilisateurs, abonnements, contenus
+Extension vectorielle
+pgvector
+Stockage et recherche des embeddings 1536D
+Agent IA
+Python + LangChain
+Orchestration RAG, tools, Analyseur de Perspectives
+Modele IA
+OpenAI GPT-4o
+Generation de reponses, raisonnement complexe
+Embeddings
+OpenAI text-embedding-3-small
+Conversion texte -&gt; vecteurs (0,02$/1M tokens)
+Analytics
+Python (Pandas + NumPy)
+Analyse comportement, dashboard admin, rapports
+CMS Contenu
+Sanity.io
+Gestion livres, cours, podcasts par l'auteur
+Paiements
+RevenueCat + StoreKit
+Abonnements iOS/Android, validation receipts
+Streaming
+Agora.io
+Lives et cellules de priere en temps reel
+Notifications
+Expo Notifications
+Push multiplateforme, rappels streak
+Transcription
+OpenAI Whisper API
+Transcription automatique des podcasts pour RAG
+Stockage fichiers
+Supabase Storage
+Livres PDF, audio, images
+Hors-ligne
+expo-file-system + SQLite
+Telechargement et lecture locale du contenu
+
+9.2 Schema de la Base de Donnees (PostgreSQL)
+  Tables principales  
+
+users
+id (UUID PK), email (UNIQUE), full_name, country, avatar_url, bio
+user_type (TEXT : 'believer' | 'skeptic' | 'curious')
+streak_current (INT), streak_best (INT), last_active_date (DATE)
+language (TEXT), created_at (TIMESTAMPTZ)
+
+subscriptions
+id, user_id (FK), plan_type ('free'|'premium'|'premium_plus'), status
+platform ('ios'|'android'), apple_original_transaction_id (UNIQUE)
+starts_at, expires_at (TIMESTAMPTZ), auto_renew (BOOL)
+
+knowledge_chunks
+id, content_id (FK), content_type ('book'|'course'|'podcast'|'article')
+chunk_index (INT), chunk_text (TEXT), embedding (VECTOR(1536))
+metadata (JSONB), language (TEXT)
+
+ia_conversations
+id, user_id (FK), session_id (UUID), role ('user'|'assistant')
+message (TEXT), tokens_used (INT), tools_called (JSONB)
+perspective_analysis_id (FK, nullable), created_at
+
+perspective_analyses
+id, user_id (FK), question (TEXT)
+believers_perspective (TEXT), skeptics_perspective (TEXT), synthesis (TEXT)
+chunks_used (JSONB), created_at
+
+ia_daily_usage
+user_id (FK), date (DATE), requests_count (INT)
+PRIMARY KEY (user_id, date)
+
+9.3 Module Analytics Python (Pandas + NumPy)
+Un microservice Python genere des rapports d'analyse pour le dashboard admin de TKV :
+Taux de conversion gratuit -&gt; premium par segment (croyant / sceptique / curieux)
+Questions les plus posees a l'agent IA (clustering semantique avec NumPy)
+Sujets de l'Analyseur de Perspectives les plus consultes
+Courbe de retention 7j / 30j / 90j par cohorte d'inscription
+Revenus MRR / ARR par plan d'abonnement
+Contenus les plus cites par l'agent IA (= les plus utiles a developper)
+
+Le module Python analytics permet a l'auteur de savoir exactement quels sujets les utilisateurs questionnent le plus, pour orienter la creation de nouveaux contenus.
+
+10. Schemas BPMN des Processus Metier
+Les diagrammes BPMN 2.0 documentent les processus critiques de TKV. Ils sont a realiser dans Lucidchart, Camunda Modeler ou draw.io avant le debut du developpement.
+
+10.1 Liste des Processus a Documenter en BPMN
+N
+Processus
+Acteurs
+Priorite
+1
+Inscription et onboarding utilisateur
+Utilisateur, App, Supabase, Email service
+P0
+2
+Question a l'agent IA (flux RAG complet)
+Utilisateur, API Node.js, LangChain, pgvector, GPT-4o
+P0
+3
+Analyse de Perspectives
+Utilisateur, Agent, Module Python, GPT-4o
+P0
+4
+Achat et validation d'abonnement (StoreKit)
+Utilisateur, Apple/Google, RevenueCat, API
+P0
+5
+Expiration et renouvellement abonnement
+RevenueCat webhook, API, Supabase, Notifications
+P0
+6
+Ingestion d'un nouveau contenu (RAG pipeline)
+Auteur, Sanity CMS, Python, OpenAI, pgvector
+P1
+7
+Signalement et moderation de contenu
+Utilisateur, Moderation admin, App
+P1
+8
+Exercice du droit RGPD (effacement)
+Utilisateur, API, Supabase, Logs
+P1
+
+Les BPMN sont des livrables contractuels : ils servent de reference entre l'auteur et le developpeur pour valider que chaque processus est correctement implemente.
+
+11. Conformite RGPD
+11.1 Obligations Legales
+TKV traite des donnees personnelles d'utilisateurs de l'Union Europeenne. La conformite RGPD est obligatoire avant toute commercialisation dans l'UE.
+
+Obligation RGPD
+Implementation dans TKV
+Consentement explicite
+Popup de consentement a l'installation avec cases a cocher separees (analytics, marketing, fonctionnel)
+Politique de confidentialite
+URL publique obligatoire, en francais et en anglais, mise a jour avant soumission App Store
+Droit d'acces
+Endpoint API GET /api/rgpd/export/{userId} : retourne toutes les donnees JSON de l'utilisateur
+Droit a l'effacement
+Endpoint DELETE /api/rgpd/delete/{userId} : suppression en cascade de toutes les donnees en 30j max
+Droit de rectification
+L'utilisateur peut modifier ses donnees de profil directement dans l'app
+Portabilite des donnees
+Export JSON disponible dans Profil &gt; Parametres &gt; Mes donnees
+Minimisation des donnees
+Seules les donnees necessaires au service sont collectees. Aucune vente a des tiers.
+Retention des donnees
+Conversations IA effacees apres 12 mois (gratuit) ou 24 mois (premium). Parametrable.
+Transferts hors UE
+OpenAI et Supabase = clauses contractuelles types (SCCs) obligatoires
+App Tracking Transparency
+Popup ATT obligatoire sur iOS 14.5+ avant tout tracking analytique
+
+Les conversations IA sont des donnees particulierement sensibles. Elles ne doivent JAMAIS etre utilisees pour entrainer des modeles tiers sans consentement explicite supplementaire.
+
+12. Design et Experience Utilisateur
+12.1 Identite Visuelle
+Palette principale : Noir profond #0D0D0D + Or #C9A96E
+Typographie : Cormorant Garamond (titres, citations) + DM Sans (corps de texte)
+Ton : Chaleureux, premium, spiritual sans etre cliche religieux
+Dark mode natif en priorite, light mode en v1.1
+
+12.2 Ecrans a Concevoir (v1.0) — 16 ecrans
+N
+Ecran
+Module
+Priorite
+1
+Onboarding (3 slides + choix profil)
+Decouverte
+Indispensable
+2
+Inscription / Connexion
+Auth
+Indispensable
+3
+Accueil (Dashboard)
+Accueil
+Indispensable
+4
+Agent IA (chat RAG)
+IA
+Indispensable
+5
+Analyseur de Perspectives
+IA
+Indispensable
+6
+Bibliotheque (liste + filtres)
+Contenu
+Indispensable
+7
+Lecteur de livre / article
+Contenu
+Indispensable
+8
+Liste des cours
+Cours
+Indispensable
+9
+Lecteur de module de cours
+Cours
+Indispensable
+10
+Communaute (fil de posts)
+Social
+Indispensable
+11
+Detail post + commentaires
+Social
+Indispensable
+12
+Profil utilisateur
+Profil
+Indispensable
+13
+Page d'abonnement (Paywall)
+Monetisation
+Indispensable
+14
+Lecteur podcast
+Contenu
+Important
+15
+Parametres + RGPD
+Profil
+Important
+16
+Dashboard admin (analytics Python)
+Admin
+Important
+
+13. Roadmap et Phases de Developpement
+Phase
+Contenu
+Duree
+Livrable
+Phase 0
+Design UX/UI Figma (16 ecrans) + BPMN des 8 processus
+3-4 sem.
+Figma + BPMN
+Phase 1a
+Auth, profil (3 types), accueil, gamification, notifications
+4-5 sem.
+Socle app
+Phase 1b
+Agent IA RAG (LangChain + pgvector) + pipeline ingestion contenu
+4-5 sem.
+IA fonctionnelle
+Phase 1c
+Analyseur de Perspectives + personnalisation profil IA
+2-3 sem.
+Mediateur IA
+Phase 1d
+Bibliotheque, cours, podcasts, communaute, paywall StoreKit
+4-5 sem.
+App complete v1.0
+Phase 2
+Tests alpha (50 beta testeurs), bugs, optimisation performances
+2-3 sem.
+App stable
+Phase 3
+Soumission App Store + Play Store, assets marketing, screenshots IA
+1-2 sem.
+App publiee
+Phase 4 (v1.1)
+Lives, cellules de priere, suivi membres, mode offline, analytics Python
+6-8 sem.
+Maj majeure
+Phase 5 (v1.2)
+Quiz avances, certificats, multilangue, export PDF IA, dashboard admin
+6-8 sem.
+Expansion
+Phase 6 (v2.0)
+IA vocale, API eglises, carte mondiale, Whisper en temps reel
+A definir
+Produit mature
+
+14. Budget Estimatif
+Poste de depense
+Budget bas
+Budget haut
+Prio.
+Design UX/UI Figma (16 ecrans) + BPMN
+2 000 EUR
+5 000 EUR
+P0
+Developpement React Native (frontend)
+6 000 EUR
+16 000 EUR
+P0
+Backend Node.js + PostgreSQL + pgvector
+4 000 EUR
+10 000 EUR
+P0
+Agent LangChain (Python) + pipeline RAG
+3 000 EUR
+8 000 EUR
+P0
+Integration OpenAI (GPT-4o + Embeddings)
+500 EUR
+1 500 EUR
+P0
+Analyseur de Perspectives (module Python)
+1 500 EUR
+4 000 EUR
+P0
+Module analytics Python (Pandas/NumPy)
+1 000 EUR
+3 000 EUR
+P1
+Integration RevenueCat + StoreKit
+1 000 EUR
+2 500 EUR
+P0
+Streaming Agora.io (lives + cellules)
+1 500 EUR
+4 000 EUR
+P1
+Comptes developpeur Apple + Google
+125 EUR
+125 EUR
+P0
+Hebergement Supabase Pro + cloud (an 1)
+800 EUR
+2 000 EUR
+P0
+Credits API OpenAI (an 1, agent + embeddings)
+600 EUR
+2 400 EUR
+P0
+Tests QA + securite + audit RGPD
+1 000 EUR
+3 000 EUR
+P0
+Assets marketing (screenshots, video 30s)
+500 EUR
+1 500 EUR
+P0
+TOTAL ESTIMATIF v1.0
+~23 525 EUR
+~63 025 EUR
+
+
+L'ajout de l'agent IA, du pipeline RAG et de l'Analyseur de Perspectives represente environ 8 000 a 15 000 EUR supplementaires par rapport a la v2. C'est l'investissement qui differencie TKV de toutes les apps concurrentes.
+
+15. Prochaines Etapes Immediates
+Ces 10 actions sont a completer AVANT de recruter un developpeur ou un studio.
+
+Valider et signer ce cahier des charges (base contractuelle de tout devis)
+Creer le compte Apple Developer Program (99 USD/an) et s'inscrire au Small Business Program
+Creer le compte Google Play Console (25 USD unique)
+Rediger et publier la Politique de Confidentialite RGPD (URL publique obligatoire)
+Ouvrir un compte OpenAI Platform et generer une API key de production
+Installer pgvector sur l'instance PostgreSQL Supabase (extension gratuite)
+Preparer le contenu initial : 2-3 livres, 1 cours complet (8 modules), 5 podcasts min.
+Commander les maquettes Figma (16 ecrans) + BPMN (8 processus) avant tout code
+Constituer le corpus initial pour la base vectorielle (objectif : 10 000 chunks min.)
+Lancer un appel d'offre structure avec ce CdC comme base de brief
+
+
+15.1 Profils de Developpeurs a Recruter
+Profil
+Competences cles
+Budget indicatif
+Lead Dev React Native
+Expo Router, RevenueCat, Agora, animations natives
+2 500-5 000 EUR/mois freelance
+Backend Node.js
+PostgreSQL, pgvector, Supabase, JWT, webhooks
+2 000-4 000 EUR/mois freelance
+Ingenieur IA Python
+LangChain, OpenAI API, Pandas, NumPy, embeddings
+2 500-5 000 EUR/mois freelance
+Designer UX/UI
+Figma, design systeme mobile, maquettes iOS/Android
+1 500-3 000 EUR/mois freelance
+
+
+15.2 Ressources et Outils
+Outil
+Usage
+URL
+Apple Developer Program
+Compte App Store
+developer.apple.com/programs
+Google Play Console
+Compte Android
+play.google.com/console
+OpenAI Platform
+GPT-4o + Embeddings + Whisper
+platform.openai.com
+LangChain (Python)
+Orchestration de l'agent IA
+python.langchain.com
+Supabase + pgvector
+Base de donnees + vectorielle
+supabase.com
+RevenueCat
+Abonnements in-app
+revenuecat.com
+Expo / React Native
+Developpement mobile
+expo.dev
+Sanity.io
+CMS contenu
+sanity.io
+Agora.io
+Lives et cellules de priere
+agora.io
+Camunda Modeler
+Diagrammes BPMN 2.0
+camunda.com/download/modeler
+Figma
+Design UX/UI
+figma.com
+
+
+
+The Kingdom's Voice  ·  Cahier des Charges v3.0  ·  Confidentiel  ·  Avril 2026
+

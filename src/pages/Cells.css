@@ -234,8 +234,14 @@
   color: var(--text-tertiary);
 }
 
-.cells-sidebar-label svg {
+.cells-sidebar-label svg,
+.cells-sidebar-label .tkv-mark-svg {
   color: var(--gold);
+  flex-shrink: 0;
+}
+
+.cells-sidebar-label .tkv-mark-svg {
+  margin-top: -1px;
 }
 
 .cells-sidebar-empty {

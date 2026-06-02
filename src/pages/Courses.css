@@ -7,20 +7,11 @@
 .courses-hero {
   position: relative;
   margin-bottom: 1.5rem;
-  padding: 1.75rem 0 1.25rem;
-  overflow: hidden;
+  padding: 1.25rem 0 0.75rem;
 }
 
 .courses-hero-glow {
-  position: absolute;
-  inset: -35% 5% auto;
-  height: 260px;
-  background: radial-gradient(
-    ellipse 75% 65% at 50% 0%,
-    rgba(201, 169, 98, 0.12) 0%,
-    transparent 72%
-  );
-  pointer-events: none;
+  display: none;
 }
 
 .courses-hero-inner {
@@ -94,12 +85,12 @@
   padding: 1.1rem 1.15rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
-  background: var(--bg-surface);
+  background: var(--bg-elevated);
   transition: border-color var(--duration-fast);
 }
 
 .courses-card:hover:not(.is-locked) {
-  border-color: var(--border-gold-hover);
+  border-color: var(--border-subtle);
 }
 
 .courses-card.is-locked {

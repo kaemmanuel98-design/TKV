@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Globe, Loader2, Plus, Send } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
-import { Send, Loader2, Plus, Globe, Users } from 'lucide-react';
-import { CellsLogo } from '../components/SectionLogos';
+import { CellsLogo, CommunityLogo } from '../components/SectionLogos';
 import ProfileAvatar from '../components/ProfileAvatar';
 import { CELL_ROOMS } from '../data/cellsRooms';
 import { fetchCustomCells, createCell } from '../lib/cellsApi';
@@ -311,7 +311,7 @@ const Cells = () => {
 
             <section className="cells-sidebar-block">
               <h3 className="cells-sidebar-label">
-                <Globe size={14} aria-hidden />
+                <CellsLogo size={14} title={t('cells_section_official')} />
                 {t('cells_section_official')}
               </h3>
               <div className="cells-room-list" role="tablist" aria-label={t('cells_section_official')}>
@@ -333,7 +333,7 @@ const Cells = () => {
 
             <section className="cells-sidebar-block">
               <h3 className="cells-sidebar-label">
-                <Users size={14} aria-hidden />
+                <CommunityLogo size={14} title={t('cells_section_custom')} />
                 {t('cells_section_custom')}
               </h3>
               <div className="cells-room-list cells-room-list--custom" role="tablist" aria-label={t('cells_section_custom')}>

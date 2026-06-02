@@ -97,6 +97,10 @@
   opacity: 0.85;
 }
 
+.friends-guest-card .tkv-mark-svg {
+  opacity: 1;
+}
+
 .friends-guest-card p {
   margin: 0;
   color: var(--text-secondary);
@@ -183,6 +187,10 @@
 .friends-panel-title svg {
   color: var(--gold);
   flex-shrink: 0;
+}
+
+.friends-panel-title .tkv-mark-svg {
+  margin-top: -1px;
 }
 
 .friends-panel-count {

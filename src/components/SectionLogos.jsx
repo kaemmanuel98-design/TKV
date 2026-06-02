@@ -529,6 +529,32 @@ export const ProfileLogo = ({ size = 40, className = '', title }) => {
   );
 };
 
+/** Parcours — coiffe académique et chemin d'apprentissage. */
+export const CoursesLogo = ({ size = 40, className = '', title }) => {
+  const id = useId().replace(/:/g, '');
+  return (
+    <MarkShell size={size} className={className} title={title} id={id}>
+      {({ gold, accent }) => (
+        <>
+          <path
+            d="M14 25l18-8 18 8-18 8-18-8z"
+            stroke={`url(#${gold})`}
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+            fill={`url(#${accent})`}
+            fillOpacity="0.22"
+          />
+          <path d="M20 28v7c0 3.5 5.2 6.5 12 6.5s12-3 12-6.5v-7" stroke={`url(#${gold})`} strokeWidth="1.5" fill="none" strokeOpacity="0.6" />
+          <path d="M50 25v10" stroke={`url(#${gold})`} strokeWidth="1.6" strokeLinecap="round" />
+          <circle cx="50" cy="37.5" r="2.2" fill={`url(#${gold})`} fillOpacity="0.85" />
+          <path d="M24 34c2.5 2 5 3 8 3s5.5-1 8-3" stroke={`url(#${gold})`} strokeWidth="1.2" strokeLinecap="round" strokeOpacity="0.45" fill="none" />
+          <path d="M18 48.5h28" stroke={`url(#${gold})`} strokeWidth="1" strokeLinecap="round" strokeOpacity="0.22" />
+        </>
+      )}
+    </MarkShell>
+  );
+};
+
 export const HomeNavIcon = ({ size = 18, className = '' }) => (
   <HomeLogo size={size} className={`tkv-mark-nav ${className}`.trim()} />
 );
@@ -551,4 +577,20 @@ export const CommunityNavIcon = ({ size = 18, className = '' }) => (
 
 export const ProfileNavIcon = ({ size = 18, className = '' }) => (
   <ProfileLogo size={size} className={`tkv-mark-nav ${className}`.trim()} />
+);
+
+export const CoursesNavIcon = ({ size = 18, className = '' }) => (
+  <CoursesLogo size={size} className={`tkv-mark-nav ${className}`.trim()} />
+);
+
+export const CellsNavIcon = ({ size = 18, className = '' }) => (
+  <CellsLogo size={size} className={`tkv-mark-nav ${className}`.trim()} />
+);
+
+export const FriendsNavIcon = ({ size = 18, className = '' }) => (
+  <FriendsLogo size={size} className={`tkv-mark-nav ${className}`.trim()} />
+);
+
+export const MapNavIcon = ({ size = 18, className = '' }) => (
+  <MapLogo size={size} className={`tkv-mark-nav ${className}`.trim()} />
 );

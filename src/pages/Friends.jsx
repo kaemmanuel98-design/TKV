@@ -7,7 +7,6 @@ import {
   Loader2,
   Check,
   X,
-  Users,
   MessageCircle,
   Bell,
   ChevronRight,
@@ -202,7 +201,7 @@ const Friends = () => {
         {hero}
         <div className="container friends-body">
           <div className="friends-guest-card">
-            <Users size={28} strokeWidth={1.5} aria-hidden />
+            <FriendsLogo size={28} title={t('friends_title')} />
             <p>{t('friends_login_required')}</p>
             <Link to="/auth" className="btn btn-primary">
               {t('profile_login_cta')}
@@ -361,7 +360,7 @@ const Friends = () => {
 
             <section className="friends-panel" aria-labelledby="friends-list-heading">
               <h2 id="friends-list-heading" className="friends-panel-title">
-                <Users size={18} strokeWidth={1.75} aria-hidden />
+                <FriendsLogo size={18} title={t('friends_list_title')} />
                 {t('friends_list_title')}
                 <span className="friends-panel-count">{friends.length}</span>
               </h2>
