@@ -5,6 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 // https://vite.dev/config/
 export default defineConfig({
   build: {
+    target: 'es2020',
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -55,6 +56,42 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         importScripts: ['/push-sw.js'],
+        runtimeCaching: [
+          {
+            urlPattern: /\/bible\/.*\.json$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'bible-chapters',
+              expiration: {
+                maxEntries: 400,
+                maxAgeSeconds: 60 * 60 * 24 * 90,
+              },
+            },
+          },
+          {
+            urlPattern: /\/covers\/.*\.(png|jpe?g|webp|svg)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'book-covers',
+              expiration: {
+                maxEntries: 40,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'supabase-rest',
+              networkTimeoutSeconds: 4,
+              expiration: {
+                maxEntries: 80,
+                maxAgeSeconds: 300,
+              },
+            },
+          },
+        ],
       },
       includeAssets: [
         'favicon.svg',

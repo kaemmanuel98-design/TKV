@@ -85,6 +85,8 @@
   border-radius: var(--radius-md);
   margin-bottom: 0.35rem;
   padding: 0.2rem 0.35rem 0.55rem;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
 }
 
 .bible-verse-wrap--highlight {

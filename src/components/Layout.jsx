@@ -32,6 +32,7 @@ import PaymentModal from './PaymentModal';
 import OnboardingGate from './OnboardingGate';
 import { useCompanionAccess } from '../hooks/useCompanionAccess';
 import { useTheme } from '../hooks/useTheme';
+import { prefetchRoute } from '../lib/prefetchRoutes';
 import './Layout.css';
 
 /** Navigation principale simplifiée (inspiration lecture-first). */
@@ -110,6 +111,8 @@ const Layout = () => {
     else navigate('/');
   };
 
+  const warmRoute = (path) => () => prefetchRoute(path);
+
   return (
     <div className="layout-container">
       {user && <FriendPresenceToasts />}
@@ -139,6 +142,9 @@ const Layout = () => {
               end={end}
               title={t(labelKey)}
               className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+              onMouseEnter={warmRoute(to)}
+              onFocus={warmRoute(to)}
+              onTouchStart={warmRoute(to)}
             >
               <Icon size={18} strokeWidth={1.75} />
               <span className="nav-link-label">{t(labelKey)}</span>
@@ -159,7 +165,15 @@ const Layout = () => {
             {toolsOpen && (
               <div className="nav-tools-dropdown card">
                 {visibleToolLinks.map(({ to, icon: Icon, labelKey }) => (
-                  <Link key={to} to={to} className="nav-tools-link" onClick={() => setToolsOpen(false)}>
+                  <Link
+                    key={to}
+                    to={to}
+                    className="nav-tools-link"
+                    onClick={() => setToolsOpen(false)}
+                    onMouseEnter={warmRoute(to)}
+                    onFocus={warmRoute(to)}
+                    onTouchStart={warmRoute(to)}
+                  >
                     <Icon size={16} />
                     {t(labelKey)}
                   </Link>
@@ -256,6 +270,7 @@ const Layout = () => {
             to={to}
             end={end}
             className={({ isActive }) => `mobile-nav-link ${isActive ? 'active' : ''}`}
+            onTouchStart={warmRoute(to)}
           >
             <Icon size={22} strokeWidth={1.75} />
             <span>{t(mobileLabelKey || labelKey)}</span>

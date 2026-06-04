@@ -5,7 +5,6 @@ import { useProfileStore } from './store/useProfileStore';
 import { useGamificationStore } from './store/useGamificationStore';
 import { useCourseProgressStore } from './store/useCourseProgressStore';
 import Layout from './components/Layout';
-import LoadingScreen from './components/LoadingScreen';
 import ErrorBoundary from './components/ErrorBoundary';
 import RequireAuth from './components/RequireAuth';
 import RequireCompanion from './components/RequireCompanion';
@@ -13,6 +12,7 @@ import MimshackLogo from './components/MimshackLogo';
 import Onboarding from './pages/Onboarding';
 import AuthPage from './pages/AuthPage';
 import Home from './pages/Home';
+import { scheduleIdleTask } from './lib/prefetchRoutes';
 import { initSpeechEngine } from './lib/speech';
 
 const Agent = lazy(() => import('./pages/Agent'));
@@ -41,17 +41,23 @@ const CompanionDashboard = lazy(() => import('./pages/CompanionDashboard'));
 const CompanionApply = lazy(() => import('./pages/CompanionApply'));
 
 function PageFallback() {
-  return <LoadingScreen />;
+  return (
+    <div className="page-fallback" role="status" aria-live="polite">
+      <div className="page-fallback-spinner" aria-hidden="true" />
+    </div>
+  );
 }
 
 function App() {
-  const { initialize, loading, user } = useAuthStore();
+  const { initialize, user } = useAuthStore();
   const fetchProfile = useProfileStore((s) => s.fetchProfile);
   const syncFromProfile = useGamificationStore((s) => s.syncFromProfile);
 
   useEffect(() => {
     initialize();
-    initSpeechEngine();
+    scheduleIdleTask(() => {
+      initSpeechEngine();
+    });
     const pct = useCourseProgressStore.getState().overallProgressPercent();
     if (pct > 0) {
       useGamificationStore.getState().setReadingProgress(pct);
@@ -68,10 +74,6 @@ function App() {
       useCourseProgressStore.getState().resetRemoteHydration();
     }
   }, [user?.id, fetchProfile, syncFromProfile]);
-
-  if (loading) {
-    return <LoadingScreen />;
-  }
 
   return (
     <ErrorBoundary>

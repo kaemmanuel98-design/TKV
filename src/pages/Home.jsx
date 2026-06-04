@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Volume2, ChevronRight, Flame, BookOpen } from 'lucide-react';
@@ -8,6 +8,7 @@ import { useCourseProgressStore } from '../store/useCourseProgressStore';
 import { useGamificationStore } from '../store/useGamificationStore';
 import { getNextIncompleteModule } from '../lib/courseStats';
 import { useSpeak } from '../hooks/useSpeak';
+import { prefetchPrimaryRoutes, prefetchRoute, scheduleIdleTask } from '../lib/prefetchRoutes';
 import MimshackLogo from '../components/MimshackLogo';
 import { LibraryLogo, BibleLogo, CoursesLogo } from '../components/SectionLogos';
 import './Home.css';
@@ -35,10 +36,21 @@ const Home = () => {
   const { streakCurrent, checkInToday, hasCheckedInToday } = useGamificationStore();
   const checkedInToday = hasCheckedInToday();
 
+  useEffect(() => {
+    scheduleIdleTask(prefetchPrimaryRoutes);
+  }, []);
+
   const renderTile = ({ to, icon: Icon, titleKey, mimshack, mark }) => {
     const Mark = mark ? HOME_MARKS[mark] : null;
     return (
-      <Link key={to} to={to} className="home-tile">
+      <Link
+        key={to}
+        to={to}
+        className="home-tile"
+        onMouseEnter={() => prefetchRoute(to)}
+        onFocus={() => prefetchRoute(to)}
+        onTouchStart={() => prefetchRoute(to)}
+      >
         <span className="home-tile-icon" aria-hidden>
           {mimshack ? (
             <MimshackLogo size={32} title="Mim" />
