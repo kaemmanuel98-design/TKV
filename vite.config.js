@@ -18,6 +18,12 @@ export default defineConfig({
           if (id.includes('node_modules/@supabase')) {
             return 'supabase';
           }
+          if (id.includes('/src/i18n/cdcKeys') || id.includes('/src/i18n/courseKeysExtended')) {
+            return 'cdc-keys';
+          }
+          if (id.includes('/src/i18n/confessionalI18n')) {
+            return 'confessional-i18n';
+          }
           if (
             id.includes('node_modules/react-dom') ||
             id.includes('node_modules/react/') ||

@@ -1,11 +1,5 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { cdcKeys } from './i18n/cdcKeys';
-import { heritageI18nKeys } from './i18n/heritageI18nKeys';
-import { heritageI18nKeysExpansion } from './i18n/heritageI18nKeysExpansion';
-import { heritageI18nKeysCharactersExtra } from './i18n/heritageI18nKeysCharactersExtra';
-import { gynoskoReaderKeys } from './i18n/gynoskoReaderKeys';
-import { confessionalI18n } from './i18n/confessionalI18n';
 
 const resources = {
   fr: {
@@ -1669,39 +1663,6 @@ const resources = {
     },
   },
 };
-
-Object.keys(cdcKeys).forEach((lang) => {
-  if (resources[lang]?.translation) {
-    Object.assign(resources[lang].translation, cdcKeys[lang]);
-  }
-});
-
-Object.keys(heritageI18nKeys).forEach((lang) => {
-  if (resources[lang]?.translation) {
-    Object.assign(resources[lang].translation, heritageI18nKeys[lang]);
-  }
-});
-
-Object.keys(heritageI18nKeysExpansion).forEach((lang) => {
-  if (resources[lang]?.translation) {
-    Object.assign(resources[lang].translation, heritageI18nKeysExpansion[lang]);
-  }
-});
-Object.keys(heritageI18nKeysCharactersExtra).forEach((lang) => {
-  if (resources[lang]?.translation) {
-    Object.assign(resources[lang].translation, heritageI18nKeysCharactersExtra[lang]);
-  }
-});
-Object.keys(gynoskoReaderKeys).forEach((lang) => {
-  if (resources[lang]?.translation) {
-    Object.assign(resources[lang].translation, gynoskoReaderKeys[lang]);
-  }
-});
-Object.keys(confessionalI18n).forEach((lang) => {
-  if (resources[lang]?.translation) {
-    Object.assign(resources[lang].translation, confessionalI18n[lang]);
-  }
-});
 
 i18n.use(initReactI18next).init({
   resources,

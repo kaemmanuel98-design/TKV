@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Volume2, VolumeX, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import { Volume2, VolumeX, ArrowLeft, ArrowRight, CheckCircle, BookOpen } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { LogoMark } from '../components/Logo';
 import { useSpeak } from '../hooks/useSpeak';

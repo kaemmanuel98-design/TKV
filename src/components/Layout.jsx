@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { Outlet, Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -23,17 +23,18 @@ import {
 } from './SectionLogos';
 import { MimshackNavIcon } from './MimshackLogo';
 import { HomeNavIcon, LibraryNavIcon, ProfileNavIcon } from './SectionLogos';
-import FriendPresenceToasts from './FriendPresenceToasts';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
 import { LogoMark } from './Logo';
 import ProfileAvatar from './ProfileAvatar';
-import PaymentModal from './PaymentModal';
 import OnboardingGate from './OnboardingGate';
 import { useCompanionAccess } from '../hooks/useCompanionAccess';
 import { useTheme } from '../hooks/useTheme';
-import { prefetchRoute } from '../lib/prefetchRoutes';
+import { prefetchAllNavRoutes, prefetchRoute } from '../lib/prefetchRoutes';
 import './Layout.css';
+
+const FriendPresenceToasts = lazy(() => import('./FriendPresenceToasts'));
+const PaymentModal = lazy(() => import('./PaymentModal'));
 
 /** Navigation principale simplifiée (inspiration lecture-first). */
 const mainNavItems = [
@@ -98,6 +99,10 @@ const Layout = () => {
   }, []);
 
   useEffect(() => {
+    prefetchAllNavRoutes();
+  }, []);
+
+  useEffect(() => {
     if (user?.id) fetchProfile(user.id);
   }, [user?.id, fetchProfile]);
 
@@ -115,7 +120,11 @@ const Layout = () => {
 
   return (
     <div className="layout-container">
-      {user && <FriendPresenceToasts />}
+      {user ? (
+        <Suspense fallback={null}>
+          <FriendPresenceToasts />
+        </Suspense>
+      ) : null}
       <header className={`header ${scrolled ? 'header-scrolled' : ''}`}>
         <Link to="/" className="logo">
           <div className="logo-mark">
@@ -254,7 +263,14 @@ const Layout = () => {
           <p className="footer-tagline">{t('home_subtitle')}</p>
           <nav className="footer-nav-simple" aria-label={t('footer_nav_label')}>
             {footerLinks.slice(0, 4).map(({ to, labelKey }) => (
-              <Link key={to} to={to} className="footer-nav-simple-link">
+              <Link
+                key={to}
+                to={to}
+                className="footer-nav-simple-link"
+                onMouseEnter={warmRoute(to)}
+                onFocus={warmRoute(to)}
+                onTouchStart={warmRoute(to)}
+              >
                 {t(labelKey)}
               </Link>
             ))}
@@ -278,7 +294,9 @@ const Layout = () => {
         ))}
       </nav>
 
-      <PaymentModal isOpen={isPaymentOpen} onClose={() => setIsPaymentOpen(false)} />
+      <Suspense fallback={null}>
+        <PaymentModal isOpen={isPaymentOpen} onClose={() => setIsPaymentOpen(false)} />
+      </Suspense>
     </div>
   );
 };

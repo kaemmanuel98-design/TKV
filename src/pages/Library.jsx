@@ -8,6 +8,7 @@ import { BOOK_META } from '../data/bookMeta';
 import { normalizeBookLang } from '../lib/bookLoader';
 import { useBookProgressStore } from '../store/useBookProgressStore';
 import PaywallModal from '../components/PaywallModal';
+import { prefetchRoute } from '../lib/prefetchRoutes';
 import './Library.css';
 
 const BOOK_CATALOG = [
@@ -56,7 +57,13 @@ function BookCard({ book, isPremiumUser, progressPercent, t, variant = 'featured
       {t('lib_locked')}
     </button>
   ) : (
-    <Link to={`/book/${book.slug}`} className="btn btn-primary btn-sm w-full">
+    <Link
+      to={`/book/${book.slug}`}
+      className="btn btn-primary btn-sm w-full"
+      onMouseEnter={() => prefetchRoute(`/book/${book.slug}`)}
+      onFocus={() => prefetchRoute(`/book/${book.slug}`)}
+      onTouchStart={() => prefetchRoute(`/book/${book.slug}`)}
+    >
       <BookOpen size={16} aria-hidden />
       {hasProgress ? t('lib_resume') : t('lib_read')}
       <ChevronRight size={16} aria-hidden />

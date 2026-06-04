@@ -14,7 +14,29 @@
     <title>TKV — The Kingdom's Voice</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <style>
+        #root:empty {
+          display: flex;
+          min-height: 100vh;
+          align-items: center;
+          justify-content: center;
+          background: #070708;
+        }
+        #root:empty::after {
+          content: '';
+          width: 28px;
+          height: 28px;
+          border: 2px solid rgba(148, 163, 184, 0.25);
+          border-top-color: #c9a962;
+          border-radius: 50%;
+          animation: tkv-boot-spin 0.75s linear infinite;
+        }
+        @keyframes tkv-boot-spin {
+          to { transform: rotate(360deg); }
+        }
+      </style>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
