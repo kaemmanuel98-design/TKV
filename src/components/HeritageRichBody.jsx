@@ -6,9 +6,11 @@ import { resolveHeritageImage } from '../lib/heritageMedia';
 function HeritageFigure({ block, t, contentSlug, contentKind }) {
   const alt = block.altKey ? t(block.altKey) : block.alt || '';
   const imgSlug = block.slug || contentSlug;
-  const { primary, fallback } = imgSlug
-    ? resolveHeritageImage({ slug: imgSlug, kind: block.kind || contentKind })
-    : resolveHeritageImage({ kind: contentKind });
+  const { primary, fallback } = resolveHeritageImage({
+    slug: imgSlug,
+    kind: block.kind || contentKind,
+    altKey: block.altKey,
+  });
 
   if (!primary && !fallback) {
     return (

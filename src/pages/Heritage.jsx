@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useTransition } from 'react';
+import { loadHeritageI18n } from '../i18n/loadI18nLayers';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Shield, Clock, Users, ScrollText, ChevronRight } from 'lucide-react';
@@ -63,6 +64,11 @@ const Heritage = () => {
     TABS.some((tab) => tab.id === tabParam) ? tabParam : 'timeline',
   );
   const [proofFilter, setProofFilter] = useState('all');
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    void loadHeritageI18n();
+  }, []);
 
   useEffect(() => {
     if (TABS.some((tab) => tab.id === tabParam)) {
@@ -71,8 +77,10 @@ const Heritage = () => {
   }, [tabParam]);
 
   const setTab = (tab) => {
-    setActiveTab(tab);
-    setSearchParams({ tab });
+    startTransition(() => {
+      setActiveTab(tab);
+      setSearchParams({ tab });
+    });
   };
 
   const filteredProofs = useMemo(() => {
@@ -104,7 +112,7 @@ const Heritage = () => {
         </div>
       </header>
 
-      <div className="container heritage-hub-body">
+      <div className={`container heritage-hub-body${isPending ? ' heritage-hub-body--pending' : ''}`}>
         <nav className="heritage-hub-tabs" role="tablist" aria-label={t('heritage')}>
           {TABS.map(({ id, icon: Icon, labelKey }) => (
             <button

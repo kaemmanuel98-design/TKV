@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 export default class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -27,9 +26,9 @@ export default class ErrorBoundary extends React.Component {
             <button type="button" className="btn btn-primary" onClick={() => window.location.reload()}>
               Recharger
             </button>
-            <Link to="/" className="btn btn-outline">
+            <a href="/" className="btn btn-outline">
               Accueil
-            </Link>
+            </a>
           </div>
         </div>
       );

@@ -1,5 +1,12 @@
 const prefetched = new Set();
 
+function prefetchRouteI18n(path) {
+  void import('../i18n/loadI18nLayers').then((m) => {
+    if (path === '/heritage') void m.loadHeritageI18n();
+    if (path === '/courses') void m.loadCourseI18n();
+  });
+}
+
 const ROUTE_LOADERS = {
   '/library': () => import('../pages/Library'),
   '/bible': () => import('../pages/BibleStrong'),
@@ -19,14 +26,29 @@ const ROUTE_LOADERS = {
 export function scheduleIdleTask(task) {
   if (typeof window === 'undefined') return;
   if ('requestIdleCallback' in window) {
-    window.requestIdleCallback(() => task(), { timeout: 1200 });
+    window.requestIdleCallback(() => task(), { timeout: 800 });
     return;
   }
-  window.setTimeout(task, 400);
+  window.setTimeout(task, 200);
 }
 
 export function prefetchRoute(path) {
   const normalized = path.split('?')[0].replace(/\/$/, '') || '/';
+
+  if (normalized === '/heritage' || normalized === '/courses') {
+    prefetchRouteI18n(normalized);
+  }
+
+  if (normalized.startsWith('/heritage/')) {
+    prefetchRouteI18n('/heritage');
+    if (prefetched.has('/heritage-detail')) return;
+    prefetched.add('/heritage-detail');
+    void import('../components/HeritageDetailLayout');
+    if (normalized.includes('/article/')) void import('../pages/HeritageArticle');
+    if (normalized.includes('/event/')) void import('../pages/HeritageEvent');
+    if (normalized.includes('/character/')) void import('../pages/HeritageCharacter');
+    return;
+  }
 
   if (normalized.startsWith('/book/')) {
     if (prefetched.has('/book')) return;

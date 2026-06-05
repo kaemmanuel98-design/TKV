@@ -1,5 +1,5 @@
 /**
- * Images Héritage — illustrations SVG locales uniquement (fiables hors-ligne).
+ * Images Héritage — photos historiques (Wikimedia) + repli SVG local.
  */
 import illustrationEvent from '../assets/heritage/illustration-event.svg?url';
 import illustrationCouncil from '../assets/heritage/illustration-council.svg?url';
@@ -9,6 +9,10 @@ import illustrationRevival from '../assets/heritage/illustration-revival.svg?url
 import illustrationArticle from '../assets/heritage/illustration-article.svg?url';
 import illustrationProof from '../assets/heritage/illustration-proof.svg?url';
 import illustrationCharacter from '../assets/heritage/illustration-character.svg?url';
+import {
+  heritagePhotoForAltKey,
+  heritagePhotoForSlug,
+} from '../data/heritage/heritageImageUrls';
 
 export const HERITAGE_LOCAL = {
   event: illustrationEvent,
@@ -47,13 +51,24 @@ export function getLocalFallback(kind) {
 }
 
 /**
- * @param {{ slug?: string, kind?: string }} opts
+ * @param {{ slug?: string, kind?: string, altKey?: string }} opts
  */
 export function resolveHeritageImage(opts = {}) {
-  const { slug, kind = 'event' } = opts;
+  const { slug, kind = 'event', altKey } = opts;
   const localKind = (slug && SLUG_TO_KIND[slug]) || kind || 'event';
-  const url = getLocalFallback(localKind);
-  return { primary: url, fallback: url };
+  const fallback = getLocalFallback(localKind);
+
+  const fromAlt = heritagePhotoForAltKey(altKey);
+  if (fromAlt) {
+    return { primary: fromAlt, fallback };
+  }
+
+  const fromSlug = heritagePhotoForSlug(slug);
+  if (fromSlug) {
+    return { primary: fromSlug, fallback };
+  }
+
+  return { primary: fallback, fallback };
 }
 
 export function heritageImageForSlug(slug, kind) {

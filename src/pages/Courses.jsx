@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { loadCourseI18n } from '../i18n/loadI18nLayers';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Lock, CheckCircle, ChevronRight } from 'lucide-react';
@@ -35,6 +36,10 @@ const Courses = () => {
   const isPremium = useProfileStore((s) => s.isPremium);
   const completedCount = useCourseProgressStore((s) => s.completedCount);
   const completed = useCourseProgressStore((s) => s.completed);
+
+  useEffect(() => {
+    void loadCourseI18n();
+  }, []);
 
   return (
     <div className="courses-page animate-fade-in">

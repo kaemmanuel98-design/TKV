@@ -1,5 +1,3 @@
-import { courseKeysExtended } from './courseKeysExtended';
-
 /** Clés i18n — alignement Cahier des Charges v3.0 (Phase 1a) */
 export const cdcKeys = {
   fr: {
@@ -4766,7 +4764,3 @@ export const cdcKeys = {
     confessional_situation_other: 'ابتلاء آخر',
   },
 };
-
-Object.keys(courseKeysExtended).forEach((lang) => {
-  Object.assign(cdcKeys[lang], courseKeysExtended[lang]);
-});

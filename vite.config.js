@@ -18,8 +18,11 @@ export default defineConfig({
           if (id.includes('node_modules/@supabase')) {
             return 'supabase';
           }
-          if (id.includes('/src/i18n/cdcKeys') || id.includes('/src/i18n/courseKeysExtended')) {
+          if (id.includes('/src/i18n/cdcKeys')) {
             return 'cdc-keys';
+          }
+          if (id.includes('/src/i18n/courseKeysExtended')) {
+            return 'course-keys';
           }
           if (id.includes('/src/i18n/confessionalI18n')) {
             return 'confessional-i18n';
@@ -75,6 +78,17 @@ export default defineConfig({
             },
           },
           {
+            urlPattern: /^https:\/\/upload\.wikimedia\.org\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'heritage-wikimedia',
+              expiration: {
+                maxEntries: 120,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
+          {
             urlPattern: /\/covers\/.*\.(png|jpe?g|webp|svg)$/i,
             handler: 'CacheFirst',
             options: {
@@ -82,6 +96,17 @@ export default defineConfig({
               expiration: {
                 maxEntries: 40,
                 maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+            },
+          },
+          {
+            urlPattern: /\/heritage\/photos\/.*\.(png|jpe?g|webp)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'heritage-photos',
+              expiration: {
+                maxEntries: 80,
+                maxAgeSeconds: 60 * 60 * 24 * 90,
               },
             },
           },

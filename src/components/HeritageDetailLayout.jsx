@@ -29,11 +29,12 @@ export default function HeritageDetailLayout({ item, slug, backPath = '/heritage
   const { t, i18n } = useTranslation();
   const { blocks, translating, translateError } = useHeritageBlocks(item.blocks, i18n, slug);
   const contentKind = resolveContentKind(item, slug);
+  const heroAltKey = item.heroAltKey || item.portraitAltKey;
   const { primary, fallback } = resolveHeritageImage({
     slug,
     kind: contentKind,
+    altKey: heroAltKey,
   });
-  const heroAltKey = item.heroAltKey || item.portraitAltKey;
 
   const backUrl = backTab ? `${backPath}?tab=${backTab}` : backPath;
 

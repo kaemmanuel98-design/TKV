@@ -339,6 +339,17 @@
   }
 }
 
+.heritage-hub-body--pending .heritage-panel {
+  opacity: 0.72;
+  transition: opacity 0.15s ease;
+}
+
+.heritage-entry,
+.heritage-timeline-entry {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 12rem;
+}
+
 .heritage-entry {
   display: flex;
   flex-direction: column;

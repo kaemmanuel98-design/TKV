@@ -18,22 +18,34 @@ export async function loadPrimaryI18n() {
   mergeKeys(gynoskoReaderKeys);
 }
 
-/** Clés de pages secondaires — après le premier rendu. */
-export async function loadSecondaryI18n() {
+/** Clés Héritage — préchargées à l’approche de /heritage. */
+export async function loadHeritageI18n() {
   const [
     { heritageI18nKeys },
     { heritageI18nKeysExpansion },
     { heritageI18nKeysCharactersExtra },
-    { confessionalI18n },
   ] = await Promise.all([
     import('./heritageI18nKeys'),
     import('./heritageI18nKeysExpansion'),
     import('./heritageI18nKeysCharactersExtra'),
-    import('./confessionalI18n'),
   ]);
-
   mergeKeys(heritageI18nKeys);
   mergeKeys(heritageI18nKeysExpansion);
   mergeKeys(heritageI18nKeysCharactersExtra);
+}
+
+/** Clés cours EIDO détaillées — chargées à l’approche de /courses. */
+export async function loadCourseI18n() {
+  const { courseKeysExtended } = await import('./courseKeysExtended');
+  mergeKeys(courseKeysExtended);
+}
+
+/** Clés de pages secondaires — après le premier rendu. */
+export async function loadSecondaryI18n() {
+  const [{ confessionalI18n }] = await Promise.all([
+    import('./confessionalI18n'),
+    loadHeritageI18n(),
+    loadCourseI18n(),
+  ]);
   mergeKeys(confessionalI18n);
 }
