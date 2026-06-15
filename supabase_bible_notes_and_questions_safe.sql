@@ -32,6 +32,10 @@ CREATE TABLE IF NOT EXISTS public.bible_verse_notes (
   verse_num integer NOT NULL CHECK (verse_num > 0),
   verse_ref text NOT NULL,
   highlighted boolean NOT NULL DEFAULT false,
+  highlight_color text CHECK (
+    highlight_color IS NULL
+    OR highlight_color IN ('yellow', 'green', 'blue', 'pink', 'purple', 'orange')
+  ),
   note text NOT NULL DEFAULT '' CHECK (char_length(note) <= 2000),
   visibility text NOT NULL DEFAULT 'private'
     CHECK (visibility IN ('private', 'friends', 'public')),

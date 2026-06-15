@@ -24,6 +24,7 @@ const OUT = path.join(ROOT, 'public', 'bible');
 const BSB_ZIP = path.join(CACHE, 'BSB_strongs_usj.zip');
 const BSB_DIR = path.join(CACHE, 'bsb_strongs');
 const FR_JSON = path.join(CACHE, 'fr_apee.json');
+const FR_PDV_JSON = path.join(CACHE, 'fr_pdv.json');
 const EN_BBE_JSON = path.join(CACHE, 'en_bbe.json');
 const ES_JSON = path.join(CACHE, 'es_rvr.json');
 const PT_JSON = path.join(CACHE, 'pt_nvi.json');
@@ -39,10 +40,11 @@ const PT_URL = `${THIAGO_BASE}/pt_nvi.json`;
 const AR_URL = `${THIAGO_BASE}/ar_svd.json`;
 const NL_URL = 'https://api.getbible.net/v2/statenvertaling.json';
 
-const BIBLE_LANGS = ['fr', 'en', 'es', 'nl', 'pt', 'ar'];
+const BIBLE_LANGS = ['fr', 'fr_pdv', 'en', 'es', 'nl', 'pt', 'ar'];
 
 const GLOSS_BY_LANG = {
   fr: (id, s) => `Mot original (${id})${s ? ` — « ${s} »` : ''}.`,
+  fr_pdv: (id, s) => `Mot original (${id})${s ? ` — « ${s} »` : ''}.`,
   en: (id, s) => `Original language word (${id})${s ? ` — "${s}"` : ''}.`,
   es: (id, s) => `Palabra en lengua original (${id})${s ? ` — «${s}»` : ''}.`,
   nl: (id, s) => `Oorspronkelijk woord (${id})${s ? ` — «${s}»` : ''}.`,
@@ -432,8 +434,15 @@ async function main() {
     }
   }
 
+  if (!fs.existsSync(FR_PDV_JSON)) {
+    console.log('Parole de Vie absente du cache — lancement download-pdv-bible.mjs…');
+    const { execSync } = await import('child_process');
+    execSync('node scripts/download-pdv-bible.mjs', { cwd: ROOT, stdio: 'inherit' });
+  }
+
   const localizedSources = {
     fr: loadThiagobodrukBible(FR_JSON),
+    fr_pdv: loadThiagobodrukBible(FR_PDV_JSON),
     en_readable: loadThiagobodrukBible(EN_BBE_JSON),
     es: loadThiagobodrukBible(ES_JSON),
     pt: loadThiagobodrukBible(PT_JSON),
@@ -486,12 +495,13 @@ async function main() {
       for (const lang of BIBLE_LANGS) {
         if (lang === 'en') continue;
         const chapterTexts = localizedSources[lang]?.[bi]?.chapters?.[ch - 1];
+        const alignLang = lang === 'fr_pdv' ? 'fr' : lang;
         const langVerses = [];
         for (const vNum of verseNums) {
           const enSegs = enVersesMap.get(vNum);
           const enVerse = segmentsToVerse(vNum, enSegs);
           const localText = chapterTexts?.[vNum - 1];
-          const verse = buildLocalizedVerse(vNum, localText, enVerse.segments, enVerse.text, lang);
+          const verse = buildLocalizedVerse(vNum, localText, enVerse.segments, enVerse.text, alignLang);
           langVerses.push(verse);
           collectLexiconFromSegments(verse.segments, lexicon, wordGloss);
         }
@@ -507,10 +517,12 @@ async function main() {
     version: 1,
     books: BIBLE_BOOKS.map((b) => ({ id: b.id, chapters: b.chapters, testament: b.testament })),
     chapterCount,
-    languages: BIBLE_LANGS,
+    languages: ['fr', 'en', 'es', 'nl', 'pt', 'ar'],
+    frenchVersions: ['fr', 'fr_pdv'],
     sources: {
       en: 'Basic English text + BSB Strong alignment (public domain)',
       fr: 'Bible de l\'Épée — traduction fidèle au texte original (thiagobodruk/bible)',
+      fr_pdv: 'Parole de Vie 2017 © Société biblique française (YouVersion API)',
       es: 'Reina-Valera (thiagobodruk/bible)',
       pt: 'Nova Versão Internacional (thiagobodruk/bible)',
       ar: 'Smith-Van Dyck (thiagobodruk/bible)',

@@ -15,10 +15,20 @@ import {
 import { verseText } from '../data/bible/utils';
 import { prepareChapterSpeechText } from '../lib/speech/prepareText';
 import { resolveBibleReadLang, pickBibleChapterLang } from '../data/bible/languages';
+import { FRENCH_BIBLE_VERSIONS } from '../data/bible/frenchVersions';
 import { resolveStrongForSurface } from '../data/bible/strongAlignHints';
 import { useSpeak } from '../hooks/useSpeak';
 import { useAuthStore } from '../store/useAuthStore';
 import { supabase } from '../lib/supabase';
+import HighlightColorPicker from '../components/bible/HighlightColorPicker';
+import HighlightedVersesPanel from '../components/bible/HighlightedVersesPanel';
+import {
+  DEFAULT_HIGHLIGHT_COLOR,
+  getHighlightWrapClass,
+  getHighlightWrapStyle,
+  getVerseHighlightColor,
+} from '../data/bible/highlightColors';
+import { loadHighlightLabels } from '../lib/bible/highlightLabels';
 import './BibleStrong.css';
 
 const VERSE_NOTE_VISIBILITY = ['private', 'friends', 'public'];
@@ -46,8 +56,20 @@ const BibleStrong = () => {
   const readLang = lang;
   const user = useAuthStore((s) => s.user);
 
-  const { bookId, currentChapter, lexiconSelection, setBook, setChapter, setLexiconSelection, clearLexicon, getBookMeta } =
-    useBibleStore();
+  const {
+    bookId,
+    currentChapter,
+    frenchVersion,
+    lexiconSelection,
+    setBook,
+    setChapter,
+    setFrenchVersion,
+    setLexiconSelection,
+    clearLexicon,
+    getBookMeta,
+    scrollToVerse,
+    clearScrollToVerse,
+  } = useBibleStore();
 
   const bookMeta = getBookMeta();
   const bookLabel = getBookName(bookId, lang);
@@ -66,10 +88,13 @@ const BibleStrong = () => {
   const [activeNoteVerseRef, setActiveNoteVerseRef] = useState('');
   const [noteDraft, setNoteDraft] = useState('');
   const [noteVisibility, setNoteVisibility] = useState('private');
-  const [noteHighlighted, setNoteHighlighted] = useState(false);
+  const [noteHighlightColor, setNoteHighlightColor] = useState(null);
+  const [highlightLabels, setHighlightLabels] = useState(() => loadHighlightLabels(user?.id));
+  const [highlightListRevision, setHighlightListRevision] = useState(0);
   const [savingNote, setSavingNote] = useState(false);
   const lexiconPanelRef = useRef(null);
   const prewarmKeyRef = useRef('');
+  const verseRefs = useRef({});
 
   useEffect(() => {
     preloadLexicon().then(() => setLexiconFetchFailed(isLexiconLoadFailed()));
@@ -90,14 +115,14 @@ const BibleStrong = () => {
         setChapterData(null);
         return;
       }
-      setChapterData(pickBibleChapterLang(data, readLang));
+      setChapterData(pickBibleChapterLang(data, readLang, frenchVersion));
     } catch (err) {
       console.error(err);
       setChapterData(null);
     } finally {
       setLoading(false);
     }
-  }, [bookId, currentChapter, readLang]);
+  }, [bookId, currentChapter, readLang, frenchVersion]);
 
   useEffect(() => {
     loadChapter();
@@ -107,8 +132,20 @@ const BibleStrong = () => {
     clearLexicon();
   }, [bookId, currentChapter, clearLexicon]);
 
+  useEffect(() => {
+    setHighlightLabels(loadHighlightLabels(user?.id));
+  }, [user?.id]);
+
   const verses = chapterData?.verses || [];
   const { speak, stop } = useSpeak();
+
+  useEffect(() => {
+    if (!scrollToVerse || loading) return;
+    const el = verseRefs.current[scrollToVerse];
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    clearScrollToVerse();
+  }, [scrollToVerse, loading, verses, clearScrollToVerse]);
 
   useEffect(() => {
     if (!verses.length) return;
@@ -208,7 +245,7 @@ const BibleStrong = () => {
 
       const { data, error } = await supabase
         .from('bible_verse_notes')
-        .select('id, user_id, book_id, chapter_num, verse_num, verse_ref, highlighted, note, visibility, created_at, updated_at')
+        .select('id, user_id, book_id, chapter_num, verse_num, verse_ref, highlighted, highlight_color, note, visibility, created_at, updated_at')
         .eq('book_id', bookId)
         .eq('chapter_num', currentChapter)
         .in('verse_num', verseIds)
@@ -256,7 +293,7 @@ const BibleStrong = () => {
   }, [bookId, currentChapter, verses, user?.id]);
 
   const upsertLocalVerseNote = useCallback(
-    ({ verseRef, verseNum, note, highlighted, visibility }) => {
+    ({ verseRef, verseNum, note, highlightColor, visibility }) => {
       const all = loadLocalVerseNotes();
       const key = `${user?.id || 'guest'}:${verseRef}`;
       all[key] = {
@@ -267,7 +304,8 @@ const BibleStrong = () => {
         verse_num: verseNum,
         verse_ref: verseRef,
         note: note || '',
-        highlighted: Boolean(highlighted),
+        highlight_color: highlightColor || null,
+        highlighted: Boolean(highlightColor),
         visibility: VERSE_NOTE_VISIBILITY.includes(visibility) ? visibility : 'private',
         updated_at: new Date().toISOString(),
       };
@@ -278,10 +316,11 @@ const BibleStrong = () => {
   );
 
   const saveVerseNote = useCallback(
-    async ({ verseRef, verseNum, note, highlighted, visibility }) => {
+    async ({ verseRef, verseNum, note, highlightColor, visibility }) => {
       const safeVisibility = VERSE_NOTE_VISIBILITY.includes(visibility) ? visibility : 'private';
       const content = String(note || '').trim();
-      const shouldKeep = Boolean(content) || Boolean(highlighted);
+      const color = highlightColor || null;
+      const shouldKeep = Boolean(content) || Boolean(color);
 
       if (!user?.id || verseNotesTableMissing) {
         if (!shouldKeep) {
@@ -292,7 +331,7 @@ const BibleStrong = () => {
           setVerseNotesByRef((prev) => ({ ...prev, [verseRef]: (prev[verseRef] || []).filter((n) => n.id !== key) }));
           return;
         }
-        upsertLocalVerseNote({ verseRef, verseNum, note: content, highlighted, visibility: safeVisibility });
+        upsertLocalVerseNote({ verseRef, verseNum, note: content, highlightColor: color, visibility: safeVisibility });
         return;
       }
 
@@ -317,13 +356,14 @@ const BibleStrong = () => {
         verse_num: verseNum,
         verse_ref: verseRef,
         note: content,
-        highlighted: Boolean(highlighted),
+        highlight_color: color,
+        highlighted: Boolean(color),
         visibility: safeVisibility,
       };
       const { data, error } = await supabase
         .from('bible_verse_notes')
         .upsert(payload, { onConflict: 'user_id,verse_ref' })
-        .select('id, user_id, book_id, chapter_num, verse_num, verse_ref, highlighted, note, visibility, created_at, updated_at')
+        .select('id, user_id, book_id, chapter_num, verse_num, verse_ref, highlighted, highlight_color, note, visibility, created_at, updated_at')
         .single();
       if (error) throw error;
       setVerseNotesByRef((prev) => ({
@@ -340,11 +380,11 @@ const BibleStrong = () => {
       setActiveNoteVerseRef(verseRef);
       setNoteDraft(own?.note || '');
       setNoteVisibility(own?.visibility || 'private');
-      setNoteHighlighted(Boolean(own?.highlighted));
+      setNoteHighlightColor(getVerseHighlightColor(own));
       if (!own && verseNum) {
         setNoteDraft('');
         setNoteVisibility('private');
-        setNoteHighlighted(false);
+        setNoteHighlightColor(null);
       }
     },
     [verseNotesByRef, user?.id]
@@ -478,9 +518,10 @@ const BibleStrong = () => {
         verseRef,
         verseNum,
         note: noteDraft,
-        highlighted: noteHighlighted,
+        highlightColor: noteHighlightColor,
         visibility: noteVisibility,
       });
+      setHighlightListRevision((n) => n + 1);
       setActiveNoteVerseRef('');
     } catch (err) {
       console.error(err);
@@ -490,9 +531,9 @@ const BibleStrong = () => {
     }
   };
 
-  const toggleVerseHighlight = async (verseRef, verseNum) => {
+  const setVerseHighlightColor = async (verseRef, verseNum, highlightColor) => {
     const own = (verseNotesByRef[verseRef] || []).find((n) => n.user_id === (user?.id || 'guest'));
-    const nextHighlighted = !Boolean(own?.highlighted);
+    const nextColor = highlightColor || null;
     const nextNote = own?.note || '';
     const nextVisibility = own?.visibility || 'private';
     try {
@@ -500,13 +541,20 @@ const BibleStrong = () => {
         verseRef,
         verseNum,
         note: nextNote,
-        highlighted: nextHighlighted,
+        highlightColor: nextColor,
         visibility: nextVisibility,
       });
+      setHighlightListRevision((n) => n + 1);
     } catch (err) {
       console.error(err);
       setVerseNoteError(true);
     }
+  };
+
+  const quickHighlightVerse = async (verseRef, verseNum) => {
+    const own = (verseNotesByRef[verseRef] || []).find((n) => n.user_id === (user?.id || 'guest'));
+    const current = getVerseHighlightColor(own);
+    await setVerseHighlightColor(verseRef, verseNum, current ? null : DEFAULT_HIGHLIGHT_COLOR);
   };
 
   const visibilityLabel = (visibility) => {
@@ -550,6 +598,23 @@ const BibleStrong = () => {
           />
 
           <div className="card bible-toolbar">
+            {readLang === 'fr' ? (
+              <label className="bible-toolbar-field">
+                <span className="bible-toolbar-label">{t('bible_select_version', { defaultValue: 'Traduction' })}</span>
+                <select
+                  className="bible-select"
+                  value={frenchVersion}
+                  onChange={(e) => setFrenchVersion(e.target.value)}
+                >
+                  {FRENCH_BIBLE_VERSIONS.map((version) => (
+                    <option key={version.id} value={version.id}>
+                      {t(version.labelKey, { defaultValue: version.defaultLabel })}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+
             <label className="bible-toolbar-field">
               <span className="bible-toolbar-label">{t('bible_select_book')}</span>
               <select
@@ -611,12 +676,20 @@ const BibleStrong = () => {
             </div>
           </div>
 
+          <HighlightedVersesPanel
+            userId={user?.id}
+            verseNotesTableMissing={verseNotesTableMissing}
+            supabase={supabase}
+            refreshKey={highlightListRevision}
+            onLabelsChange={setHighlightLabels}
+          />
+
           <div className="bible-note-feature-banner" role="status">
             <strong>{t('bible_note_feature_title', { defaultValue: 'Nouveau : Notes et surlignage des versets' })}</strong>
             <p>
               {t('bible_note_feature_desc', {
                 defaultValue:
-                  'Sous chaque verset, utilise les boutons "Surligner" et "Ajouter une note". Tu peux choisir : prive, amis, ou public.',
+                  'Sous chaque verset, choisis une couleur de surlignage et ajoute une note. Tu peux filtrer tes versets surlignés par couleur.',
               })}
             </p>
           </div>
@@ -668,11 +741,18 @@ const BibleStrong = () => {
                 const verseNotes = verseNotesByRef[verseRef] || [];
                 const ownNote = verseNotes.find((n) => n.user_id === (user?.id || 'guest'));
                 const communityNotes = verseNotes.filter((n) => n.user_id !== (user?.id || 'guest') && n.note);
-                const isHighlighted = Boolean(ownNote?.highlighted);
+                const ownColor = getVerseHighlightColor(ownNote);
                 const isEditing = activeNoteVerseRef === verseRef;
 
                 return (
-                  <div key={verse.id} className={`bible-verse-wrap ${isHighlighted ? 'bible-verse-wrap--highlight' : ''}`}>
+                  <div
+                    key={verse.id}
+                    ref={(el) => {
+                      if (el) verseRefs.current[verse.id] = el;
+                    }}
+                    className={`bible-verse-wrap ${getHighlightWrapClass(ownNote)}`}
+                    style={getHighlightWrapStyle(ownNote)}
+                  >
                     <div className="bible-verse">
                       <span className="bible-verse-num">{verse.id}</span>
                       {verse.segments.map((seg, index) => {
@@ -707,11 +787,18 @@ const BibleStrong = () => {
                     <div className="bible-verse-tools">
                       <button
                         type="button"
-                        className={`btn btn-sm bible-verse-tool-btn ${isHighlighted ? 'btn-primary' : 'btn-outline'}`}
-                        onClick={() => toggleVerseHighlight(verseRef, verse.id)}
+                        className={`btn btn-sm bible-verse-tool-btn ${ownColor ? 'btn-primary' : 'btn-outline'}`}
+                        onClick={() => quickHighlightVerse(verseRef, verse.id)}
                       >
                         {t('bible_highlight_toggle', { defaultValue: 'Surligner' })}
                       </button>
+                      <HighlightColorPicker
+                        compact
+                        activeColor={ownColor}
+                        customLabels={highlightLabels}
+                        onPick={(color) => setVerseHighlightColor(verseRef, verse.id, color)}
+                        showRemove={false}
+                      />
                       <button
                         type="button"
                         className="btn btn-sm btn-outline bible-verse-tool-btn"
@@ -765,14 +852,14 @@ const BibleStrong = () => {
                               <option value="public">{visibilityLabel('public')}</option>
                             </select>
                           </label>
-                          <label className="bible-note-check">
-                            <input
-                              type="checkbox"
-                              checked={noteHighlighted}
-                              onChange={(e) => setNoteHighlighted(e.target.checked)}
+                          <div className="bible-note-highlight-field">
+                            <span>{t('bible_highlight_keep_color', { defaultValue: 'Couleur du surlignage' })}</span>
+                            <HighlightColorPicker
+                              activeColor={noteHighlightColor}
+                              customLabels={highlightLabels}
+                              onPick={setNoteHighlightColor}
                             />
-                            {t('bible_highlight_keep', { defaultValue: 'Garder le verset surligne' })}
-                          </label>
+                          </div>
                         </div>
                         <div className="bible-note-editor-actions">
                           <button

@@ -1,3 +1,5 @@
+import { resolveFrenchBibleTextKey } from './frenchVersions.js';
+
 /** Langues de lecture Bible Strong (alignées sur i18n de l'app) */
 export const BIBLE_READ_LANGS = ['fr', 'en', 'es', 'nl', 'pt', 'ar'];
 
@@ -6,12 +8,20 @@ export function resolveBibleReadLang(i18nLang) {
   return BIBLE_READ_LANGS.includes(code) ? code : 'en';
 }
 
-export function pickBibleChapterLang(chapterPayload, readLang) {
+/** Clé de texte dans les chapitres JSON (fr vs fr_pdv). */
+export function resolveBibleTextKey(readLang, frenchVersion) {
+  if (readLang === 'fr') return resolveFrenchBibleTextKey(frenchVersion);
+  return readLang;
+}
+
+export function pickBibleChapterLang(chapterPayload, readLang, frenchVersion = 'fr') {
   if (!chapterPayload) return null;
+  const textKey = resolveBibleTextKey(readLang, frenchVersion);
   return (
+    chapterPayload[textKey] ||
     chapterPayload[readLang] ||
-    chapterPayload.en ||
     chapterPayload.fr ||
+    chapterPayload.en ||
     Object.values(chapterPayload).find((v) => v?.verses?.length) ||
     null
   );

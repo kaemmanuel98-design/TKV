@@ -341,9 +341,14 @@
     "pt",
     "ar"
   ],
+  "frenchVersions": [
+    "fr",
+    "fr_pdv"
+  ],
   "sources": {
     "en": "Basic English text + BSB Strong alignment (public domain)",
     "fr": "Bible de l'Épée — traduction fidèle au texte original (thiagobodruk/bible)",
+    "fr_pdv": "Parole de Vie 2017 © Société biblique française (YouVersion API)",
     "es": "Reina-Valera (thiagobodruk/bible)",
     "pt": "Nova Versão Internacional (thiagobodruk/bible)",
     "ar": "Smith-Van Dyck (thiagobodruk/bible)",
