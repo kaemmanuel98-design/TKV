@@ -33,6 +33,7 @@
 }
 
 .nav-link .tkv-mark-nav,
+.nav-tools-tile .tkv-mark-nav,
 .nav-tools-link .tkv-mark-nav,
 .mobile-nav-link .tkv-mark-nav {
   width: 1.2em;

@@ -11,6 +11,9 @@ import {
   DoorClosed,
   HeartHandshake,
   Info,
+  ChevronDown,
+  Wrench,
+  X,
 } from 'lucide-react';
 import {
   BibleNavIcon,
@@ -50,16 +53,32 @@ const mobileNavItems = [
   { ...mainNavItems[2], mobileLabelKey: 'course_page_title' },
 ];
 
-const toolLinks = [
-  { to: '/agent', icon: MimshackNavIcon, labelKey: 'tab_agent' },
-  { to: '/community', icon: CommunityNavIcon, labelKey: 'tab_community' },
-  { to: '/bible', icon: BibleNavIcon, labelKey: 'nav_bible' },
-  { to: '/heritage', icon: HeritageNavIcon, labelKey: 'nav_heritage' },
-  { to: '/confessional', icon: DoorClosed, labelKey: 'nav_confessional' },
-  { to: '/podcasts', icon: Headphones, labelKey: 'podcast_page_title' },
-  { to: '/friends', icon: FriendsNavIcon, labelKey: 'friends_nav' },
-  { to: '/map', icon: MapNavIcon, labelKey: 'map' },
-  { to: '/cells', icon: CellsNavIcon, labelKey: 'footer_link_cells' },
+const getToolGroups = (isCompanion) => [
+  {
+    labelKey: 'nav_tools_group_faith',
+    items: [
+      { to: '/bible', icon: BibleNavIcon, labelKey: 'nav_bible' },
+      { to: '/heritage', icon: HeritageNavIcon, labelKey: 'nav_heritage' },
+      { to: '/confessional', icon: DoorClosed, labelKey: 'nav_confessional' },
+      { to: '/podcasts', icon: Headphones, labelKey: 'podcast_page_title' },
+    ],
+  },
+  {
+    labelKey: 'nav_tools_group_connect',
+    items: [
+      { to: '/agent', icon: MimshackNavIcon, labelKey: 'tab_agent' },
+      ...(isCompanion
+        ? [{ to: '/companion', icon: HeartHandshake, labelKey: 'nav_companion' }]
+        : []),
+      { to: '/community', icon: CommunityNavIcon, labelKey: 'tab_community' },
+      { to: '/friends', icon: FriendsNavIcon, labelKey: 'friends_nav' },
+      { to: '/cells', icon: CellsNavIcon, labelKey: 'footer_link_cells' },
+    ],
+  },
+  {
+    labelKey: 'nav_tools_group_explore',
+    items: [{ to: '/map', icon: MapNavIcon, labelKey: 'map' }],
+  },
 ];
 
 const footerLinks = [
@@ -83,14 +102,54 @@ const Layout = () => {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
 
-  const visibleToolLinks = isCompanion
-    ? [
-        ...toolLinks.slice(0, 3),
-        { to: '/companion', icon: HeartHandshake, labelKey: 'nav_companion' },
-        ...toolLinks.slice(3),
-      ]
-    : toolLinks;
+  const toolGroups = getToolGroups(isCompanion);
+
+  const isToolActive = (to) =>
+    to === '/' ? location.pathname === '/' : location.pathname.startsWith(to);
+
+  const isOnToolRoute =
+    location.pathname === '/about' ||
+    toolGroups.some((group) => group.items.some((item) => isToolActive(item.to)));
+
+  const closeTools = () => {
+    setToolsOpen(false);
+    setMobileToolsOpen(false);
+  };
+
+  useEffect(() => {
+    closeTools();
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!toolsOpen) return undefined;
+    const onPointerDown = (e) => {
+      if (!e.target.closest('.nav-tools-wrap')) setToolsOpen(false);
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') setToolsOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [toolsOpen]);
+
+  useEffect(() => {
+    if (!mobileToolsOpen) return undefined;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e) => {
+      if (e.key === 'Escape') setMobileToolsOpen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [mobileToolsOpen]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -117,6 +176,38 @@ const Layout = () => {
   };
 
   const warmRoute = (path) => () => prefetchRoute(path);
+
+  const renderToolsPanel = (variant) => (
+    <div className={`nav-tools-panel nav-tools-panel--${variant}`}>
+      {toolGroups.map(({ labelKey, items }) => (
+        <section key={labelKey} className="nav-tools-group">
+          <h3 className="nav-tools-group-label">{t(labelKey)}</h3>
+          <div className="nav-tools-grid">
+            {items.map(({ to, icon: Icon, labelKey: itemLabelKey }) => (
+              <Link
+                key={to}
+                to={to}
+                className={`nav-tools-tile ${isToolActive(to) ? 'is-active' : ''}`}
+                onClick={closeTools}
+                onMouseEnter={warmRoute(to)}
+                onFocus={warmRoute(to)}
+                onTouchStart={warmRoute(to)}
+              >
+                <span className="nav-tools-tile-icon" aria-hidden>
+                  <Icon size={variant === 'mobile' ? 20 : 18} strokeWidth={1.75} />
+                </span>
+                <span className="nav-tools-tile-label">{t(itemLabelKey)}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ))}
+      <Link to="/about" className="nav-tools-about" onClick={closeTools}>
+        <Info size={16} strokeWidth={1.75} aria-hidden />
+        {t('layout_about')}
+      </Link>
+    </div>
+  );
 
   return (
     <div className="layout-container">
@@ -165,31 +256,20 @@ const Layout = () => {
           <div className="nav-tools-wrap">
             <button
               type="button"
-              className="btn btn-ghost btn-sm nav-tools-btn hide-mobile"
+              className={`btn btn-ghost btn-sm nav-tools-btn hide-mobile ${toolsOpen ? 'is-open' : ''}`}
               onClick={() => setToolsOpen((o) => !o)}
               aria-expanded={toolsOpen}
+              aria-haspopup="true"
             >
               {t('nav_tools')}
+              <ChevronDown size={14} className="nav-tools-chevron" aria-hidden />
             </button>
             {toolsOpen && (
-              <div className="nav-tools-dropdown card">
-                {visibleToolLinks.map(({ to, icon: Icon, labelKey }) => (
-                  <Link
-                    key={to}
-                    to={to}
-                    className="nav-tools-link"
-                    onClick={() => setToolsOpen(false)}
-                    onMouseEnter={warmRoute(to)}
-                    onFocus={warmRoute(to)}
-                    onTouchStart={warmRoute(to)}
-                  >
-                    <Icon size={16} />
-                    {t(labelKey)}
-                  </Link>
-                ))}
-                <Link to="/about" className="nav-tools-link" onClick={() => setToolsOpen(false)}>
-                  {t('layout_about')}
-                </Link>
+              <div className="nav-tools-dropdown" role="menu" aria-label={t('nav_tools')}>
+                <div className="nav-tools-dropdown-head">
+                  <span className="nav-tools-dropdown-title">{t('nav_tools')}</span>
+                </div>
+                {renderToolsPanel('desktop')}
               </div>
             )}
           </div>
@@ -292,7 +372,46 @@ const Layout = () => {
             <span>{t(mobileLabelKey || labelKey)}</span>
           </NavLink>
         ))}
+        <button
+          type="button"
+          className={`mobile-nav-link mobile-nav-tools-btn ${mobileToolsOpen || isOnToolRoute ? 'active' : ''}`}
+          onClick={() => setMobileToolsOpen(true)}
+          aria-expanded={mobileToolsOpen}
+          aria-haspopup="dialog"
+        >
+          <Wrench size={22} strokeWidth={1.75} />
+          <span>{t('nav_mobile_tools')}</span>
+        </button>
       </nav>
+
+      {mobileToolsOpen && (
+        <div
+          className="nav-tools-mobile-overlay"
+          role="presentation"
+          onClick={() => setMobileToolsOpen(false)}
+        >
+          <div
+            className="nav-tools-mobile-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('nav_tools')}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <header className="nav-tools-mobile-head">
+              <h2 className="nav-tools-mobile-title">{t('nav_tools')}</h2>
+              <button
+                type="button"
+                className="nav-tools-mobile-close"
+                onClick={() => setMobileToolsOpen(false)}
+                aria-label={t('layout_back')}
+              >
+                <X size={20} />
+              </button>
+            </header>
+            {renderToolsPanel('mobile')}
+          </div>
+        </div>
+      )}
 
       <Suspense fallback={null}>
         <PaymentModal isOpen={isPaymentOpen} onClose={() => setIsPaymentOpen(false)} />
