@@ -5,7 +5,7 @@ const STROKE = 2.25;
 const SHELL = { x: 6, y: 6, size: 52, rx: 12 };
 
 /**
- * Conteneur d’icônes TKV — style Apple (squircle app / glyphe navigation).
+ * Conteneur d’icônes TKV — tuiles app / glyphes navigation.
  * variant="app"  → tuiles, en-têtes, favicon
  * variant="glyph" → barre de navigation, liens compacts
  */
