@@ -11,7 +11,6 @@ import {
   DoorClosed,
   HeartHandshake,
   Info,
-  ChevronDown,
   Wrench,
   X,
 } from 'lucide-react';
@@ -101,7 +100,6 @@ const Layout = () => {
   const { isCompanion } = useCompanionAccess();
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [toolsOpen, setToolsOpen] = useState(false);
   const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
 
   const toolGroups = getToolGroups(isCompanion);
@@ -113,30 +111,11 @@ const Layout = () => {
     location.pathname === '/about' ||
     toolGroups.some((group) => group.items.some((item) => isToolActive(item.to)));
 
-  const closeTools = () => {
-    setToolsOpen(false);
+  const closeTools = () => setMobileToolsOpen(false);
+
+  useEffect(() => {
     setMobileToolsOpen(false);
-  };
-
-  useEffect(() => {
-    closeTools();
   }, [location.pathname]);
-
-  useEffect(() => {
-    if (!toolsOpen) return undefined;
-    const onPointerDown = (e) => {
-      if (!e.target.closest('.nav-tools-wrap')) setToolsOpen(false);
-    };
-    const onKey = (e) => {
-      if (e.key === 'Escape') setToolsOpen(false);
-    };
-    document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [toolsOpen]);
 
   useEffect(() => {
     if (!mobileToolsOpen) return undefined;
@@ -186,8 +165,8 @@ const Layout = () => {
 
   const warmRoute = (path) => () => prefetchRoute(path);
 
-  const renderToolsPanel = (variant) => (
-    <div className={`nav-tools-panel nav-tools-panel--${variant}`}>
+  const renderToolsPanel = () => (
+    <div className="nav-tools-panel nav-tools-panel--mobile">
       {toolGroups.map(({ labelKey, items }) => (
         <section key={labelKey} className="nav-tools-group">
           <h3 className="nav-tools-group-label">{t(labelKey)}</h3>
@@ -205,7 +184,7 @@ const Layout = () => {
                 onTouchStart={warmRoute(to)}
               >
                 <span className="nav-tools-tile-icon" aria-hidden>
-                  <Icon size={variant === 'mobile' ? 20 : 18} strokeWidth={1.75} />
+                  <Icon size={20} strokeWidth={1.75} />
                 </span>
                 <span className="nav-tools-tile-label">{t(itemLabelKey)}</span>
               </Link>
@@ -264,27 +243,6 @@ const Layout = () => {
         </nav>
 
         <div className="header-actions">
-          <div className="nav-tools-wrap">
-            <button
-              type="button"
-              className={`btn btn-ghost btn-sm nav-tools-btn hide-mobile ${toolsOpen ? 'is-open' : ''}`}
-              onClick={() => setToolsOpen((o) => !o)}
-              aria-expanded={toolsOpen}
-              aria-haspopup="true"
-            >
-              {t('nav_tools')}
-              <ChevronDown size={14} className="nav-tools-chevron" aria-hidden />
-            </button>
-            {toolsOpen && (
-              <div className="nav-tools-dropdown" role="menu" aria-label={t('nav_tools')}>
-                <div className="nav-tools-dropdown-head">
-                  <span className="nav-tools-dropdown-title">{t('nav_tools')}</span>
-                </div>
-                {renderToolsPanel('desktop')}
-              </div>
-            )}
-          </div>
-
           <button
             type="button"
             onClick={() => setIsPaymentOpen(true)}
@@ -423,7 +381,7 @@ const Layout = () => {
               </button>
             </header>
             <div className="nav-tools-mobile-scroll">
-              {renderToolsPanel('mobile')}
+              {renderToolsPanel()}
             </div>
           </div>
         </div>
