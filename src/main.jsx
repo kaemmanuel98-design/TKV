@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
 import './pages/pages.css';
+import './styles/harmony.css';
 import i18n from './i18n';
 import { loadPrimaryI18n, loadSecondaryI18n } from './i18n/loadI18nLayers';
 import { preloadSpeechVoices } from './lib/speech';

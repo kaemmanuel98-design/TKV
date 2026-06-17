@@ -18,7 +18,7 @@
   height: 280px;
   background: radial-gradient(
     ellipse 80% 70% at 50% 0%,
-    rgba(201, 169, 98, 0.14) 0%,
+    var(--accent-medium) 0%,
     transparent 70%
   );
   pointer-events: none;
@@ -86,9 +86,9 @@
 
 .profile-plan-pill--premium,
 .profile-plan-pill--premium_plus {
-  border-color: rgba(201, 169, 98, 0.45);
-  color: var(--gold-bright);
-  background: rgba(201, 169, 98, 0.1);
+  border-color: var(--accent-border-strong);
+  color: var(--accent-text);
+  background: var(--accent-soft);
 }
 
 .profile-checkin-pill {
@@ -111,7 +111,7 @@
 
 .profile-checkin-pill:hover:not(:disabled) {
   border-color: var(--border-gold-hover);
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .profile-checkin-pill.is-done,
@@ -121,7 +121,7 @@
 }
 
 .profile-checkin-pill svg {
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 .profile-inline-notice {
@@ -130,7 +130,7 @@
 }
 
 .profile-inline-notice--ok {
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .profile-inline-notice--err {
@@ -161,7 +161,7 @@
 }
 
 .profile-metric svg {
-  color: var(--gold);
+  color: var(--accent-text);
   margin-bottom: 0.15rem;
 }
 
@@ -177,7 +177,7 @@
   font-family: var(--font-display);
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--gold-bright);
+  color: var(--accent-text);
   line-height: 1.2;
 }
 
@@ -219,12 +219,12 @@
 
 .profile-tab.is-active {
   background: var(--bg-surface);
-  color: var(--gold-bright);
+  color: var(--accent-text);
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.25);
 }
 
 .profile-tab:focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--accent-ring);
   outline-offset: 2px;
 }
 
@@ -275,12 +275,12 @@
 .profile-block-link {
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--gold);
+  color: var(--accent-text);
   text-decoration: none;
 }
 
 .profile-block-link:hover {
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .profile-block-desc {
@@ -324,8 +324,8 @@
   width: 2.25rem;
   height: 2.25rem;
   border-radius: var(--radius-sm);
-  background: rgba(201, 169, 98, 0.08);
-  color: var(--gold);
+  background: var(--accent-soft);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -376,7 +376,7 @@
 
 .profile-course-slim-meta {
   font-size: 0.75rem;
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 .profile-course-slim .profile-progress-bar {
@@ -405,13 +405,13 @@
 }
 
 .profile-cert-slim:hover {
-  border-color: var(--gold);
+  border-color: var(--accent-text);
 }
 
 .profile-cert-slim code {
   margin-left: auto;
   font-size: 0.7rem;
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 /* —— Upsell —— */
@@ -421,12 +421,12 @@
   gap: 0.85rem;
   padding: 1rem 1.1rem;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(201, 169, 98, 0.25);
-  background: linear-gradient(135deg, rgba(201, 169, 98, 0.08), transparent);
+  border: 1px solid var(--accent-border);
+  background: linear-gradient(135deg, var(--accent-soft), transparent);
 }
 
 .profile-upsell svg {
-  color: var(--gold);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -475,9 +475,9 @@
 }
 
 .profile-type-btn.active {
-  border-color: var(--gold);
-  color: var(--gold-bright);
-  background: rgba(201, 169, 98, 0.1);
+  border-color: var(--accent-text);
+  color: var(--accent-text);
+  background: var(--accent-soft);
 }
 
 .profile-field-grid {
@@ -511,7 +511,7 @@
 .profile-saved-hint {
   margin: 0.65rem 0 0;
   font-size: 0.8125rem;
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .profile-save-btn {
@@ -550,7 +550,7 @@
 }
 
 .profile-action-card svg:first-child {
-  color: var(--gold);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -573,8 +573,8 @@
 }
 
 .profile-action-card--accent {
-  border-color: rgba(201, 169, 98, 0.3);
-  background: linear-gradient(135deg, rgba(201, 169, 98, 0.06), transparent);
+  border-color: var(--accent-border);
+  background: linear-gradient(135deg, var(--accent-subtle), transparent);
 }
 
 /* —— Details (collapsible) —— */
@@ -603,7 +603,7 @@
 .profile-details summary::after {
   content: '+';
   float: right;
-  color: var(--gold);
+  color: var(--accent-text);
   font-weight: 400;
 }
 
@@ -666,9 +666,9 @@
 }
 
 .profile-badge-chip.earned {
-  border-color: rgba(201, 169, 98, 0.35);
-  color: var(--gold-bright);
-  background: rgba(201, 169, 98, 0.08);
+  border-color: var(--accent-border-strong);
+  color: var(--accent-text);
+  background: var(--accent-soft);
 }
 
 /* —— RGPD & logout —— */
@@ -721,7 +721,7 @@
 
 .profile-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright));
+  background: var(--progress-fill);
   border-radius: var(--radius-pill);
   transition: width var(--duration-normal);
 }

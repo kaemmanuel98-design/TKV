@@ -128,7 +128,7 @@ const Layout = () => {
       <header className={`header ${scrolled ? 'header-scrolled' : ''}`}>
         <Link to="/" className="logo">
           <div className="logo-mark">
-            <LogoMark size={40} title="TKV — The Kingdom's Voice" />
+            <LogoMark size={32} title="TKV — The Kingdom's Voice" />
           </div>
           <div className="logo-text">
             <strong>TKV</strong>

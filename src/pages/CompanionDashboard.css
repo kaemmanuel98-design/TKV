@@ -162,7 +162,7 @@
 
 .companion-queue-item.active {
   border-color: var(--border-gold);
-  background: rgba(212, 175, 55, 0.08);
+  background: var(--brand-subtle);
 }
 
 .companion-queue-name {
@@ -258,7 +258,7 @@
 
 .companion-chat-companion {
   margin-left: auto;
-  background: rgba(212, 175, 55, 0.15);
+  background: var(--brand-medium);
 }
 
 .companion-chat-form {

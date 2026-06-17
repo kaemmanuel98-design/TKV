@@ -23,7 +23,7 @@
 }
 
 .course-back:hover {
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .course-detail-hero {
@@ -85,7 +85,7 @@
 .course-detail-progress-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright));
+  background: var(--progress-fill);
   transition: width var(--duration-normal);
 }
 
@@ -132,7 +132,7 @@
 }
 
 .course-module-row.is-done {
-  border-color: rgba(201, 169, 98, 0.3);
+  border-color: var(--accent-border);
 }
 
 .course-module-row.is-locked {
@@ -150,7 +150,7 @@
 }
 
 .course-module-row.is-done .course-module-status {
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .course-module-content {
@@ -163,7 +163,7 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 .course-module-title {

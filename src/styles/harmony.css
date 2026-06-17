@@ -1,0 +1,91 @@
+/**
+ * Harmonisation globale — complète les tokens sémantiques sur toutes les pages.
+ */
+
+/* Héros & bandeaux (Community, Friends, Cells, Agent, Map, Profile…) */
+[class*='-hero-glow']:not(.map-hero-glow):not(.map-hero-aura) {
+  background: radial-gradient(
+    ellipse 85% 55% at 50% -15%,
+    var(--hero-tint) 0%,
+    transparent 62%
+  ) !important;
+}
+
+.community-hero,
+.friends-hero,
+.cells-hero,
+.agent-hero,
+.heritage-hero,
+.library-hero,
+.courses-hero {
+  background: var(--bg-base);
+}
+
+/* Liens & texte accentué dans le contenu */
+[class*='-card']:hover,
+[class*='-tile']:hover,
+[class*='-row']:hover {
+  border-color: var(--card-hover-border, var(--accent-border));
+}
+
+a:not(.btn):not(.nav-link):not(.mobile-nav-link):not([class*='-tile']):hover {
+  color: var(--link-hover);
+}
+
+/* Chips, badges, pills actifs */
+[class*='-pill'].is-active,
+[class*='-chip'].is-active,
+[class*='-badge'].is-active,
+[class*='-filter'].is-active {
+  background: var(--chip-active-bg);
+  color: var(--chip-active-text);
+  border-color: var(--chip-active-border);
+}
+
+/* Barres de progression */
+[class*='-progress-fill'],
+[class*='-progress-bar'] > *,
+.progress-bar-fill {
+  background: var(--progress-fill) !important;
+}
+
+/* Spinners & loaders */
+.spin,
+[class*='-spinner'] {
+  color: var(--accent);
+}
+
+/* Numéros de versets Bible */
+.bible-verse-num {
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.bible-word-strong:hover {
+  color: var(--accent-hover);
+  text-decoration-color: var(--accent-border-strong);
+}
+
+/* Certificats — touche or TKV (identité) */
+.course-certificate-card,
+.certificate-card {
+  border-color: var(--brand-border-strong) !important;
+}
+
+.course-certificate-card .certificate-title,
+.certificate-card h1,
+.certificate-card h2 {
+  color: var(--brand-text);
+}
+
+/* Scrollbars discrètes */
+* {
+  scrollbar-color: var(--accent-border) transparent;
+}
+
+/* Focus cohérent sur les cartes interactives */
+[class*='-card']:focus-visible,
+[class*='-tile']:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+}

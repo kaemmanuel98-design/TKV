@@ -30,8 +30,8 @@
   height: 4.5rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
-  background: rgba(201, 169, 98, 0.08);
-  color: var(--gold-bright);
+  background: var(--accent-soft);
+  color: var(--accent-text);
 }
 
 .courses-hero-copy {
@@ -104,9 +104,9 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
-  background: rgba(201, 169, 98, 0.1);
-  border: 1px solid rgba(201, 169, 98, 0.25);
-  color: var(--gold-bright);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -146,7 +146,7 @@
 }
 
 .courses-card-meta-badge {
-  color: var(--gold-bright);
+  color: var(--accent-text);
   font-weight: 600;
 }
 
@@ -160,7 +160,7 @@
 
 .courses-card-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright));
+  background: var(--progress-fill);
   border-radius: var(--radius-pill);
   transition: width var(--duration-normal);
 }
@@ -174,7 +174,7 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 .courses-card-action .btn {
@@ -187,15 +187,15 @@
   align-items: flex-start;
   padding: 1rem 1.1rem;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(201, 169, 98, 0.22);
-  background: linear-gradient(135deg, rgba(201, 169, 98, 0.06), transparent);
+  border: 1px solid var(--accent-border);
+  background: linear-gradient(135deg, var(--accent-subtle), transparent);
   color: var(--text-secondary);
   font-size: 0.875rem;
   line-height: 1.55;
 }
 
 .courses-note svg {
-  color: var(--gold);
+  color: var(--accent-text);
   flex-shrink: 0;
   margin-top: 0.1rem;
 }

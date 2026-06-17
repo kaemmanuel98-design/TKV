@@ -19,7 +19,7 @@
   background: radial-gradient(
     ellipse 80% 70% at 50% 0%,
     rgba(155, 126, 217, 0.14) 0%,
-    rgba(201, 169, 98, 0.1) 35%,
+    var(--accent-soft) 35%,
     transparent 72%
   );
   pointer-events: none;
@@ -98,18 +98,18 @@
 }
 
 .agent-quota-chip svg {
-  color: var(--gold);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
 .agent-quota-chip--premium {
-  color: var(--gold-bright);
+  color: var(--accent-text);
   border-color: var(--border-gold);
-  background: rgba(201, 169, 98, 0.08);
+  background: var(--accent-soft);
 }
 
 .agent-quota-chip--premium svg {
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 /* —— Body —— */
@@ -151,10 +151,10 @@
 }
 
 .agent-tab--active {
-  background: rgba(201, 169, 98, 0.12);
-  color: var(--gold-bright);
+  background: var(--accent-soft);
+  color: var(--accent-text);
   border: 1px solid var(--border-gold);
-  box-shadow: 0 2px 12px rgba(201, 169, 98, 0.08);
+  box-shadow: 0 2px 12px var(--accent-soft);
 }
 
 .agent-tab .mimshack-logo-svg {
@@ -287,7 +287,7 @@
 }
 
 .agent-msg--user .agent-msg-bubble {
-  background: rgba(201, 169, 98, 0.14);
+  background: var(--accent-medium);
   border: 1px solid var(--border-gold);
   border-bottom-right-radius: 0.35rem;
 }
@@ -318,7 +318,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--accent-text);
   margin-bottom: 0.35rem;
 }
 
@@ -367,7 +367,7 @@
 
 .agent-composer-input:focus {
   border-color: var(--border-gold-hover);
-  box-shadow: 0 0 0 2px rgba(201, 169, 98, 0.12);
+  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
 .agent-composer-send {
@@ -400,8 +400,8 @@
   gap: 0.65rem;
   padding: 0.75rem 0.9rem;
   border-radius: var(--radius-md);
-  border: 1px solid rgba(201, 169, 98, 0.3);
-  background: rgba(201, 169, 98, 0.06);
+  border: 1px solid var(--accent-border);
+  background: var(--accent-subtle);
 }
 
 .agent-premium-strip p {
@@ -464,7 +464,7 @@
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: uppercase;
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .agent-perspective-card p {
@@ -478,7 +478,7 @@
   border-color: var(--border-gold);
   background: linear-gradient(
     165deg,
-    rgba(201, 169, 98, 0.08) 0%,
+    var(--accent-soft) 0%,
     var(--bg-surface) 55%
   );
 }
@@ -513,7 +513,7 @@
 .agent-link-btn {
   background: none;
   border: none;
-  color: var(--gold-bright);
+  color: var(--accent-text);
   font-weight: 500;
   cursor: pointer;
   text-decoration: underline;

@@ -1,14 +1,30 @@
 .tkv-mark-svg {
   display: block;
   flex-shrink: 0;
+  color: var(--mark-stroke);
 }
 
-.tkv-mark-svg * {
+.tkv-mark-svg--glyph {
+  color: currentColor;
+}
+
+.tkv-mark-shell-bg {
+  fill: var(--mark-bg);
+}
+
+.tkv-mark-shell-border {
+  fill: none;
+  stroke: var(--mark-border);
+  stroke-width: 1;
+}
+
+.tkv-mark-glyph {
   vector-effect: non-scaling-stroke;
 }
 
 .tkv-mark-nav {
   display: block;
+  color: inherit;
 }
 
 .nav-link .tkv-mark-nav,
@@ -19,8 +35,12 @@
 .nav-link .tkv-mark-nav,
 .nav-tools-link .tkv-mark-nav,
 .mobile-nav-link .tkv-mark-nav {
-  width: 1.15em;
-  height: 1.15em;
+  width: 1.2em;
+  height: 1.2em;
+}
+
+.nav-link.active .tkv-mark-nav {
+  color: var(--text-primary);
 }
 
 .page-hero-mark .tkv-mark-svg,
@@ -30,7 +50,7 @@
 .map-hero-mark .tkv-mark-svg,
 .library-hero-mark .tkv-mark-svg,
 .courses-hero-mark .tkv-mark-svg {
-  filter: drop-shadow(0 4px 14px rgba(201, 169, 98, 0.14));
+  filter: none;
 }
 
 .community-toolbar-link .tkv-mark-svg,
@@ -39,22 +59,13 @@
 .friends-guest-card .tkv-mark-svg,
 .profile-shortcut-icon .tkv-mark-svg,
 .profile-action-card .tkv-mark-svg {
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
-.community-toolbar-link .tkv-mark-svg,
-.profile-shortcut-icon .tkv-mark-svg,
-.profile-action-card .tkv-mark-svg {
-  filter: drop-shadow(0 2px 8px rgba(201, 169, 98, 0.16));
-}
-
-.home-path-icon--mark {
-  border: none;
-  background: transparent;
-  width: 52px;
-  height: 52px;
-  padding: 0;
+.home-tile-icon .tkv-mark-svg {
+  width: 100%;
+  height: 100%;
 }
 
 .page-header-mark {
@@ -62,24 +73,14 @@
 }
 
 .page-header-mark .tkv-mark-svg {
-  filter: drop-shadow(0 4px 12px rgba(201, 169, 98, 0.12));
+  filter: none;
 }
 
 @media (max-width: 640px) {
   .nav-link .tkv-mark-nav,
   .nav-tools-link .tkv-mark-nav,
   .mobile-nav-link .tkv-mark-nav {
-    width: 1.1em;
-    height: 1.1em;
-  }
-
-  .community-toolbar-link .tkv-mark-svg,
-  .cells-sidebar-label .tkv-mark-svg,
-  .friends-panel-title .tkv-mark-svg,
-  .friends-guest-card .tkv-mark-svg,
-  .profile-shortcut-icon .tkv-mark-svg,
-  .profile-action-card .tkv-mark-svg {
-    width: 1.05rem;
-    height: 1.05rem;
+    width: 1.15em;
+    height: 1.15em;
   }
 }

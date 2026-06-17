@@ -24,13 +24,13 @@
 .certificate-doc-border {
   padding: 2.5rem 2rem;
   text-align: center;
-  border: 2px solid rgba(201, 169, 98, 0.45);
+  border: 2px solid var(--accent-border-strong);
   margin: 1.25rem;
-  background: linear-gradient(160deg, rgba(201, 169, 98, 0.06), transparent 55%);
+  background: linear-gradient(160deg, var(--accent-subtle), transparent 55%);
 }
 
 .certificate-icon {
-  color: var(--gold-bright);
+  color: var(--accent-text);
   margin-bottom: 0.5rem;
 }
 
@@ -39,7 +39,7 @@
   font-size: 0.6875rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .certificate-doc h1 {
@@ -74,7 +74,7 @@
 
 .certificate-code {
   font-family: monospace;
-  color: var(--gold-bright);
+  color: var(--accent-text);
   letter-spacing: 0.05em;
 }
 

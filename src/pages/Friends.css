@@ -18,7 +18,7 @@
   height: 260px;
   background: radial-gradient(
     ellipse 75% 65% at 50% 0%,
-    rgba(201, 169, 98, 0.12) 0%,
+    var(--accent-soft) 0%,
     transparent 72%
   );
   pointer-events: none;
@@ -93,7 +93,7 @@
 }
 
 .friends-guest-card svg {
-  color: var(--gold);
+  color: var(--accent-text);
   opacity: 0.85;
 }
 
@@ -141,7 +141,7 @@
 }
 
 .friends-stat-value--pending {
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .friends-stat-label {
@@ -166,10 +166,10 @@
 }
 
 .friends-panel--incoming {
-  border-color: rgba(201, 169, 98, 0.35);
+  border-color: var(--accent-border-strong);
   background: linear-gradient(
     165deg,
-    rgba(201, 169, 98, 0.06) 0%,
+    var(--accent-subtle) 0%,
     var(--bg-surface) 48%
   );
 }
@@ -185,7 +185,7 @@
 }
 
 .friends-panel-title svg {
-  color: var(--gold);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -238,13 +238,13 @@
 
 .friends-search-input:focus {
   border-color: var(--border-gold-hover);
-  box-shadow: 0 0 0 2px rgba(201, 169, 98, 0.12);
+  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
 .friends-search-spinner {
   position: absolute;
   right: 0.85rem;
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 /* —— List rows —— */
@@ -279,8 +279,8 @@
 }
 
 .friends-row--highlight {
-  border-color: rgba(201, 169, 98, 0.2);
-  background: rgba(201, 169, 98, 0.04);
+  border-color: var(--accent-medium);
+  background: var(--brand-subtle);
 }
 
 .friends-row-body {
@@ -357,12 +357,12 @@
 }
 
 .friends-chip--accent {
-  color: var(--gold-bright);
+  color: var(--accent-text);
   border-color: var(--border-gold);
 }
 
 .friends-chip--ok {
-  color: var(--gold-bright);
+  color: var(--accent-text);
   border-color: var(--border-gold);
 }
 
@@ -437,7 +437,7 @@
 }
 
 .friends-details-summary svg {
-  color: var(--gold);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -464,7 +464,7 @@
 }
 
 .friends-toggle input {
-  accent-color: var(--gold);
+  accent-color: var(--accent);
 }
 
 /* —— Feedback —— */

@@ -29,5 +29,5 @@
 .payment-return-ref {
   font-family: monospace;
   font-size: 1rem;
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }

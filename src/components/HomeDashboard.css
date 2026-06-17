@@ -12,7 +12,7 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--teal-bright);
+  color: var(--success);
 }
 
 .home-dashboard-metrics {
@@ -50,7 +50,7 @@
 }
 
 .home-dashboard-metric-head svg {
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 .home-dashboard-metric-value {
@@ -58,7 +58,7 @@
   font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 600;
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .home-dashboard-metric-meta {
@@ -177,7 +177,7 @@
   padding-top: 0.35rem;
   font-size: 0.8125rem;
   font-weight: 700;
-  color: var(--teal-bright);
+  color: var(--success);
 }
 
 @media (max-width: 560px) {

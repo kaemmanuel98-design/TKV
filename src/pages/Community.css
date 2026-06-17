@@ -18,7 +18,7 @@
   height: 260px;
   background: radial-gradient(
     ellipse 75% 65% at 50% 0%,
-    rgba(201, 169, 98, 0.12) 0%,
+    var(--accent-soft) 0%,
     transparent 72%
   );
   pointer-events: none;
@@ -115,12 +115,12 @@
 
 .community-toolbar-link:hover {
   border-color: var(--border-gold-hover);
-  color: var(--gold-bright);
+  color: var(--accent-text);
   transform: translateY(-1px);
 }
 
 .community-toolbar-link svg {
-  color: var(--gold);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -157,7 +157,7 @@
 
 .community-tab.is-active {
   background: var(--bg-surface);
-  color: var(--gold-bright);
+  color: var(--accent-text);
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.22);
 }
 
@@ -168,7 +168,7 @@
 }
 
 .community-tab:focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--accent-ring);
   outline-offset: 2px;
 }
 
@@ -229,7 +229,7 @@
   gap: 0.35rem;
   margin: 0;
   font-size: 0.8125rem;
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .community-compose-kind svg {
@@ -285,9 +285,9 @@
 }
 
 .community-notice--ok {
-  color: var(--gold-bright);
-  border: 1px solid rgba(201, 169, 98, 0.3);
-  background: rgba(201, 169, 98, 0.08);
+  color: var(--accent-text);
+  border: 1px solid var(--accent-border);
+  background: var(--accent-soft);
 }
 
 .community-notice--err {
@@ -335,7 +335,7 @@
 .community-empty-icon {
   display: block;
   margin: 0 auto 1rem;
-  color: var(--gold);
+  color: var(--accent-text);
   opacity: 0.45;
 }
 
@@ -375,8 +375,8 @@
 }
 
 .community-post--testimony {
-  border-color: rgba(201, 169, 98, 0.28);
-  background: linear-gradient(135deg, rgba(201, 169, 98, 0.04), transparent);
+  border-color: var(--accent-border);
+  background: linear-gradient(135deg, var(--brand-subtle), transparent);
 }
 
 .community-post-header {
@@ -416,9 +416,9 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--gold-bright);
-  border: 1px solid rgba(201, 169, 98, 0.35);
-  background: rgba(201, 169, 98, 0.08);
+  color: var(--accent-text);
+  border: 1px solid var(--accent-border-strong);
+  background: var(--accent-soft);
 }
 
 .community-post-meta {
@@ -552,7 +552,7 @@
 }
 
 .community-reaction-btn:hover:not(:disabled) {
-  color: var(--gold);
+  color: var(--accent-text);
   border-color: var(--border-subtle);
   background: var(--bg-elevated);
 }

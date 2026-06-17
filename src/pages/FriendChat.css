@@ -60,7 +60,7 @@
 
 .friend-chat-bubble--mine {
   align-self: flex-end;
-  background: rgba(201, 169, 98, 0.12);
+  background: var(--accent-soft);
   border-color: var(--border-gold);
 }
 

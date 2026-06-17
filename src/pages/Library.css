@@ -97,11 +97,11 @@
 
 .library-toolbar-link:hover {
   border-color: var(--border-gold-hover);
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .library-toolbar-link svg {
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 .library-toolbar-premium {
@@ -172,7 +172,7 @@
 }
 
 .library-book-lock svg {
-  color: var(--gold);
+  color: var(--accent-text);
 }
 
 .library-book-body {
@@ -230,7 +230,7 @@
 
 .library-book-progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--gold-dim), var(--gold-bright));
+  background: var(--progress-fill);
   border-radius: var(--radius-pill);
   transition: width var(--duration-normal);
 }
@@ -306,9 +306,9 @@
 }
 
 .library-book-badge--premium {
-  color: var(--gold-bright);
-  border-color: rgba(201, 169, 98, 0.35);
-  background: rgba(201, 169, 98, 0.08);
+  color: var(--accent-text);
+  border-color: var(--accent-border-strong);
+  background: var(--accent-soft);
 }
 
 .library-book--soon .library-book-actions {

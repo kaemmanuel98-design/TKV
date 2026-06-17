@@ -5,7 +5,7 @@
 }
 
 .cells-page *:focus-visible {
-  outline: 2px solid rgba(201, 169, 98, 0.45);
+  outline: 2px solid var(--accent-border-strong);
   outline-offset: 2px;
 }
 
@@ -24,7 +24,7 @@
   background: radial-gradient(
     ellipse 80% 70% at 50% 0%,
     rgba(155, 126, 217, 0.1) 0%,
-    rgba(201, 169, 98, 0.1) 40%,
+    var(--accent-soft) 40%,
     transparent 72%
   );
   pointer-events: none;
@@ -116,7 +116,7 @@
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-subtle);
-  background: rgba(201, 169, 98, 0.06);
+  background: var(--accent-subtle);
   font-size: 0.875rem;
   color: var(--text-secondary);
 }
@@ -236,7 +236,7 @@
 
 .cells-sidebar-label svg,
 .cells-sidebar-label .tkv-mark-svg {
-  color: var(--gold);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -258,7 +258,7 @@
   overflow-y: auto;
   min-height: 0;
   scrollbar-width: thin;
-  scrollbar-color: rgba(201, 169, 98, 0.25) transparent;
+  scrollbar-color: var(--accent-border) transparent;
 }
 
 .cells-room-list--custom {
@@ -292,8 +292,8 @@ a.cells-room-chip {
 
 .cells-room-chip--active {
   border-color: var(--border-gold);
-  color: var(--gold-bright);
-  background: rgba(201, 169, 98, 0.1);
+  color: var(--accent-text);
+  background: var(--accent-soft);
 }
 
 .cells-room-chip--custom {
@@ -318,8 +318,8 @@ a.cells-room-chip {
   font-size: 0.62rem;
   padding: 0.1rem 0.4rem;
   border-radius: var(--radius-pill);
-  background: rgba(201, 169, 98, 0.18);
-  color: var(--gold-bright);
+  background: var(--accent-medium);
+  color: var(--accent-text);
   flex-shrink: 0;
 }
 
@@ -345,7 +345,7 @@ a.cells-room-chip {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
-  color: var(--gold-bright);
+  color: var(--accent-text);
 }
 
 .cells-chat-meta {
@@ -364,7 +364,7 @@ a.cells-room-chip {
   min-height: 12rem;
   scroll-behavior: smooth;
   scrollbar-width: thin;
-  scrollbar-color: rgba(201, 169, 98, 0.2) transparent;
+  scrollbar-color: var(--accent-medium) transparent;
   transition: opacity 0.2s ease;
 }
 
@@ -452,7 +452,7 @@ a.cells-room-chip {
 }
 
 .cells-msg--mine .cells-msg-bubble {
-  background: rgba(201, 169, 98, 0.14);
+  background: var(--accent-medium);
   border: 1px solid var(--border-gold);
   border-bottom-right-radius: 0.3rem;
 }
@@ -467,7 +467,7 @@ a.cells-room-chip {
   display: block;
   font-size: 0.68rem;
   font-weight: 600;
-  color: var(--gold);
+  color: var(--accent-text);
   margin-bottom: 0.15rem;
 }
 
@@ -515,7 +515,7 @@ a.cells-room-chip {
 
 .cells-composer-input:focus {
   border-color: var(--border-gold-hover);
-  box-shadow: 0 0 0 2px rgba(201, 169, 98, 0.12);
+  box-shadow: 0 0 0 2px var(--accent-soft);
 }
 
 .cells-composer-input:disabled {

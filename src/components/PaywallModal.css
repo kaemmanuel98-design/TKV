@@ -59,7 +59,7 @@
 
 .paywall-plan-featured {
   border-color: var(--border-gold);
-  background: rgba(201, 169, 98, 0.08);
+  background: var(--accent-soft);
 }
 
 .paywall-plan h3 {
@@ -70,7 +70,7 @@
 .paywall-price {
   font-family: var(--font-display);
   font-size: 1.5rem;
-  color: var(--gold-bright);
+  color: var(--accent-text);
   margin-bottom: 0.75rem;
 }
 
@@ -96,7 +96,7 @@
 }
 
 .paywall-plan li svg {
-  color: var(--gold);
+  color: var(--accent-text);
   flex-shrink: 0;
   margin-top: 0.15rem;
 }
@@ -126,8 +126,8 @@
 }
 
 .paywall-plan-selected {
-  border-color: var(--gold-bright);
-  box-shadow: 0 0 0 1px rgba(201, 169, 98, 0.35);
+  border-color: var(--accent-text);
+  box-shadow: 0 0 0 1px var(--accent-border-strong);
 }
 
 .paywall-next {
@@ -163,7 +163,7 @@
 }
 
 .paywall-method-btn:hover:not(:disabled) {
-  border-color: var(--gold-bright);
+  border-color: var(--accent-text);
 }
 
 .paywall-method-btn:disabled {

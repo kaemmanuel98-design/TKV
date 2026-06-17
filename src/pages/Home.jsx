@@ -53,9 +53,9 @@ const Home = () => {
       >
         <span className="home-tile-icon" aria-hidden>
           {mimshack ? (
-            <MimshackLogo size={32} title="Mim" />
+            <MimshackLogo size={48} title="Mim" />
           ) : Mark ? (
-            <Mark size={32} title={t(titleKey)} />
+            <Mark size={48} title={t(titleKey)} />
           ) : (
             <Icon size={22} strokeWidth={1.5} />
           )}
