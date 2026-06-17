@@ -152,6 +152,15 @@ const Layout = () => {
   }, [mobileToolsOpen]);
 
   useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const onChange = () => {
+      if (mq.matches) setMobileToolsOpen(false);
+    };
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
@@ -182,7 +191,9 @@ const Layout = () => {
       {toolGroups.map(({ labelKey, items }) => (
         <section key={labelKey} className="nav-tools-group">
           <h3 className="nav-tools-group-label">{t(labelKey)}</h3>
-          <div className="nav-tools-grid">
+          <div
+            className={`nav-tools-grid${items.length === 1 ? ' nav-tools-grid--single' : ''}`}
+          >
             {items.map(({ to, icon: Icon, labelKey: itemLabelKey }) => (
               <Link
                 key={to}
@@ -210,7 +221,7 @@ const Layout = () => {
   );
 
   return (
-    <div className="layout-container">
+    <div className={`layout-container${mobileToolsOpen ? ' tools-mobile-open' : ''}`}>
       {user ? (
         <Suspense fallback={null}>
           <FriendPresenceToasts />
@@ -375,9 +386,10 @@ const Layout = () => {
         <button
           type="button"
           className={`mobile-nav-link mobile-nav-tools-btn ${mobileToolsOpen || isOnToolRoute ? 'active' : ''}`}
-          onClick={() => setMobileToolsOpen(true)}
+          onClick={() => setMobileToolsOpen((open) => !open)}
           aria-expanded={mobileToolsOpen}
           aria-haspopup="dialog"
+          aria-controls="mobile-tools-sheet"
         >
           <Wrench size={22} strokeWidth={1.75} />
           <span>{t('nav_mobile_tools')}</span>
@@ -391,24 +403,28 @@ const Layout = () => {
           onClick={() => setMobileToolsOpen(false)}
         >
           <div
+            id="mobile-tools-sheet"
             className="nav-tools-mobile-sheet"
             role="dialog"
             aria-modal="true"
             aria-label={t('nav_tools')}
             onClick={(e) => e.stopPropagation()}
           >
+            <div className="nav-tools-mobile-grabber" aria-hidden />
             <header className="nav-tools-mobile-head">
               <h2 className="nav-tools-mobile-title">{t('nav_tools')}</h2>
               <button
                 type="button"
                 className="nav-tools-mobile-close"
                 onClick={() => setMobileToolsOpen(false)}
-                aria-label={t('layout_back')}
+                aria-label={t('nav_tools_close')}
               >
                 <X size={20} />
               </button>
             </header>
-            {renderToolsPanel('mobile')}
+            <div className="nav-tools-mobile-scroll">
+              {renderToolsPanel('mobile')}
+            </div>
           </div>
         </div>
       )}
