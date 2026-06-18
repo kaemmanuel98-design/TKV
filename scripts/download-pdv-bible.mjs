@@ -26,19 +26,24 @@ function decodeHtmlEntities(text) {
     .replace(/&gt;/g, '>')
     .replace(/&laquo;/g, '«')
     .replace(/&raquo;/g, '»')
-    .replace(/&nbsp;/g, ' ')
+    .replace(/&nbsp;/g, ' ');
+}
+
+function stripHtmlTags(html) {
+  return decodeHtmlEntities(html.replace(/<[^>]*>/g, ' '))
     .replace(/\s+/g, ' ')
     .trim();
 }
 
 function parseYouVersionChapterHtml(html) {
   const byVerse = new Map();
-  const re =
-    /<span class="verse v\d+"[^>]*data-usfm="[^"]+\.(\d+)"[^>]*>\s*<span class="label">\d+<\/span>\s*<span class="content">([\s\S]*?)<\/span>\s*<\/span>/g;
+  const verseRe =
+    /<span class="verse v\d+"[^>]*data-usfm="[^"]+\.(\d+)"[^>]*>([\s\S]*?)<\/span>\s*(?=<span class="verse|<\/p>|$)/g;
   let m;
-  while ((m = re.exec(html)) !== null) {
+  while ((m = verseRe.exec(html)) !== null) {
     const vNum = parseInt(m[1], 10);
-    const text = decodeHtmlEntities(m[2]);
+    const inner = m[2].replace(/<span class="label">\d+<\/span>\s*/, '');
+    const text = stripHtmlTags(inner);
     if (text) byVerse.set(vNum, text);
   }
   return byVerse;

@@ -16,6 +16,7 @@ import {
   normalizeToken,
 } from '../src/data/bible/strongAlignHints.js';
 import { enrichLexiconFromStrongs } from './enrich-strongs-lexicon.mjs';
+import { stripHtmlFromText } from './fix-bible-html.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -318,7 +319,7 @@ function loadGetbibleNl() {
 }
 
 function buildLocalizedVerse(vNum, localText, enSegments, fallbackText, lang) {
-  const text = localText || fallbackText;
+  const text = stripHtmlFromText(localText || fallbackText);
   const segments = localText ? alignLocalizedVerse(text, enSegments, lang) : enSegments;
   return { id: vNum, segments, text };
 }
