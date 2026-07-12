@@ -189,7 +189,7 @@ const Agent = () => {
   const handlePerspectives = async () => {
     const q = perspectiveQ.trim();
     if (!q || loading) return;
-    if (!canAnalyzePerspectives(planType)) {
+    if (!isPremium() && !canAnalyzePerspectives(planType)) {
       setPaywallOpen(true);
       return;
     }

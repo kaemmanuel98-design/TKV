@@ -10,6 +10,7 @@ import {
   saveProfileLocationCache,
 } from '../lib/profileLocation';
 import { enrichProfileWithFounderAccess } from '../lib/founderAccess';
+import { isPremiumProfile, resolvePlanType } from '../lib/premiumAccess';
 import { PROFILE_TYPE_KEY, ONBOARDING_KEY } from './useGamificationStore';
 
 async function persistProfileUpdate(userId, updates) {
@@ -169,15 +170,9 @@ export const useProfileStore = create((set, get) => ({
     return merged;
   },
 
-  getPlanType: () => {
-    const p = get().profile;
-    if (p?.is_premium || p?.plan_type === 'premium' || p?.plan_type === 'premium_plus') {
-      return 'premium';
-    }
-    return p?.plan_type || 'free';
-  },
+  getPlanType: () => resolvePlanType(get().profile),
 
-  isPremium: () => get().getPlanType() === 'premium',
+  isPremium: () => isPremiumProfile(get().profile),
 
   /** @deprecated alias — Premium inclut tous les anciens privilèges Premium+ */
   isPremiumPlus: () => get().isPremium(),

@@ -35,12 +35,14 @@ export const useAgentStore = create(
       },
 
       canSendChat: (planType) => {
+        if (planType === 'premium') return true;
         get().resetIfNewDay();
         const { chat } = get().getLimits(planType);
         return get().chatCount < chat;
       },
 
       canAnalyzePerspectives: (planType) => {
+        if (planType === 'premium') return true;
         get().resetIfNewDay();
         const { perspectives } = get().getLimits(planType);
         return perspectives > 0 && get().perspectivesCount < perspectives;

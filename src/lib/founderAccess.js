@@ -10,15 +10,10 @@ function parseEmailList(raw) {
 /** E-mails avec accès Premium complet côté client (Vite). */
 export function getFounderEmails() {
   const explicit = parseEmailList(import.meta.env.VITE_FOUNDER_EMAILS || '');
-  if (explicit.length) return [...new Set(explicit)];
-
   const jitsi = parseEmailList(import.meta.env.VITE_JITSI_HOST_EMAILS || '');
   const companion = parseEmailList(import.meta.env.VITE_COMPANION_HOST_EMAILS || '');
-  const merged = [...jitsi, ...companion];
-  if (merged.length) return [...new Set(merged)];
-
-  if (import.meta.env.DEV) return [DEV_DEFAULT_FOUNDER];
-  return [];
+  const merged = [DEV_DEFAULT_FOUNDER, ...explicit, ...jitsi, ...companion];
+  return [...new Set(merged.map((e) => e.toLowerCase()).filter(Boolean))];
 }
 
 export function isFounderEmail(email) {
@@ -30,11 +25,16 @@ export function isFounderEmail(email) {
 export function enrichProfileWithFounderAccess(profile, email) {
   if (!isFounderEmail(email)) return profile;
   const base = profile ? { ...profile } : {};
+  const premiumUntil = new Date();
+  premiumUntil.setFullYear(premiumUntil.getFullYear() + 10);
   return {
     ...base,
     is_premium: true,
     plan_type: 'premium',
+    premium_until: base.premium_until || premiumUntil.toISOString(),
     can_host_visio: true,
     is_confessional_companion: true,
+    is_companion_admin: true,
+    is_companion_super_admin: true,
   };
 }

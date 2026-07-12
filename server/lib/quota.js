@@ -1,6 +1,7 @@
 import { PLAN_LIMITS } from '../config.js';
 import { getSupabaseAdmin, getUserProfile } from './supabaseAdmin.js';
 import { enrichProfileWithFounderAccess } from './founderAccess.js';
+import { premiumUsageResult } from './premiumAccess.js';
 
 const memoryUsage = new Map();
 
@@ -19,17 +20,21 @@ function memoryKey(userId, req) {
 }
 
 export function resolvePlan(profile) {
-  if (!profile) return 'free';
-  if (profile.is_premium || profile.plan_type === 'premium' || profile.plan_type === 'premium_plus') {
-    return 'premium';
-  }
-  return 'free';
+  return isPremiumProfile(profile) ? 'premium' : 'free';
 }
 
 export async function getDailyUsage(userId, req = null) {
   const rawProfile = userId ? await getUserProfile(userId) : null;
   const profile = enrichProfileWithFounderAccess(rawProfile, req?.user?.email);
   const plan = resolvePlan(profile);
+  if (plan === 'premium') {
+    return {
+      plan,
+      chat: { used: 0, limit: null, remaining: null, unlimited: true },
+      perspectives: { used: 0, limit: null, remaining: null, unlimited: true },
+    };
+  }
+
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
   const admin = getSupabaseAdmin();
   const date = todayKey();
@@ -74,9 +79,12 @@ export async function checkAndIncrementUsage(userId, type = 'chat', req = null) 
   const rawProfile = userId ? await getUserProfile(userId) : null;
   const profile = enrichProfileWithFounderAccess(rawProfile, req?.user?.email);
   const plan = resolvePlan(profile);
+  if (plan === 'premium') {
+    return premiumUsageResult(plan);
+  }
+
   const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
   const limit = type === 'perspectives' ? limits.perspectives : limits.chat;
-
   const admin = getSupabaseAdmin();
 
   if (admin && userId) {
