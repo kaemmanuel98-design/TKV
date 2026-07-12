@@ -1,7 +1,7 @@
 import { PLAN_LIMITS } from '../config.js';
 import { getSupabaseAdmin, getUserProfile } from './supabaseAdmin.js';
 import { enrichProfileWithFounderAccess } from './founderAccess.js';
-import { premiumUsageResult } from './premiumAccess.js';
+import { isPremiumProfile, premiumUsageResult } from './premiumAccess.js';
 
 const memoryUsage = new Map();
 
