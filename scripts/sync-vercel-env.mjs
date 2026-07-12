@@ -1,12 +1,20 @@
 /**
  * Sync .env → Vercel (production, preview, development).
  * Skips local-only keys. Does not print secret values.
+ *
+ * Preview on Vercel CLI v55+ requires a git branch (default: main).
+ * Usage:
+ *   node scripts/sync-vercel-env.mjs
+ *   node scripts/sync-vercel-env.mjs --preview-only
  */
 import fs from 'fs';
 import { spawnSync } from 'child_process';
 
 const SKIP = new Set(['API_PORT', 'VERCEL_OIDC_TOKEN']);
-const TARGETS = ['production', 'preview', 'development'];
+const previewOnly = process.argv.includes('--preview-only');
+const TARGETS = previewOnly
+  ? ['preview']
+  : ['production', 'preview', 'development'];
 
 function parseEnv(content) {
   const env = {};
@@ -29,26 +37,37 @@ function parseEnv(content) {
 }
 
 function addEnv(key, value, target) {
-  const res = spawnSync(
-    'npx',
-    ['vercel', 'env', 'add', key, target, '--force', '--yes'],
-    {
-      input: value,
-      encoding: 'utf8',
-      stdio: ['pipe', 'pipe', 'pipe'],
-      shell: true,
-    }
-  );
+  const args = [
+    'vercel@55',
+    'env',
+    'add',
+    key,
+    target,
+    '--value',
+    value,
+    '--force',
+    '--yes',
+    '--non-interactive',
+  ];
+
+  const res = spawnSync('npx', args, {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    shell: true,
+    env: { ...process.env, npm_config_devdir: '' },
+  });
+
+  const out = `${res.stdout || ''}\n${res.stderr || ''}`.trim();
   if (res.status === 0) {
     console.log(`  ✓ ${key} → ${target}`);
     return true;
   }
-  const err = (res.stderr || res.stdout || '').trim();
-  if (/already exists|duplicate/i.test(err)) {
-    console.log(`  · ${key} → ${target} (exists, skipped)`);
+  if (/already exists|duplicate/i.test(out)) {
+    console.log(`  · ${key} → ${target} (exists)`);
     return true;
   }
-  console.error(`  ✗ ${key} → ${target}: ${err.slice(0, 120)}`);
+  const reason = out.replace(/\s+/g, ' ').slice(0, 160);
+  console.error(`  ✗ ${key} → ${target}: ${reason}`);
   return false;
 }
 
@@ -60,13 +79,15 @@ if (!fs.existsSync(envPath)) {
 
 const env = parseEnv(fs.readFileSync(envPath, 'utf8'));
 
-// Production URL for CORS / redirects
 if (!env.CORS_ORIGINS?.includes('tkv-app.vercel.app')) {
   env.CORS_ORIGINS = [env.CORS_ORIGINS, 'https://tkv-app.vercel.app'].filter(Boolean).join(',');
 }
 env.APP_PUBLIC_URL = 'https://tkv-app.vercel.app';
 
-console.log('Sync variables Vercel…\n');
+console.log(
+  previewOnly ? 'Sync preview Vercel (toutes branches)…\n' : 'Sync variables Vercel…\n'
+);
+
 let ok = 0;
 let fail = 0;
 
