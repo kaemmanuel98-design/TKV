@@ -32,3 +32,16 @@ export function prepareChapterSpeechText(verses, { locale } = {}) {
     .filter(Boolean);
   return parts.join('. ');
 }
+
+/** Texte Mim pour lecture vocale (sans markdown). */
+export function prepareAgentSpeechText(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/\[(Source|T\d+)[^\]]*\]/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}

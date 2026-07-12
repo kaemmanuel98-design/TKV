@@ -1,6 +1,6 @@
 import { config } from '../config.js';
 import { getSupabaseAdmin } from './supabaseAdmin.js';
-import { embedText, buildSystemPrompt, chatCompletion, analyzePerspectives } from './openai.js';
+import { embedText, buildSystemPrompt, chatCompletion, chatCompletionStream, analyzePerspectives } from './openai.js';
 import { searchChunks, searchChunksText, loadChunks } from './vectorStore.js';
 import { synthesizeFromChunks } from './synthesize.js';
 import { rankChunks } from './knowledgePriority.js';
@@ -123,15 +123,24 @@ async function retrieveChunks(admin, message, language) {
   return { chunks, mode, openaiError };
 }
 
-export async function handleChat({ message, language = 'fr', userType = 'curious', history = [] }) {
-  const admin = getSupabaseAdmin();
+async function buildChatPayload(admin, message, language, userType) {
   const { chunks, mode, openaiError: embedQuota } = await retrieveChunks(admin, message, language);
-
   const context = buildContext(chunks);
   const system = `${buildSystemPrompt(userType, language)}
 
 --- CONTEXTE TKV (pour t'appuyer sur les textes ; répondre en langage parlé) ---
 ${context}`;
+  return { system, chunks, mode, openaiError: embedQuota };
+}
+
+export async function handleChat({ message, language = 'fr', userType = 'curious', history = [] }) {
+  const admin = getSupabaseAdmin();
+  const { system, chunks, mode, openaiError: embedQuota } = await buildChatPayload(
+    admin,
+    message,
+    language,
+    userType
+  );
 
   let reply = null;
   let openaiError = embedQuota;
@@ -151,6 +160,45 @@ ${context}`;
     reply,
     sources: formatSources(chunks),
     mode: reply && !openaiError ? `${mode}+openai` : `${mode}+synthesis`,
+  };
+}
+
+/** Chat avec streaming token par token (fallback synthèse si OpenAI indisponible). */
+export async function handleChatStream(
+  { message, language = 'fr', userType = 'curious', history = [] },
+  onToken
+) {
+  const admin = getSupabaseAdmin();
+  const { system, chunks, mode, openaiError: embedQuota } = await buildChatPayload(
+    admin,
+    message,
+    language,
+    userType
+  );
+
+  let reply = '';
+  let openaiError = embedQuota;
+
+  try {
+    for await (const token of chatCompletionStream({ system, userMessage: message, history })) {
+      reply += token;
+      if (onToken) onToken(token);
+    }
+    reply = reply.trim();
+  } catch (err) {
+    if (err?.code === 'insufficient_quota') openaiError = 'quota';
+    reply = '';
+  }
+
+  if (!reply) {
+    reply = synthesizeFromChunks(message, chunks, userType, { language, openaiError });
+    if (onToken && reply) onToken(reply);
+  }
+
+  return {
+    reply,
+    sources: formatSources(chunks),
+    mode: reply && !openaiError ? `${mode}+openai+stream` : `${mode}+synthesis`,
   };
 }
 

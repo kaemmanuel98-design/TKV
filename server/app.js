@@ -5,7 +5,8 @@ import { verifyUser, getUserProfile } from './lib/supabaseAdmin.js';
 import { enrichProfileWithFounderAccess } from './lib/founderAccess.js';
 import { checkAndIncrementUsage, getDailyUsage } from './lib/quota.js';
 import { checkAndIncrementConfessionalUsage } from './lib/confessionalQuota.js';
-import { handleChat, handlePerspectives } from './lib/agentService.js';
+import { handleChat, handleChatStream, handlePerspectives } from './lib/agentService.js';
+import { transcribeAudio } from './lib/stt.js';
 import { loadChunks } from './lib/vectorStore.js';
 import { synthesizeSpeech } from './lib/tts.js';
 import { translateTexts } from './lib/translateService.js';
@@ -107,7 +108,7 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
-app.use(express.json({ limit: '1mb' }));
+app.use(express.json({ limit: '12mb' }));
 
 app.use(
   rateLimit({
@@ -1049,6 +1050,92 @@ app.post('/api/agent/chat', authMiddleware, agentRateLimit, async (req, res) => 
   } catch (err) {
     console.error('chat error', err);
     res.status(500).json({ error: 'agent_error', message: safeErrorMessage(err) });
+  }
+});
+
+app.post('/api/agent/chat/stream', authMiddleware, agentRateLimit, async (req, res) => {
+  try {
+    if (!requireUser(req, res)) return;
+    const { message, language = 'fr', history = [] } = req.body || {};
+    if (!message?.trim()) {
+      return res.status(400).json({ error: 'message_required' });
+    }
+
+    const userType = req.profile?.user_type || req.body?.userType || 'curious';
+    const usage = await checkAndIncrementUsage(req.user.id, 'chat', req);
+
+    if (!usage.allowed) {
+      return res.status(402).json({
+        error: 'quota_exceeded',
+        plan: usage.plan,
+        limit: usage.limit,
+        used: usage.used,
+      });
+    }
+
+    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('Connection', 'keep-alive');
+    if (typeof res.flushHeaders === 'function') res.flushHeaders();
+
+    const send = (event, data) => {
+      res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    };
+
+    const result = await handleChatStream(
+      {
+        message: message.trim(),
+        language,
+        userType,
+        history: Array.isArray(history) ? history.slice(-20) : [],
+      },
+      (token) => send('token', { t: token })
+    );
+
+    const daily = await getDailyUsage(req.user.id, req);
+    send('done', { sources: result.sources, usage: daily, mode: result.mode, reply: result.reply });
+    res.end();
+  } catch (err) {
+    console.error('chat stream error', err);
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'agent_error', message: safeErrorMessage(err) });
+    } else {
+      res.write(`event: error\ndata: ${JSON.stringify({ error: 'agent_error' })}\n\n`);
+      res.end();
+    }
+  }
+});
+
+app.post('/api/agent/transcribe', authMiddleware, agentRateLimit, async (req, res) => {
+  try {
+    if (!requireUser(req, res)) return;
+    const { audio, language = 'fr' } = req.body || {};
+    if (!audio || typeof audio !== 'string') {
+      return res.status(400).json({ error: 'audio_required' });
+    }
+
+    const buffer = Buffer.from(audio, 'base64');
+    if (buffer.length > 8 * 1024 * 1024) {
+      return res.status(413).json({ error: 'audio_too_large' });
+    }
+    if (buffer.length < 32) {
+      return res.status(400).json({ error: 'audio_empty' });
+    }
+
+    if (!config.openaiKey) {
+      return res.status(503).json({ error: 'stt_unavailable' });
+    }
+
+    const text = await transcribeAudio(buffer, language);
+    res.json({ text: text || '' });
+  } catch (err) {
+    console.error('transcribe error', err);
+    const msg = err.message || '';
+    const status = /quota|429/i.test(msg) ? 429 : 500;
+    res.status(status).json({
+      error: status === 429 ? 'stt_quota_exceeded' : 'stt_error',
+      message: safeErrorMessage(err),
+    });
   }
 });
 

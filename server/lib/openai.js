@@ -159,7 +159,7 @@ export async function chatCompletion({ system, userMessage, history = [] }) {
 
   const messages = [
     { role: 'system', content: system },
-    ...history.slice(-8).map((m) => ({ role: m.role, content: m.content })),
+    ...history.slice(-10).map((m) => ({ role: m.role, content: m.content })),
     { role: 'user', content: userMessage },
   ];
 
@@ -168,7 +168,7 @@ export async function chatCompletion({ system, userMessage, history = [] }) {
       model: config.openaiChatModel,
       messages,
       temperature: 0.78,
-      max_tokens: 1400,
+      max_tokens: 1600,
       presence_penalty: 0.15,
       frequency_penalty: 0.1,
     });
@@ -184,6 +184,42 @@ export async function chatCompletion({ system, userMessage, history = [] }) {
   }
 }
 
+/** Stream de tokens pour une réponse fluide (style assistant moderne). */
+export async function* chatCompletionStream({ system, userMessage, history = [] }) {
+  const openai = getOpenAI();
+  if (!openai) return;
+
+  const messages = [
+    { role: 'system', content: system },
+    ...history.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+    { role: 'user', content: userMessage },
+  ];
+
+  try {
+    const stream = await openai.chat.completions.create({
+      model: config.openaiChatModel,
+      messages,
+      temperature: 0.78,
+      max_tokens: 1600,
+      presence_penalty: 0.15,
+      frequency_penalty: 0.1,
+      stream: true,
+    });
+
+    for await (const part of stream) {
+      const delta = part.choices[0]?.delta?.content;
+      if (delta) yield delta;
+    }
+  } catch (err) {
+    if (err?.code === 'insufficient_quota' || err?.status === 429) {
+      const e = new Error('insufficient_quota');
+      e.code = 'insufficient_quota';
+      throw e;
+    }
+    throw err;
+  }
+}
+
 export async function analyzePerspectives(question, context, userType, language = 'fr') {
   const openai = getOpenAI();
   if (!openai) return null;
@@ -193,22 +229,26 @@ export async function analyzePerspectives(question, context, userType, language 
 
   const prompt = `${buildSystemPrompt(userType, lang)}
 
-Contexte TKV:
+Contexte TKV (matériel de référence — tisser dans un langage humain, pas en listes) :
 ${context}
 
-Question: "${question}"
+Question à analyser : "${question}"
 
-Produis une analyse en 3 sections JSON strictes (pas de markdown), en ${langName}:
+Rédige une analyse approfondie en 3 sections JSON strictes (pas de markdown), en ${langName}.
+Chaque section : 2 à 4 paragraphes fluides, nuancés, comme un médiateur bienveillant qui parle à voix haute.
+Pas de titres ni numérotation dans les valeurs JSON.
+
 {
-  "believers": "perspective croyante équilibrée",
-  "skeptics": "perspective sceptique équilibrée",
-  "synthesis": "synthèse neutre invitant au dialogue"
+  "believers": "perspective croyante : arguments, sensibilités, limites honnêtes",
+  "skeptics": "perspective sceptique : objections sérieuses, présentées avec respect",
+  "synthesis": "synthèse : points communs, tensions restantes, invitation au dialogue concret"
 }`;
 
   const res = await openai.chat.completions.create({
     model: config.openaiChatModel,
     messages: [{ role: 'user', content: prompt }],
-    temperature: 0.5,
+    temperature: 0.72,
+    max_tokens: 2200,
     response_format: { type: 'json_object' },
   });
 

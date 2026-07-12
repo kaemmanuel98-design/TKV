@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Send, Scale, Loader2, Sparkles, Crown, Trash2 } from 'lucide-react';
+import { Send, Scale, Loader2, Sparkles, Crown, Trash2, Mic, Volume2 } from 'lucide-react';
 import MimshackLogo from '../components/MimshackLogo';
 import AgentMessageContent from '../components/AgentMessageContent';
 import PaywallModal from '../components/PaywallModal';
@@ -8,7 +8,8 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
 import { useAgentStore } from '../store/useAgentStore';
 import { useGamificationStore } from '../store/useGamificationStore';
-import { postAgentChat, postAgentPerspectives, getAgentUsage } from '../lib/agentApi';
+import { streamAgentChat, postAgentPerspectives, getAgentUsage } from '../lib/agentApi';
+import { useMimVoice } from '../hooks/useMimVoice';
 import '../components/MimshackLogo.css';
 import './Agent.css';
 
@@ -41,14 +42,52 @@ const Agent = () => {
     syncUsageFromServer,
     rollbackLastUserMessage,
     clearMessages,
+    startAssistantMessage,
+    appendAssistantToken,
+    finishAssistantMessage,
   } = useAgentStore();
   const incrementIa = useGamificationStore((s) => s.incrementIaQuestions);
+  const handleSendRef = useRef(null);
 
   resetIfNewDay();
   const limits = getLimits(planType);
   const lang = i18n.language?.split('-')[0] || 'fr';
   const userType = profile?.user_type || 'curious';
   const token = session?.access_token;
+
+  const onVoiceError = useCallback(
+    (err) => {
+      const code = err?.message || '';
+      if (code === 'not-allowed' || code === 'NotAllowedError') {
+        setError(t('agent_voice_denied'));
+      } else if (code === 'stt_empty') {
+        setError(t('agent_voice_empty'));
+      } else if (/stt|quota/i.test(code)) {
+        setError(t('agent_voice_stt_error'));
+      } else {
+        setError(t('agent_voice_error'));
+      }
+    },
+    [t]
+  );
+
+  const {
+    voiceMode,
+    toggleVoiceMode,
+    isListening,
+    isSpeaking,
+    interimText,
+    startListening,
+    stopListening,
+    stopAndSendRecording,
+    speakReply,
+  } = useMimVoice({
+    lang,
+    accessToken: token,
+    onTranscript: (text) => handleSendRef.current?.(text),
+    onVoiceError,
+    disabled: loading,
+  });
 
   const refreshUsage = useCallback(async () => {
     if (!token) return;
@@ -66,7 +105,19 @@ const Agent = () => {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  }, [messages.length, loading, tab]);
+  }, [messages.length, loading, tab, interimText]);
+
+  useEffect(() => {
+    if (!voiceMode) {
+      stopListening();
+    }
+  }, [voiceMode, stopListening]);
+
+  useEffect(() => {
+    if (tab !== 'chat' || !voiceMode || loading || isListening || isSpeaking) return;
+    const t = setTimeout(() => startListening(), 400);
+    return () => clearTimeout(t);
+  }, [voiceMode, tab, loading, isListening, isSpeaking, startListening]);
 
   const handleSend = async (textOverride) => {
     const q = (textOverride ?? input).trim();
@@ -76,25 +127,41 @@ const Agent = () => {
       return;
     }
     setError(null);
-    const history = messages.map((m) => ({ role: m.role, content: m.content }));
+    const history = messages
+      .filter((m) => !m.streaming)
+      .map((m) => ({ role: m.role, content: m.content }));
     sendMessage('user', q);
     incrementIa();
     setInput('');
     setLoading(true);
+    startAssistantMessage();
+
+    let finalReply = '';
 
     try {
-      const data = await postAgentChat({
+      await streamAgentChat({
         message: q,
         language: lang,
         history,
         accessToken: token,
         userType,
+        onToken: (tokenChunk) => {
+          appendAssistantToken(tokenChunk);
+          finalReply += tokenChunk;
+        },
+        onDone: (data) => {
+          finalReply = data.reply || finalReply;
+          finishAssistantMessage(data.sources);
+          if (data.usage) syncUsageFromServer(data.usage);
+          else refreshUsage();
+        },
       });
-      sendMessage('assistant', data.reply, data.sources);
-      if (data.usage) syncUsageFromServer(data.usage);
-      else refreshUsage();
     } catch (err) {
       rollbackLastUserMessage();
+      const msgs = useAgentStore.getState().messages;
+      if (msgs[msgs.length - 1]?.streaming) {
+        useAgentStore.setState({ messages: msgs.slice(0, -1) });
+      }
       if (err.status === 401) {
         setError(t('auth_login_required'));
       } else if (err.status === 402) {
@@ -105,10 +172,19 @@ const Agent = () => {
       } else {
         setError(t('agent_error'));
       }
-    } finally {
       setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+
+    if (voiceMode && finalReply.trim()) {
+      await speakReply(finalReply);
+      if (voiceMode && !loading) startListening();
     }
   };
+
+  handleSendRef.current = handleSend;
 
   const handlePerspectives = async () => {
     const q = perspectiveQ.trim();
@@ -273,7 +349,7 @@ const Agent = () => {
                   </div>
                 </div>
               ))}
-              {loading && (
+              {loading && !messages.some((m) => m.streaming) && (
                 <div className="agent-msg agent-msg--assistant agent-msg--loading">
                   <div className="agent-msg-avatar" aria-hidden>
                     <MimshackLogo size={28} />
@@ -287,7 +363,32 @@ const Agent = () => {
               <div ref={messagesEndRef} className="agent-messages-anchor" />
             </div>
 
+            {(isListening || isSpeaking) && (
+              <p className="agent-voice-status" role="status">
+                {isListening ? t('agent_voice_listening') : t('agent_voice_speaking')}
+                {interimText ? ` — « ${interimText} »` : ''}
+              </p>
+            )}
+
             <div className="agent-composer">
+              <button
+                type="button"
+                className={`agent-voice-mode-btn ${voiceMode ? 'agent-voice-mode-btn--on' : ''}`}
+                onClick={toggleVoiceMode}
+                aria-pressed={voiceMode}
+                title={t('agent_voice_mode')}
+              >
+                <Volume2 size={18} aria-hidden />
+              </button>
+              <button
+                type="button"
+                className={`agent-voice-btn ${isListening ? 'agent-voice-btn--active' : ''}`}
+                onClick={() => (isListening ? stopAndSendRecording() : startListening())}
+                disabled={loading || isSpeaking}
+                aria-label={isListening ? t('agent_voice_stop') : t('agent_voice_start')}
+              >
+                <Mic size={18} aria-hidden />
+              </button>
               <input
                 type="text"
                 className="agent-composer-input"

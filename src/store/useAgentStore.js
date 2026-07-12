@@ -52,6 +52,39 @@ export const useAgentStore = create(
         }));
       },
 
+      startAssistantMessage: () => {
+        set((state) => ({
+          messages: [
+            ...state.messages,
+            { role: 'assistant', content: '', sources: null, at: Date.now(), streaming: true },
+          ],
+        }));
+      },
+
+      appendAssistantToken: (token) => {
+        set((state) => {
+          const messages = [...state.messages];
+          const last = messages[messages.length - 1];
+          if (last?.role !== 'assistant') return state;
+          messages[messages.length - 1] = { ...last, content: last.content + token };
+          return { messages };
+        });
+      },
+
+      finishAssistantMessage: (sources = null) => {
+        set((state) => {
+          const messages = [...state.messages];
+          const last = messages[messages.length - 1];
+          if (last?.role !== 'assistant') return state;
+          messages[messages.length - 1] = {
+            ...last,
+            sources: sources ?? last.sources,
+            streaming: false,
+          };
+          return { messages };
+        });
+      },
+
       rollbackLastUserMessage: () => {
         set((state) => {
           const messages = [...state.messages];
