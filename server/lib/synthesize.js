@@ -3,16 +3,15 @@ import { config } from '../config.js';
 const FOOTNOTES = {
   fr: {
     quota:
-      '\n\n*Réponse construite à partir des textes TKV. Le quota OpenAI est épuisé — activez la facturation sur platform.openai.com pour des réponses conversationnelles complètes.*',
-    offline:
-      '\n\n*Réponse construite à partir des textes TKV (mode local).*',
-    ia: '\n\n*Je suis une IA au service de votre discernement — vérifiez toujours les sources citées.*',
+      '\n\n*(Réponse tirée des textes TKV — pour des échanges plus fluides, vérifiez la clé OpenAI sur Vercel.)*',
+    offline: '',
+    ia: '',
   },
   en: {
     quota:
-      '\n\n*Answer built from TKV texts. OpenAI quota exceeded — enable billing at platform.openai.com for full conversational replies.*',
-    offline: '\n\n*Answer built from TKV texts (local mode).*',
-    ia: '\n\n*I am an AI serving your discernment — always check the cited sources.*',
+      '\n\n*(Answer drawn from TKV texts — for smoother conversation, check the OpenAI key on Vercel.)*',
+    offline: '',
+    ia: '',
   },
 };
 
@@ -23,7 +22,7 @@ function normalize(text) {
     .replace(/\p{M}/gu, '');
 }
 
-function extractSentences(chunks, { max = 5, topicFilter = null } = {}) {
+function extractSentences(chunks, { max = 4, topicFilter = null } = {}) {
   const seen = new Set();
   const out = [];
 
@@ -31,7 +30,7 @@ function extractSentences(chunks, { max = 5, topicFilter = null } = {}) {
     const parts = chunk.chunk_text.split(/(?<=[.!?])\s+/);
     for (let s of parts) {
       s = s.replace(/\n+/g, ' ').trim();
-      if (s.length < 35 || s.length > 420) continue;
+      if (s.length < 40 || s.length > 380) continue;
       const key = s.slice(0, 80);
       if (seen.has(key)) continue;
       if (topicFilter && !topicFilter(s)) continue;
@@ -48,56 +47,89 @@ function isAboutGod(question) {
   return /\bdieu\b|\bgod\b|\bcreator\b|\bcreateur\b|\bcréateur\b/.test(q);
 }
 
+function joinNaturally(sentences, lang) {
+  if (sentences.length <= 1) return sentences[0] || '';
+  const connectors =
+    lang === 'en'
+      ? ['Also, ', 'What strikes me too is that ', 'And ']
+      : ['Aussi, ', 'Ce qui me frappe aussi, c’est que ', 'Et '];
+  let out = sentences[0];
+  for (let i = 1; i < sentences.length; i += 1) {
+    const c = connectors[(i - 1) % connectors.length];
+    const s = sentences[i].charAt(0).toLowerCase() + sentences[i].slice(1);
+    out += ` ${c}${s}`;
+  }
+  return out;
+}
+
 export function synthesizeFromChunks(question, chunks, userType = 'curious', { language = 'fr', openaiError = null } = {}) {
   const lang = language?.split('-')[0] || 'fr';
   const foot = FOOTNOTES[lang] || FOOTNOTES.fr;
   const aboutGod = isAboutGod(question);
 
-  const godFilter = (s) => /dieu|christ|jésus|jesus|connaître|connaitre|éternelle|père|padre|verbe|parole/i.test(s);
+  const godFilter = (s) => /dieu|christ|jésus|jesus|connaître|connaitre|éternelle|père|verbe|parole/i.test(s);
   const sentences = extractSentences(chunks, {
-    max: 5,
+    max: 4,
     topicFilter: aboutGod ? godFilter : null,
   });
 
-  const intros = {
+  const openers = {
     fr: {
-      believer: 'Voici ce que les enseignements TKV soulignent, pour approfondir votre relation avec Dieu :',
-      skeptic:
-        'Les textes TKV ne prétendent pas tout prouver, mais voici ce qu’ils affirment clairement sur Dieu — à examiner avec esprit critique :',
-      curious:
-        'Pour commencer à cerner qui est Dieu selon TKV, voici les idées centrales des contenus de la plateforme :',
+      believer: 'Je suis content que tu poses ça. ',
+      skeptic: 'C’est une vraie question — merci de la formuler ainsi. ',
+      curious: 'Content de marcher un peu avec toi là-dessus. ',
     },
     en: {
-      believer: 'Here is what TKV teaching emphasizes to deepen your walk with God:',
-      skeptic: 'TKV texts do not claim to prove everything, but here is what they clearly affirm about God — worth examining critically:',
-      curious: 'To begin understanding who God is according to TKV, here are the central ideas from the platform’s content:',
+      believer: "I'm glad you're asking this. ",
+      skeptic: "That's a fair question — thanks for putting it plainly. ",
+      curious: "Happy to walk through this with you. ",
     },
   };
 
-  const L = intros[lang] || intros.fr;
-  const intro = aboutGod ? L[userType] || L.curious : (L[userType] || L.curious).replace(/Dieu|God/, 'cette question');
+  const L = openers[lang] || openers.fr;
+  const opener = L[userType] || L.curious;
 
-  let body = `${intro}\n\n`;
+  let body = opener;
 
   if (aboutGod) {
-    body += `Qui est Dieu, selon TKV ?\n\n`;
-    body += `Dieu n'y est pas présenté comme une notion vague, mais comme le seul vrai Dieu, Père de Jésus-Christ, qu'on peut connaître personnellement — pas seulement croire en une idée.\n\n`;
+    body +=
+      lang === 'en'
+        ? "In TKV, God isn't a vague idea but the living Father of Jesus Christ — someone we can know, not just believe in abstractly. "
+        : "Dans les enseignements TKV, Dieu n’est pas une idée floue : c’est le Père vivant de Jésus-Christ, qu’on peut connaître vraiment, pas seulement croire de loin. ";
     if (sentences.length) {
-      body += sentences.map((s, i) => `${i + 1}. ${s}`).join('\n\n');
-      body += '\n\n';
+      body += joinNaturally(sentences, lang) + ' ';
     }
-    body += `En synthèse : la « vie éternelle » est décrite comme cette connaissance vivante du Père et du Fils (Jean 17:3). GYNOSKO invite à dépasser la religion formelle pour entrer dans une relation de révélation, prière et Parole.`;
+    body +=
+      lang === 'en'
+        ? "Eternal life is described as knowing the Father and the Son (John 17:3) — GYNOSKO invites us beyond formal religion into prayer, the Word, and real relationship."
+        : "La vie éternelle, c’est cette connaissance du Père et du Fils (Jean 17:3) — GYNOSKO nous invite au-delà de la religion formelle, vers la prière, la Parole et une relation réelle.";
   } else if (sentences.length) {
-    body += sentences.map((s, i) => `${i + 1}. ${s}`).join('\n\n');
+    body +=
+      lang === 'en'
+        ? 'From what TKV teaches on this, '
+        : 'D’après ce que les textes TKV éclairent sur ce sujet, ';
+    body += joinNaturally(sentences, lang);
   } else if (chunks[0]) {
-    body += chunks[0].chunk_text.slice(0, 500) + (chunks[0].chunk_text.length > 500 ? '…' : '');
+    const excerpt = chunks[0].chunk_text.slice(0, 480).trim();
+    body +=
+      lang === 'en'
+        ? `I found this in the library that might help: ${excerpt}${chunks[0].chunk_text.length > 480 ? '…' : ''}`
+        : `J’ai retrouvé ceci dans la bibliothèque — ça pourrait t’aider : ${excerpt}${chunks[0].chunk_text.length > 480 ? '…' : ''}`;
   } else {
     body +=
       lang === 'en'
-        ? 'Explore the GYNOSKO library and Heritage section for more on this topic.'
-        : 'Explorez la bibliothèque GYNOSKO et l’onglet Héritage pour aller plus loin.';
+        ? "I don't have much indexed on that yet — try the GYNOSKO library or Heritage tab, and come back; we can dig in together."
+        : "Je n’ai pas encore beaucoup de matière indexée là-dessus — explore la bibliothèque GYNOSKO ou l’onglet Héritage, et reviens me voir ; on creusera ensemble.";
   }
 
-  const footnote = openaiError === 'quota' ? foot.quota : config.openaiKey ? foot.ia : foot.offline;
+  const closers = {
+    fr: ' Qu’est-ce qui te parle le plus dans tout ça ?',
+    en: ' What resonates most with you in all this?',
+  };
+  if (!body.includes('?')) {
+    body += closers[lang] || closers.fr;
+  }
+
+  const footnote = openaiError === 'quota' ? foot.quota : '';
   return body + footnote;
 }

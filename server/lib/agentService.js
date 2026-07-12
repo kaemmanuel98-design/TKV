@@ -3,16 +3,22 @@ import { getSupabaseAdmin } from './supabaseAdmin.js';
 import { embedText, buildSystemPrompt, chatCompletion, analyzePerspectives } from './openai.js';
 import { searchChunks, searchChunksText, loadChunks } from './vectorStore.js';
 import { synthesizeFromChunks } from './synthesize.js';
-import { rankChunks, formatChunkSourceLine } from './knowledgePriority.js';
+import { rankChunks } from './knowledgePriority.js';
 import { lookupBibleContext, lookupStrongLexicon } from './bibleLookup.js';
 
 const RETRIEVE_POOL = Math.max(config.ragTopK * 3, 12);
 
 function buildContext(chunks) {
   if (!chunks.length) return 'Aucun extrait TKV indexé pour le moment.';
-  return chunks
-    .map((c, i) => `${formatChunkSourceLine(c, i)}\n${c.chunk_text}`)
-    .join('\n\n---\n\n');
+  return `Matériel de référence (tisser naturellement dans ta réponse — ne pas lister mécaniquement) :
+
+${chunks
+  .map((c, i) => {
+    const meta = c.metadata || {};
+    const tag = [meta.title, meta.chapter, meta.strong_id].filter(Boolean).join(' · ') || 'TKV';
+    return `(${i + 1}) [${tag}]\n${c.chunk_text}`;
+  })
+  .join('\n\n')}`;
 }
 
 function extractStrongIds(message) {
@@ -122,7 +128,10 @@ export async function handleChat({ message, language = 'fr', userType = 'curious
   const { chunks, mode, openaiError: embedQuota } = await retrieveChunks(admin, message, language);
 
   const context = buildContext(chunks);
-  const system = `${buildSystemPrompt(userType, language)}\n\n--- CONTEXTE TKV ---\n${context}`;
+  const system = `${buildSystemPrompt(userType, language)}
+
+--- CONTEXTE TKV (pour t'appuyer sur les textes ; répondre en langage parlé) ---
+${context}`;
 
   let reply = null;
   let openaiError = embedQuota;

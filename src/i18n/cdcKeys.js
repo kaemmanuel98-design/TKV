@@ -113,7 +113,7 @@ export const cdcKeys = {
     agent_placeholder: 'Écrivez votre question, votre doute, ou ce que vous traversez…',
     agent_send: 'Envoyer',
     agent_disclaimer:
-      'Je suis Mim, assistant IA de TKV. Mes réponses s\'appuient sur la base TKV. Vérifiez toujours avec discernement.',
+      'Mim s\'appuie sur la base TKV. Comme dans tout dialogue, prends ce qui t\'éclaire et vérifie avec discernement.',
     agent_premium_gate: 'Passez en Premium pour l\'Analyseur de Perspectives et plus de requêtes.',
     agent_upgrade: 'Voir les offres',
     agent_mock_reply:
