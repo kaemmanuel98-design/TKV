@@ -1,19 +1,33 @@
-import { config } from '../config.js';
-
 const FOOTNOTES = {
   fr: {
     quota:
-      '\n\n*(Réponse tirée des textes TKV — pour des échanges plus fluides, vérifiez la clé OpenAI sur Vercel.)*',
+      '\n\n*(Réponse tirée des Écritures et ressources indexées — pour des échanges plus fluides, vérifiez la clé OpenAI sur Vercel.)*',
     offline: '',
     ia: '',
   },
   en: {
     quota:
-      '\n\n*(Answer drawn from TKV texts — for smoother conversation, check the OpenAI key on Vercel.)*',
+      '\n\n*(Answer drawn from Scripture and indexed resources — for smoother conversation, check the OpenAI key on Vercel.)*',
     offline: '',
     ia: '',
   },
 };
+
+function isBibleChunk(c) {
+  return (
+    c._liveBible ||
+    c._strongMatch ||
+    c.metadata?.content_type === 'bible_strong'
+  );
+}
+
+function sortBibleFirst(chunks) {
+  return [...chunks].sort((a, b) => {
+    const ba = isBibleChunk(a) ? 1 : 0;
+    const bb = isBibleChunk(b) ? 1 : 0;
+    return bb - ba;
+  });
+}
 
 function normalize(text) {
   return text
@@ -26,7 +40,7 @@ function extractSentences(chunks, { max = 4, topicFilter = null } = {}) {
   const seen = new Set();
   const out = [];
 
-  for (const chunk of chunks) {
+  for (const chunk of sortBibleFirst(chunks)) {
     const parts = chunk.chunk_text.split(/(?<=[.!?])\s+/);
     for (let s of parts) {
       s = s.replace(/\n+/g, ' ').trim();
@@ -66,9 +80,10 @@ export function synthesizeFromChunks(question, chunks, userType = 'curious', { l
   const lang = language?.split('-')[0] || 'fr';
   const foot = FOOTNOTES[lang] || FOOTNOTES.fr;
   const aboutGod = isAboutGod(question);
+  const ordered = sortBibleFirst(chunks);
 
-  const godFilter = (s) => /dieu|christ|jésus|jesus|connaître|connaitre|éternelle|père|verbe|parole/i.test(s);
-  const sentences = extractSentences(chunks, {
+  const godFilter = (s) => /dieu|christ|jésus|jesus|connaître|connaitre|éternelle|père|verbe|parole|scripture|bible|écri/i.test(s);
+  const sentences = extractSentences(ordered, {
     max: 4,
     topicFilter: aboutGod ? godFilter : null,
   });
@@ -94,32 +109,40 @@ export function synthesizeFromChunks(question, chunks, userType = 'curious', { l
   if (aboutGod) {
     body +=
       lang === 'en'
-        ? "In TKV, God isn't a vague idea but the living Father of Jesus Christ — someone we can know, not just believe in abstractly. "
-        : "Dans les enseignements TKV, Dieu n’est pas une idée floue : c’est le Père vivant de Jésus-Christ, qu’on peut connaître vraiment, pas seulement croire de loin. ";
+        ? "Scripture presents God not as a vague idea but as the living Father of Jesus Christ — someone we can know through faith, not merely speculate about. "
+        : "La Bible présente Dieu non pas comme une idée floue, mais comme le Père vivant de Jésus-Christ — qu’on peut connaître par la foi, pas seulement spéculer. ";
     if (sentences.length) {
       body += joinNaturally(sentences, lang) + ' ';
     }
     body +=
       lang === 'en'
-        ? "Eternal life is described as knowing the Father and the Son (John 17:3) — GYNOSKO invites us beyond formal religion into prayer, the Word, and real relationship."
-        : "La vie éternelle, c’est cette connaissance du Père et du Fils (Jean 17:3) — GYNOSKO nous invite au-delà de la religion formelle, vers la prière, la Parole et une relation réelle.";
+        ? "Eternal life is described as knowing the Father and the Son (John 17:3) — the Bible invites us beyond formal religion into prayer, the Word, and real relationship."
+        : "La vie éternelle, c’est cette connaissance du Père et du Fils (Jean 17:3) — la Bible nous invite au-delà de la religion formelle, vers la prière, la Parole et une relation réelle.";
   } else if (sentences.length) {
     body +=
       lang === 'en'
-        ? 'From what TKV teaches on this, '
-        : 'D’après ce que les textes TKV éclairent sur ce sujet, ';
+        ? 'From what Scripture clearly teaches on this, '
+        : 'D’après ce que la Bible enseigne clairement sur ce sujet, ';
     body += joinNaturally(sentences, lang);
-  } else if (chunks[0]) {
-    const excerpt = chunks[0].chunk_text.slice(0, 480).trim();
+  } else if (ordered[0]) {
+    const excerpt = ordered[0].chunk_text.slice(0, 480).trim();
+    const sourceLabel =
+      lang === 'en'
+        ? isBibleChunk(ordered[0])
+          ? 'this passage from Scripture'
+          : 'this complementary note from the TKV library'
+        : isBibleChunk(ordered[0])
+          ? 'ce passage des Écritures'
+          : 'cette note complémentaire de la bibliothèque TKV';
     body +=
       lang === 'en'
-        ? `I found this in the library that might help: ${excerpt}${chunks[0].chunk_text.length > 480 ? '…' : ''}`
-        : `J’ai retrouvé ceci dans la bibliothèque — ça pourrait t’aider : ${excerpt}${chunks[0].chunk_text.length > 480 ? '…' : ''}`;
+        ? `I found ${sourceLabel} that might help: ${excerpt}${ordered[0].chunk_text.length > 480 ? '…' : ''}`
+        : `J’ai retrouvé ${sourceLabel} — ça pourrait t’aider : ${excerpt}${ordered[0].chunk_text.length > 480 ? '…' : ''}`;
   } else {
     body +=
       lang === 'en'
-        ? "I don't have much indexed on that yet — try the GYNOSKO library or Heritage tab, and come back; we can dig in together."
-        : "Je n’ai pas encore beaucoup de matière indexée là-dessus — explore la bibliothèque GYNOSKO ou l’onglet Héritage, et reviens me voir ; on creusera ensemble.";
+        ? "I don't have much indexed on that yet — try the Bible tab or GYNOSKO library, and come back; we can dig into Scripture together."
+        : "Je n’ai pas encore beaucoup de matière indexée là-dessus — explore l’onglet Bible ou la bibliothèque GYNOSKO, et reviens me voir ; on creusera les Écritures ensemble.";
   }
 
   const closers = {

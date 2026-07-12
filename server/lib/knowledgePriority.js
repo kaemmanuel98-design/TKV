@@ -1,10 +1,10 @@
-/** Priorité des sources pour Mim (plus élevé = plus important). */
+/** Priorité des sources pour Mim (plus élevé = plus important). Bible d'abord. */
 
 export const SOURCE_PRIORITY = {
-  tkv_book: 100,
-  bible_strong: 90,
-  heritage_history: 85,
-  pastor_teaching: 70,
+  bible_strong: 100,
+  tkv_book: 72,
+  heritage_history: 65,
+  pastor_teaching: 50,
 };
 
 export const SOURCE_LABELS = {
@@ -24,7 +24,9 @@ export function rankChunks(chunks, topK) {
   const scored = chunks.map((c) => {
     const p = priorityForChunk(c);
     const sim = typeof c.similarity === 'number' ? c.similarity : 0.5;
-    const boost = 1 + p / 200;
+    const isBible =
+      c.metadata?.content_type === 'bible_strong' || c._liveBible || c._strongMatch;
+    const boost = (1 + p / 200) * (isBible ? 1.45 : 1);
     return { ...c, _rank: sim * boost, _priority: p };
   });
 

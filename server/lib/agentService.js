@@ -8,17 +8,46 @@ import { lookupBibleContext, lookupStrongLexicon } from './bibleLookup.js';
 
 const RETRIEVE_POOL = Math.max(config.ragTopK * 3, 12);
 
-function buildContext(chunks) {
-  if (!chunks.length) return 'Aucun extrait TKV indexé pour le moment.';
-  return `Matériel de référence (tisser naturellement dans ta réponse — ne pas lister mécaniquement) :
+function isBibleChunk(c) {
+  return (
+    c._liveBible ||
+    c._strongMatch ||
+    c.metadata?.content_type === 'bible_strong'
+  );
+}
 
-${chunks
-  .map((c, i) => {
-    const meta = c.metadata || {};
-    const tag = [meta.title, meta.chapter, meta.strong_id].filter(Boolean).join(' · ') || 'TKV';
-    return `(${i + 1}) [${tag}]\n${c.chunk_text}`;
-  })
-  .join('\n\n')}`;
+function formatChunkLine(c, index) {
+  const meta = c.metadata || {};
+  const tag = [meta.title, meta.chapter, meta.strong_id].filter(Boolean).join(' · ') || 'Bible';
+  return `(${index}) [${tag}]\n${c.chunk_text}`;
+}
+
+function buildContext(chunks) {
+  const bible = chunks.filter(isBibleChunk);
+  const supplemental = chunks.filter((c) => !isBibleChunk(c));
+  const sections = [];
+
+  if (bible.length) {
+    sections.push(
+      `ÉCRITURES ET LEXIQUE (autorité suprême — fonder ta réponse ici en priorité) :
+
+${bible.map((c, i) => formatChunkLine(c, i + 1)).join('\n\n')}`
+    );
+  }
+
+  if (supplemental.length) {
+    sections.push(
+      `Ressources complémentaires TKV (secondaires — illustration seulement ; ne jamais contredire la Bible) :
+
+${supplemental.map((c, i) => formatChunkLine(c, i + 1)).join('\n\n')}`
+    );
+  }
+
+  if (!sections.length) {
+    return 'Aucun extrait biblique ou TKV indexé pour le moment. Appuie-toi sur ce que la Bible enseigne clairement ; indique les limites si le contexte est insuffisant.';
+  }
+
+  return sections.join('\n\n---\n\n');
 }
 
 function extractStrongIds(message) {
@@ -65,9 +94,9 @@ function formatSources(chunks) {
   }
 
   return unique.map((c) => ({
-    title: c.metadata?.title || 'TKV',
+    title: c.metadata?.title || (isBibleChunk(c) ? 'Bible' : 'TKV'),
     chapter: c.metadata?.chapter || c.metadata?.strong_id || '',
-    sourceType: c.metadata?.content_type || 'tkv',
+    sourceType: isBibleChunk(c) ? 'bible' : c.metadata?.content_type || 'tkv',
     pastor: c.metadata?.pastor || '',
     excerpt: c.chunk_text.slice(0, 180) + (c.chunk_text.length > 180 ? '…' : ''),
     similarity: c.similarity,
@@ -128,7 +157,7 @@ async function buildChatPayload(admin, message, language, userType) {
   const context = buildContext(chunks);
   const system = `${buildSystemPrompt(userType, language)}
 
---- CONTEXTE TKV (pour t'appuyer sur les textes ; répondre en langage parlé) ---
+--- CONTEXTE FOURNI (Bible d'abord ; ressources TKV en complément seulement) ---
 ${context}`;
   return { system, chunks, mode, openaiError: embedQuota };
 }
@@ -221,16 +250,16 @@ export async function handlePerspectives({ question, language = 'fr', userType =
     result = {
       believers:
         language === 'en'
-          ? 'Christian faith sees God as the personal Creator revealed in Scripture, knowable through Christ.'
-          : 'La foi chrétienne voit Dieu comme le Créateur personnel révélé dans les Écritures, connaissable en Christ.',
+          ? 'From a Christian perspective grounded in Scripture, God is the personal Creator revealed in the Bible — knowable through Jesus Christ and the witness of the apostles.'
+          : 'Du point de vue chrétien, ancré dans les Écritures, Dieu est le Créateur personnel révélé dans la Bible — connaissable par Jésus-Christ et le témoignage des apôtres.',
       skeptics:
         language === 'en'
-          ? 'A skeptical view asks for testable evidence and questions whether "God" is a necessary explanation.'
-          : 'Une lecture sceptique demande des preuves vérifiables et interroge si « Dieu » est une explication nécessaire.',
+          ? 'A skeptical reading asks for testable evidence and questions whether invoking God is necessary — it often highlights suffering, religious diversity, and the limits of human certainty.'
+          : 'Une lecture sceptique demande des preuves vérifiables et interroge si invoquer Dieu est nécessaire — elle met souvent en avant la souffrance, la diversité religieuse et les limites de la certitude humaine.',
       synthesis:
         language === 'en'
-          ? 'TKV invites dialogue without caricature: intellectual rigor and spiritual openness can coexist.'
-          : 'TKV invite un dialogue sans caricature : rigueur intellectuelle et ouverture spirituelle peuvent coexister.',
+          ? 'Both sides can meet around honest questions: what the Bible actually claims, what can be known with humility, and an invitation to examine Scripture together without caricature.'
+          : 'Les deux perspectives peuvent se rencontrer autour de questions honnêtes : ce que la Bible affirme réellement, ce qu’on peut savoir avec humilité, et une invitation à examiner les Écritures ensemble sans caricature.',
     };
   }
 
