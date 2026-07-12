@@ -4,6 +4,7 @@ import { embedText, buildSystemPrompt, chatCompletion, analyzePerspectives } fro
 import { searchChunks, searchChunksText, loadChunks } from './vectorStore.js';
 import { synthesizeFromChunks } from './synthesize.js';
 import { rankChunks, formatChunkSourceLine } from './knowledgePriority.js';
+import { lookupBibleContext, lookupStrongLexicon } from './bibleLookup.js';
 
 const RETRIEVE_POOL = Math.max(config.ragTopK * 3, 12);
 
@@ -71,6 +72,9 @@ async function retrieveChunks(admin, message, language) {
   let openaiError = null;
   let mode = 'keyword';
 
+  const liveBible = await lookupBibleContext(message, language);
+  const liveStrong = lookupStrongLexicon(message, language);
+
   const embedResult = await embedText(message);
   let embedding = null;
   if (embedResult?.error === 'quota') {
@@ -92,13 +96,22 @@ async function retrieveChunks(admin, message, language) {
     mode = 'keyword';
   }
 
+  if (!chunks.length && language !== 'fr') {
+    chunks = await searchChunksText(admin, message, { ...searchOpts, language: 'fr' });
+    if (chunks.length) mode = 'keyword-fr-fallback';
+  }
+
   if (!chunks.length) {
     chunks = loadChunks()
-      .filter((c) => c.language === language || c.metadata?.content_type === 'bible_strong')
+      .filter((c) => c.language === language || c.language === 'fr' || c.metadata?.content_type === 'bible_strong')
       .slice(0, RETRIEVE_POOL);
   }
 
-  chunks = attachStrongChunks(chunks, message);
+  const merged = new Map();
+  for (const c of [...liveBible, ...liveStrong, ...chunks]) {
+    merged.set(c.id, c);
+  }
+  chunks = attachStrongChunks([...merged.values()], message);
   chunks = rankChunks(chunks, config.ragTopK);
 
   return { chunks, mode, openaiError };
@@ -109,7 +122,7 @@ export async function handleChat({ message, language = 'fr', userType = 'curious
   const { chunks, mode, openaiError: embedQuota } = await retrieveChunks(admin, message, language);
 
   const context = buildContext(chunks);
-  const system = `${buildSystemPrompt(userType)}\n\n--- CONTEXTE TKV ---\n${context}`;
+  const system = `${buildSystemPrompt(userType, language)}\n\n--- CONTEXTE TKV ---\n${context}`;
 
   let reply = null;
   let openaiError = embedQuota;
@@ -140,7 +153,7 @@ export async function handlePerspectives({ question, language = 'fr', userType =
   let result = null;
 
   try {
-    result = await analyzePerspectives(question, context, userType);
+    result = await analyzePerspectives(question, context, userType, language);
   } catch (err) {
     if (err?.code === 'insufficient_quota') {
       /* fall through */

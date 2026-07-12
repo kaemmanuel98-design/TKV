@@ -1,5 +1,12 @@
 import { API_BASE, parseApiResponse } from './apiClient.js';
 
+export async function getAgentUsage(accessToken) {
+  const res = await fetch(`${API_BASE}/api/agent/usage`, {
+    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
+  });
+  return parseApiResponse(res);
+}
+
 export async function postAgentChat({ message, language, history, accessToken, userType }) {
   const res = await fetch(`${API_BASE}/api/agent/chat`, {
     method: 'POST',

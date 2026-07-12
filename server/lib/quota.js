@@ -26,6 +26,50 @@ export function resolvePlan(profile) {
   return 'free';
 }
 
+export async function getDailyUsage(userId, req = null) {
+  const rawProfile = userId ? await getUserProfile(userId) : null;
+  const profile = enrichProfileWithFounderAccess(rawProfile, req?.user?.email);
+  const plan = resolvePlan(profile);
+  const limits = PLAN_LIMITS[plan] || PLAN_LIMITS.free;
+  const admin = getSupabaseAdmin();
+  const date = todayKey();
+
+  if (admin && userId) {
+    const { data: row } = await admin
+      .from('ia_daily_usage')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('date', date)
+      .maybeSingle();
+
+    return {
+      plan,
+      chat: {
+        used: row?.requests_count ?? 0,
+        limit: limits.chat,
+        remaining: Math.max(0, limits.chat - (row?.requests_count ?? 0)),
+      },
+      perspectives: {
+        used: row?.perspectives_count ?? 0,
+        limit: limits.perspectives,
+        remaining: Math.max(0, limits.perspectives - (row?.perspectives_count ?? 0)),
+      },
+    };
+  }
+
+  const key = memoryKey(userId, req);
+  const usage = memoryUsage.get(key) || { chat: 0, perspectives: 0 };
+  return {
+    plan,
+    chat: { used: usage.chat, limit: limits.chat, remaining: Math.max(0, limits.chat - usage.chat) },
+    perspectives: {
+      used: usage.perspectives,
+      limit: limits.perspectives,
+      remaining: Math.max(0, limits.perspectives - usage.perspectives),
+    },
+  };
+}
+
 export async function checkAndIncrementUsage(userId, type = 'chat', req = null) {
   const rawProfile = userId ? await getUserProfile(userId) : null;
   const profile = enrichProfileWithFounderAccess(rawProfile, req?.user?.email);

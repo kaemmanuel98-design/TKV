@@ -1,15 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Send, Scale, Loader2, Sparkles, Crown } from 'lucide-react';
+import { Send, Scale, Loader2, Sparkles, Crown, Trash2 } from 'lucide-react';
 import MimshackLogo from '../components/MimshackLogo';
+import AgentMessageContent from '../components/AgentMessageContent';
 import PaywallModal from '../components/PaywallModal';
 import { useAuthStore } from '../store/useAuthStore';
 import { useProfileStore } from '../store/useProfileStore';
 import { useAgentStore } from '../store/useAgentStore';
 import { useGamificationStore } from '../store/useGamificationStore';
-import { postAgentChat, postAgentPerspectives } from '../lib/agentApi';
+import { postAgentChat, postAgentPerspectives, getAgentUsage } from '../lib/agentApi';
 import '../components/MimshackLogo.css';
 import './Agent.css';
+
+const SUGGESTION_KEYS = ['agent_suggest_1', 'agent_suggest_2', 'agent_suggest_3'];
 
 const Agent = () => {
   const { t, i18n } = useTranslation();
@@ -35,7 +38,9 @@ const Agent = () => {
     chatCount,
     canSendChat,
     canAnalyzePerspectives,
-    incrementPerspectives,
+    syncUsageFromServer,
+    rollbackLastUserMessage,
+    clearMessages,
   } = useAgentStore();
   const incrementIa = useGamificationStore((s) => s.incrementIaQuestions);
 
@@ -45,20 +50,33 @@ const Agent = () => {
   const userType = profile?.user_type || 'curious';
   const token = session?.access_token;
 
-  const chatHistory = messages.map((m) => ({ role: m.role, content: m.content }));
+  const refreshUsage = useCallback(async () => {
+    if (!token) return;
+    try {
+      const usage = await getAgentUsage(token);
+      syncUsageFromServer(usage);
+    } catch {
+      /* quota affiché localement en secours */
+    }
+  }, [token, syncUsageFromServer]);
+
+  useEffect(() => {
+    refreshUsage();
+  }, [refreshUsage]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages.length, loading, tab]);
 
-  const handleSend = async () => {
-    const q = input.trim();
+  const handleSend = async (textOverride) => {
+    const q = (textOverride ?? input).trim();
     if (!q || loading) return;
     if (!isPremium() && !canSendChat(planType)) {
       setPaywallOpen(true);
       return;
     }
     setError(null);
+    const history = messages.map((m) => ({ role: m.role, content: m.content }));
     sendMessage('user', q);
     incrementIa();
     setInput('');
@@ -68,17 +86,22 @@ const Agent = () => {
       const data = await postAgentChat({
         message: q,
         language: lang,
-        history: chatHistory,
+        history,
         accessToken: token,
         userType,
       });
       sendMessage('assistant', data.reply, data.sources);
+      if (data.usage) syncUsageFromServer(data.usage);
+      else refreshUsage();
     } catch (err) {
+      rollbackLastUserMessage();
       if (err.status === 401) {
         setError(t('auth_login_required'));
       } else if (err.status === 402) {
         setPaywallOpen(true);
-        sendMessage('assistant', t('agent_quota_exceeded'));
+        setError(t('agent_quota_exceeded'));
+      } else if (err.status === 429) {
+        setError(t('agent_error_rate'));
       } else {
         setError(t('agent_error'));
       }
@@ -104,7 +127,7 @@ const Agent = () => {
         accessToken: token,
         userType,
       });
-      incrementPerspectives();
+      if (data.usage) syncUsageFromServer(data.usage);
       setPerspectiveResult({
         believers: data.believers,
         skeptics: data.skeptics,
@@ -116,6 +139,7 @@ const Agent = () => {
         setError(t('auth_login_required'));
       } else if (err.status === 402) {
         setPaywallOpen(true);
+        setError(t('agent_quota_exceeded'));
       } else {
         setError(t('agent_error'));
       }
@@ -183,26 +207,56 @@ const Agent = () => {
 
         {tab === 'chat' ? (
           <section className="agent-panel agent-panel--chat" aria-label={t('agent_tab_chat')}>
+            {messages.length > 0 && (
+              <div className="agent-panel-toolbar">
+                <button
+                  type="button"
+                  className="agent-clear-btn"
+                  onClick={() => {
+                    clearMessages();
+                    setError(null);
+                  }}
+                  disabled={loading}
+                >
+                  <Trash2 size={14} aria-hidden />
+                  {t('agent_clear_chat')}
+                </button>
+              </div>
+            )}
+
             <div className="agent-messages">
               {messages.length === 0 && !loading && (
                 <div className="agent-welcome">
                   <MimshackLogo size={40} title={t('agent_title')} />
                   <p className="agent-welcome-title">{t('agent_welcome_title')}</p>
                   <p className="agent-welcome-hint">{t('agent_welcome_hint')}</p>
+                  <div className="agent-suggestions">
+                    {SUGGESTION_KEYS.map((key) => (
+                      <button
+                        key={key}
+                        type="button"
+                        className="agent-suggestion-chip"
+                        onClick={() => handleSend(t(key))}
+                      >
+                        {t(key)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )}
               {messages.map((msg, i) => (
-                <div
-                  key={i}
-                  className={`agent-msg agent-msg--${msg.role}`}
-                >
+                <div key={i} className={`agent-msg agent-msg--${msg.role}`}>
                   {msg.role === 'assistant' && (
                     <div className="agent-msg-avatar" aria-hidden>
                       <MimshackLogo size={28} />
                     </div>
                   )}
                   <div className="agent-msg-bubble">
-                    <p>{msg.content}</p>
+                    {msg.role === 'assistant' ? (
+                      <AgentMessageContent text={msg.content} />
+                    ) : (
+                      <p>{msg.content}</p>
+                    )}
                     {msg.sources?.length > 0 && (
                       <div className="agent-sources">
                         <span className="agent-sources-label">{t('agent_sources')}</span>
@@ -247,7 +301,7 @@ const Agent = () => {
               <button
                 type="button"
                 className="btn btn-primary agent-composer-send"
-                onClick={handleSend}
+                onClick={() => handleSend()}
                 disabled={loading || !input.trim()}
                 aria-label={t('agent_send')}
               >
@@ -307,15 +361,15 @@ const Agent = () => {
               <div className="agent-perspective-grid">
                 <article className="agent-perspective-card">
                   <h3>{t('perspectives_believers')}</h3>
-                  <p>{perspectiveResult.believers}</p>
+                  <AgentMessageContent text={perspectiveResult.believers} />
                 </article>
                 <article className="agent-perspective-card">
                   <h3>{t('perspectives_skeptics')}</h3>
-                  <p>{perspectiveResult.skeptics}</p>
+                  <AgentMessageContent text={perspectiveResult.skeptics} />
                 </article>
                 <article className="agent-perspective-card agent-perspective-card--synthesis">
                   <h3>{t('perspectives_synthesis')}</h3>
-                  <p>{perspectiveResult.synthesis}</p>
+                  <AgentMessageContent text={perspectiveResult.synthesis} />
                 </article>
               </div>
             )}

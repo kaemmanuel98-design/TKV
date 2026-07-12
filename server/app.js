@@ -3,7 +3,7 @@ import cors from 'cors';
 import { config } from './config.js';
 import { verifyUser, getUserProfile } from './lib/supabaseAdmin.js';
 import { enrichProfileWithFounderAccess } from './lib/founderAccess.js';
-import { checkAndIncrementUsage } from './lib/quota.js';
+import { checkAndIncrementUsage, getDailyUsage } from './lib/quota.js';
 import { checkAndIncrementConfessionalUsage } from './lib/confessionalQuota.js';
 import { handleChat, handlePerspectives } from './lib/agentService.js';
 import { loadChunks } from './lib/vectorStore.js';
@@ -1002,6 +1002,17 @@ app.get('/api/companion/admin/audit', authMiddleware, async (req, res) => {
   }
 });
 
+app.get('/api/agent/usage', authMiddleware, async (req, res) => {
+  try {
+    if (!requireUser(req, res)) return;
+    const usage = await getDailyUsage(req.user.id, req);
+    res.json(usage);
+  } catch (err) {
+    console.error('agent usage error', err);
+    res.status(500).json({ error: 'agent_error' });
+  }
+});
+
 app.post('/api/agent/chat', authMiddleware, agentRateLimit, async (req, res) => {
   try {
     if (!requireUser(req, res)) return;
@@ -1029,14 +1040,11 @@ app.post('/api/agent/chat', authMiddleware, agentRateLimit, async (req, res) => 
       history: Array.isArray(history) ? history.slice(-20) : [],
     });
 
+    const daily = await getDailyUsage(req.user.id, req);
+
     res.json({
       ...result,
-      usage: {
-        plan: usage.plan,
-        used: usage.used,
-        limit: usage.limit,
-        remaining: usage.remaining,
-      },
+      usage: daily,
     });
   } catch (err) {
     console.error('chat error', err);
@@ -1224,7 +1232,7 @@ app.post('/api/agent/perspectives', authMiddleware, agentRateLimit, async (req, 
       return res.status(400).json({ error: 'question_required' });
     }
 
-    const userType = req.profile?.user_type || 'curious';
+    const userType = req.profile?.user_type || req.body?.userType || 'curious';
     const usage = await checkAndIncrementUsage(req.user.id, 'perspectives', req);
 
     if (!usage.allowed) {
@@ -1242,14 +1250,11 @@ app.post('/api/agent/perspectives', authMiddleware, agentRateLimit, async (req, 
       userType,
     });
 
+    const daily = await getDailyUsage(req.user.id, req);
+
     res.json({
       ...result,
-      usage: {
-        plan: usage.plan,
-        used: usage.used,
-        limit: usage.limit,
-        remaining: usage.remaining,
-      },
+      usage: daily,
     });
   } catch (err) {
     console.error('perspectives error', err);

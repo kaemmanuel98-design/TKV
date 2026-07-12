@@ -25,6 +25,15 @@ export const useAgentStore = create(
 
       getLimits: (planType = 'free') => limits[planType] || limits.free,
 
+      syncUsageFromServer: (usage) => {
+        if (!usage) return;
+        get().resetIfNewDay();
+        set({
+          chatCount: usage.chat?.used ?? get().chatCount,
+          perspectivesCount: usage.perspectives?.used ?? get().perspectivesCount,
+        });
+      },
+
       canSendChat: (planType) => {
         get().resetIfNewDay();
         const { chat } = get().getLimits(planType);
@@ -40,9 +49,20 @@ export const useAgentStore = create(
       sendMessage: (role, content, sources = null) => {
         set((state) => ({
           messages: [...state.messages, { role, content, sources, at: Date.now() }],
-          chatCount: role === 'user' ? state.chatCount + 1 : state.chatCount,
         }));
       },
+
+      rollbackLastUserMessage: () => {
+        set((state) => {
+          const messages = [...state.messages];
+          if (messages.length && messages[messages.length - 1]?.role === 'user') {
+            messages.pop();
+          }
+          return { messages, chatCount: Math.max(0, state.chatCount - 1) };
+        });
+      },
+
+      clearMessages: () => set({ messages: [] }),
 
       incrementPerspectives: () => {
         get().resetIfNewDay();

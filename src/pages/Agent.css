@@ -543,6 +543,79 @@
   }
 }
 
+.agent-welcome-hint {
+  margin: 0 0 1rem;
+}
+
+.agent-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.agent-suggestion-chip {
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  text-align: left;
+  color: var(--text-secondary);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.agent-suggestion-chip:hover {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.agent-panel-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.agent-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.agent-clear-btn:hover:not(:disabled) {
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.agent-msg-formatted p {
+  margin: 0 0 0.65rem;
+}
+
+.agent-msg-formatted p:last-child {
+  margin-bottom: 0;
+}
+
+.agent-msg-list {
+  margin: 0 0 0.65rem 1.1rem;
+  padding: 0;
+}
+
+.agent-msg-list li {
+  margin-bottom: 0.35rem;
+}
+
 @media (max-width: 480px) {
   .agent-hero-inner {
     gap: 1rem;
