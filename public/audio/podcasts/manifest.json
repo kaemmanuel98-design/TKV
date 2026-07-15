@@ -1,0 +1,82 @@
+{
+  "revenons-premier-amour": {
+    "audio": {
+      "fr": "/audio/podcasts/revenons-premier-amour.mp3",
+      "en": "/audio/podcasts/revenons-premier-amour.en.mp3",
+      "es": "/audio/podcasts/revenons-premier-amour.es.mp3",
+      "nl": "/audio/podcasts/revenons-premier-amour.nl.mp3",
+      "pt": "/audio/podcasts/revenons-premier-amour.pt.mp3",
+      "ar": "/audio/podcasts/revenons-premier-amour.ar.mp3"
+    },
+    "transcript": {
+      "fr": "/audio/podcasts/revenons-premier-amour.transcript.json",
+      "en": "/audio/podcasts/revenons-premier-amour.en.transcript.json",
+      "es": "/audio/podcasts/revenons-premier-amour.es.transcript.json",
+      "nl": "/audio/podcasts/revenons-premier-amour.nl.transcript.json",
+      "pt": "/audio/podcasts/revenons-premier-amour.pt.transcript.json",
+      "ar": "/audio/podcasts/revenons-premier-amour.ar.transcript.json"
+    },
+    "duration": {
+      "fr": 781,
+      "en": 949,
+      "es": 981,
+      "nl": 1122,
+      "pt": 1048,
+      "ar": 1147
+    },
+    "available": [
+      "fr",
+      "en",
+      "es",
+      "nl",
+      "pt",
+      "ar"
+    ]
+  },
+  "puissance-grace-faiblesses": {
+    "audio": {
+      "fr": "/audio/podcasts/puissance-grace-faiblesses.mp3"
+    },
+    "transcript": {
+      "fr": "/audio/podcasts/puissance-grace-faiblesses.transcript.json"
+    },
+    "duration": {
+      "fr": 612
+    },
+    "available": [
+      "fr"
+    ]
+  },
+  "tunique-couleurs-destinee": {
+    "audio": {
+      "fr": "/audio/podcasts/tunique-couleurs-destinee.mp3",
+      "en": "/audio/podcasts/tunique-couleurs-destinee.en.mp3"
+    },
+    "transcript": {
+      "fr": "/audio/podcasts/tunique-couleurs-destinee.transcript.json",
+      "en": "/audio/podcasts/tunique-couleurs-destinee.en.transcript.json"
+    },
+    "duration": {
+      "fr": 798,
+      "en": 920
+    },
+    "available": [
+      "fr",
+      "en"
+    ]
+  },
+  "resurrection-probleme-vue": {
+    "audio": {
+      "fr": "/audio/podcasts/resurrection-probleme-vue.mp3"
+    },
+    "transcript": {
+      "fr": "/audio/podcasts/resurrection-probleme-vue.transcript.json"
+    },
+    "duration": {
+      "fr": 673
+    },
+    "available": [
+      "fr"
+    ]
+  }
+}

@@ -80,8 +80,6 @@ const BibleStrong = () => {
   const [lexiconLoading, setLexiconLoading] = useState(false);
   const [lexiconFetchFailed, setLexiconFetchFailed] = useState(false);
   const [lexiconLargeText, setLexiconLargeText] = useState(false);
-  const [lexiconPrewarming, setLexiconPrewarming] = useState(false);
-  const [lexiconPrewarmProgress, setLexiconPrewarmProgress] = useState({ done: 0, total: 0 });
   const [verseNotesByRef, setVerseNotesByRef] = useState({});
   const [verseNotesTableMissing, setVerseNotesTableMissing] = useState(false);
   const [verseNoteError, setVerseNoteError] = useState(false);
@@ -150,63 +148,12 @@ const BibleStrong = () => {
   useEffect(() => {
     if (!verses.length) return;
 
-    const prewarmKey = `${bookId}:${currentChapter}:${lang}`;
+    const prewarmKey = `${bookId}:${currentChapter}`;
     if (prewarmKeyRef.current === prewarmKey) return;
     prewarmKeyRef.current = prewarmKey;
 
-    const strongSet = new Set();
-    for (const verse of verses) {
-      for (const seg of verse.segments || []) {
-        if (!seg?.s || !seg?.t) continue;
-        const resolvedId = resolveStrongForSurface(seg.t.trim(), lang, seg.s);
-        if (resolvedId) strongSet.add(resolvedId);
-      }
-    }
-
-    const strongIds = Array.from(strongSet);
-    if (!strongIds.length) return;
-
-    let cancelled = false;
-    const connection = typeof navigator !== 'undefined' ? navigator.connection : null;
-    const saveData = Boolean(connection?.saveData);
-    const effectiveType = String(connection?.effectiveType || '').toLowerCase();
-    const avoidPrewarm = saveData || effectiveType === 'slow-2g' || effectiveType === '2g';
-    if (avoidPrewarm) {
-      setLexiconPrewarming(false);
-      setLexiconPrewarmProgress({ done: 0, total: 0 });
-      return;
-    }
-
-    const prewarm = async () => {
-      setLexiconPrewarming(true);
-      setLexiconPrewarmProgress({ done: 0, total: strongIds.length });
-      const chunkSize = 12;
-      try {
-        for (let i = 0; i < strongIds.length; i += chunkSize) {
-          if (cancelled) return;
-          const chunk = strongIds.slice(i, i + chunkSize);
-          await Promise.allSettled(chunk.map((id) => getLocalizedLexiconEntryAsync(id, lang)));
-          if (!cancelled) {
-            const done = Math.min(i + chunk.length, strongIds.length);
-            setLexiconPrewarmProgress({ done, total: strongIds.length });
-          }
-        }
-      } finally {
-        if (!cancelled) {
-          setLexiconPrewarming(false);
-          setLexiconPrewarmProgress({ done: 0, total: 0 });
-        }
-      }
-    };
-
-    prewarm();
-
-    return () => {
-      cancelled = true;
-      setLexiconPrewarming(false);
-      setLexiconPrewarmProgress({ done: 0, total: 0 });
-    };
-  }, [bookId, currentChapter, lang, verses]);
+    void preloadLexicon();
+  }, [bookId, currentChapter, verses.length]);
 
   useEffect(() => {
     if (!verses.length) {
@@ -694,17 +641,6 @@ const BibleStrong = () => {
             </p>
           </div>
 
-          {lexiconPrewarming && (
-            <p className="lexicon-prewarm-hint text-muted" aria-live="polite">
-              <Loader2 size={14} className="spin" />
-              {t('bible_lexicon_prewarming')}
-              {lexiconPrewarmProgress.total > 0 ? (
-                <span className="lexicon-prewarm-count">
-                  {lexiconPrewarmProgress.done}/{lexiconPrewarmProgress.total}
-                </span>
-              ) : null}
-            </p>
-          )}
 
           {buildMissing && !loading && (
             <div className="card bible-unavailable">

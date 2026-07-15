@@ -99,3 +99,17 @@
   font-size: 0.8125rem;
   text-align: center;
 }
+
+.podcasts-sermon-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.45rem;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+  color: var(--accent-text);
+  margin-right: 0.35rem;
+  vertical-align: middle;
+}

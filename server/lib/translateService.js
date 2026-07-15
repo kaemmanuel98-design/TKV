@@ -2,6 +2,31 @@ import { translate } from '@vitalets/google-translate-api';
 
 const MAX_CHUNK = 4500;
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+const translationCache = new Map();
+const CACHE_MAX = 8000;
+const CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+function cacheKey(text, from, to) {
+  return `${from}|${to}|${text}`;
+}
+
+function getCached(key) {
+  const entry = translationCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.at > CACHE_TTL_MS) {
+    translationCache.delete(key);
+    return null;
+  }
+  return entry.value;
+}
+
+function setCached(key, value) {
+  if (translationCache.size >= CACHE_MAX) {
+    const oldest = translationCache.keys().next().value;
+    if (oldest) translationCache.delete(oldest);
+  }
+  translationCache.set(key, { value, at: Date.now() });
+}
 
 function splitForTranslate(text) {
   const t = String(text || '');
@@ -58,7 +83,7 @@ async function translateChunk(text, { from, to }) {
   for (let attempt = 0; attempt < 6; attempt++) {
     try {
       const res = await translate(text, { from, to });
-      await delay(900 + attempt * 400);
+      await delay(2000 + attempt * 600);
       return res.text;
     } catch (e) {
       const rateLimited = /too many requests/i.test(e.message || '');
@@ -73,12 +98,18 @@ async function translateOne(text, { from, to }) {
   if (!text?.trim()) return text;
   if (from === to) return text;
 
+  const key = cacheKey(text, from, to);
+  const cached = getCached(key);
+  if (cached != null) return cached;
+
   const chunks = splitForTranslate(text);
   const out = [];
   for (const chunk of chunks) {
     out.push(await translateChunk(chunk, { from, to }));
   }
-  return out.join('\n\n');
+  const result = out.join('\n\n');
+  setCached(key, result);
+  return result;
 }
 
 /**

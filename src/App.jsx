@@ -193,7 +193,14 @@ function App() {
                 </RequireAuth>
               }
             />
-            <Route path="payment/return" element={<PaymentReturn />} />
+            <Route
+              path="payment/return"
+              element={
+                <Suspense fallback={<PageFallback />}>
+                  <PaymentReturn />
+                </Suspense>
+              }
+            />
             <Route
               path="podcasts"
               element={

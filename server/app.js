@@ -99,7 +99,6 @@ const corsOptions = {
     if (!config.isProduction) return callback(null, true);
     if (config.corsOrigins.length === 0) {
       if (config.appPublicUrl && origin === config.appPublicUrl) return callback(null, true);
-      if (origin && /\.vercel\.app$/i.test(origin)) return callback(null, true);
       return callback(null, false);
     }
     if (config.corsOrigins.includes(origin)) return callback(null, true);
@@ -379,7 +378,13 @@ app.post('/api/confessional/prayers', authMiddleware, async (req, res) => {
   }
 });
 
-app.post('/api/confessional/prayers/:id/pray', authMiddleware, async (req, res) => {
+const prayerRateLimit = rateLimit({
+  windowMs: 60_000,
+  max: config.isProduction ? 20 : 60,
+  keyPrefix: 'prayer',
+});
+
+app.post('/api/confessional/prayers/:id/pray', authMiddleware, prayerRateLimit, async (req, res) => {
   try {
     if (!requireUser(req, res)) return;
     const data = await incrementPrayerCount(req.params.id);
@@ -1151,8 +1156,9 @@ const translateRateLimit = rateLimit({
   keyPrefix: 'translate',
 });
 
-app.post('/api/translate', translateRateLimit, async (req, res) => {
+app.post('/api/translate', authMiddleware, translateRateLimit, async (req, res) => {
   try {
+    if (!requireUser(req, res)) return;
     const { texts, to, from = 'fr' } = req.body || {};
     const target = String(to || '')
       .split('-')[0]
@@ -1194,6 +1200,7 @@ app.post('/api/translate', translateRateLimit, async (req, res) => {
 
 app.post('/api/tts', authMiddleware, ttsRateLimit, async (req, res) => {
   try {
+    if (!requireUser(req, res)) return;
     const { text, locale = 'fr-FR' } = req.body || {};
     if (!text?.trim()) {
       return res.status(400).json({ error: 'text_required' });
@@ -1287,16 +1294,18 @@ app.post('/api/payments/paypal/capture', authMiddleware, paymentRateLimit, async
   }
 });
 
-app.post('/api/payments/dev/complete', authMiddleware, paymentRateLimit, async (req, res) => {
-  try {
-    if (!requireUser(req, res)) return;
-    const { orderId, secret } = req.body || {};
-    const order = await devCompleteOrder(orderId, req.user.id, secret);
-    res.json({ ok: true, order });
-  } catch (err) {
-    res.status(403).json({ error: 'forbidden' });
-  }
-});
+if (!config.isProduction && config.paymentSandbox) {
+  app.post('/api/payments/dev/complete', authMiddleware, paymentRateLimit, async (req, res) => {
+    try {
+      if (!requireUser(req, res)) return;
+      const { orderId, secret } = req.body || {};
+      const order = await devCompleteOrder(orderId, req.user.id, secret);
+      res.json({ ok: true, order });
+    } catch (err) {
+      res.status(403).json({ error: 'forbidden' });
+    }
+  });
+}
 
 app.post('/api/payments/wave/webhook', async (req, res) => {
   try {

@@ -1,5 +1,3 @@
-const DEV_DEFAULT_FOUNDER = 'kaemmanuel98@gmail.com';
-
 function parseEmailList(raw) {
   return raw
     .split(',')
@@ -7,12 +5,12 @@ function parseEmailList(raw) {
     .filter(Boolean);
 }
 
-/** E-mails avec accès Premium complet côté client (Vite). */
+/** E-mails avec accès Premium complet côté client (Vite). Production : env uniquement. */
 export function getFounderEmails() {
   const explicit = parseEmailList(import.meta.env.VITE_FOUNDER_EMAILS || '');
   const jitsi = parseEmailList(import.meta.env.VITE_JITSI_HOST_EMAILS || '');
   const companion = parseEmailList(import.meta.env.VITE_COMPANION_HOST_EMAILS || '');
-  const merged = [DEV_DEFAULT_FOUNDER, ...explicit, ...jitsi, ...companion];
+  const merged = [...explicit, ...jitsi, ...companion];
   return [...new Set(merged.map((e) => e.toLowerCase()).filter(Boolean))];
 }
 

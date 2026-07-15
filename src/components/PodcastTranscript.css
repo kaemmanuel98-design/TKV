@@ -1,0 +1,117 @@
+.podcast-transcript {
+  margin-bottom: 1.5rem;
+  padding: 0;
+  overflow: hidden;
+}
+
+.podcast-transcript-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  border: none;
+  background: transparent;
+  color: var(--accent-text);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.podcast-transcript-toggle span:first-of-type {
+  flex: 1;
+}
+
+.podcast-transcript-spin {
+  animation: podcast-spin 0.9s linear infinite;
+}
+
+@keyframes podcast-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.podcast-transcript-summary {
+  margin: 0 1.25rem 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.podcast-transcript-chapters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0 1.25rem 0.75rem;
+}
+
+.podcast-transcript-chapter {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.podcast-transcript-chapter.is-active,
+.podcast-transcript-chapter:hover {
+  border-color: var(--border-gold);
+  color: var(--accent-text);
+}
+
+.podcast-transcript-body {
+  max-height: min(420px, 55vh);
+  overflow-y: auto;
+  padding: 0 0.5rem 1rem;
+}
+
+.podcast-transcript-para {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  margin: 0.15rem 0;
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  transition: background var(--duration-fast);
+}
+
+.podcast-transcript-para:hover {
+  background: var(--bg-elevated);
+}
+
+.podcast-transcript-para.is-active {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.podcast-transcript-time {
+  flex-shrink: 0;
+  width: 2.75rem;
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-text);
+  padding-top: 0.15rem;
+}
+
+.podcast-transcript-text {
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+}
+
+.podcast-transcript-para.is-active .podcast-transcript-text {
+  color: var(--accent-text);
+}

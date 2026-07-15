@@ -67,6 +67,7 @@ export function prefetchPrimaryRoutes() {
   ['/library', '/bible', '/courses'].forEach((path) => prefetchRoute(path));
 }
 
+/** @deprecated Préférer prefetchPrimaryRoutes ou prefetchRoute au survol */
 export function prefetchAllNavRoutes() {
-  Object.keys(ROUTE_LOADERS).forEach((path) => prefetchRoute(path));
+  prefetchPrimaryRoutes();
 }

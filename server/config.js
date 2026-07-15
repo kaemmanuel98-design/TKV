@@ -74,9 +74,25 @@ export const config = {
   paypalSandbox: process.env.PAYPAL_SANDBOX !== 'false',
   waveApiKey: envTrim('WAVE_API_KEY'),
   waveWebhookSecret: envTrim('WAVE_WEBHOOK_SECRET'),
-  paymentSandbox: process.env.PAYMENT_SANDBOX === 'true' || !isProduction,
+  paymentSandbox: process.env.PAYMENT_SANDBOX === 'true' && !isProduction,
   paymentDevSecret: envTrim('PAYMENT_DEV_SECRET'),
+  /** ElevenLabs — prédications avec voix clonée */
+  elevenlabsApiKey: envTrim('ELEVENLABS_API_KEY'),
+  elevenlabsVoiceId: envTrim('ELEVENLABS_VOICE_ID'),
+  elevenlabsModel: envTrim('ELEVENLABS_MODEL') || 'eleven_multilingual_v2',
 };
+
+if (isProduction) {
+  if (!config.confessionalEncryptionKey || config.confessionalEncryptionKey.length < 16) {
+    console.error('[TKV] CONFESSIONAL_ENCRYPTION_KEY requis en production (min. 16 caractères)');
+  }
+  if (!config.jitsiRoomSecret && config.supabaseServiceKey) {
+    console.warn('[TKV] Définir JITSI_ROOM_SECRET (ne pas réutiliser la clé service Supabase)');
+  }
+  if (process.env.PAYMENT_SANDBOX === 'true') {
+    console.error('[TKV] PAYMENT_SANDBOX=true interdit en production');
+  }
+}
 
 export const PLAN_LIMITS = {
   free: { chat: 3, perspectives: 0 },

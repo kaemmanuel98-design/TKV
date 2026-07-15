@@ -7,21 +7,12 @@ import './styles/harmony.css';
 import i18n from './i18n';
 import { loadPrimaryI18n, loadSecondaryI18n } from './i18n/loadI18nLayers';
 import { preloadSpeechVoices } from './lib/speech';
-import { prefetchAllNavRoutes, prefetchRoute, scheduleIdleTask } from './lib/prefetchRoutes';
-
-const PRIMARY_I18N_BUDGET_MS = 2500;
+import { scheduleIdleTask } from './lib/prefetchRoutes';
 
 async function bootstrap() {
   const primaryI18n = loadPrimaryI18n().catch((err) => {
     console.error('TKV i18n primary load failed', err);
   });
-
-  await Promise.race([
-    primaryI18n,
-    new Promise((resolve) => {
-      window.setTimeout(resolve, PRIMARY_I18N_BUDGET_MS);
-    }),
-  ]);
 
   const root = ReactDOM.createRoot(document.getElementById('root'));
   root.render(
@@ -40,9 +31,6 @@ async function bootstrap() {
 
   scheduleIdleTask(() => {
     preloadSpeechVoices();
-    prefetchAllNavRoutes();
-    prefetchRoute('/book/gynosko');
-    prefetchRoute('/book/eido');
   });
 }
 

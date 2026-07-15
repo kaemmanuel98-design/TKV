@@ -32,7 +32,7 @@ import ProfileAvatar from './ProfileAvatar';
 import OnboardingGate from './OnboardingGate';
 import { useCompanionAccess } from '../hooks/useCompanionAccess';
 import { useTheme } from '../hooks/useTheme';
-import { prefetchAllNavRoutes, prefetchRoute, scheduleIdleTask } from '../lib/prefetchRoutes';
+import { prefetchPrimaryRoutes, prefetchRoute, scheduleIdleTask } from '../lib/prefetchRoutes';
 import './Layout.css';
 
 const FriendPresenceToasts = lazy(() => import('./FriendPresenceToasts'));
@@ -146,7 +146,7 @@ const Layout = () => {
   }, []);
 
   useEffect(() => {
-    scheduleIdleTask(prefetchAllNavRoutes);
+    scheduleIdleTask(prefetchPrimaryRoutes);
   }, []);
 
   useEffect(() => {

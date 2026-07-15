@@ -155,6 +155,11 @@ export async function createPrayerDirect(userId, prayerText) {
 }
 
 export async function incrementPrayerDirect(prayerId) {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.access_token) {
+    return prayForRequest(prayerId, session.access_token);
+  }
+
   const { data: row } = await supabase
     .from('prayer_requests')
     .select('prayer_count')

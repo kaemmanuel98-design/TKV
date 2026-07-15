@@ -172,33 +172,18 @@ export async function localizeLexiconEntry(entry, lang) {
   const baseGloss = (entry.gloss || '').trim();
   const sourceForTranslate = englishDef || baseGloss;
 
-  // Always localize all textual fields to the active app language.
-  // This guarantees consistent translation for any clicked Strong entry.
-  const shouldTranslateAll = l !== 'en';
-
   let meaning = baseGloss;
-  if (shouldTranslateAll) {
-    meaning = await translateField(sourceForTranslate, l, baseGloss || englishDef);
-  } else if (glossNeedsTranslation(meaning, l, englishDef)) {
+  if (glossNeedsTranslation(meaning, l, englishDef)) {
     meaning = await translateField(sourceForTranslate, l, baseGloss || englishDef);
   }
-
-  const derivation = shouldTranslateAll
-    ? await translateField(entry.derivation, l)
-    : entry.derivation || '';
-
-  const localizedKjvDef = shouldTranslateAll ? await translateField(entry.kjvDef, l) : entry.kjvDef || '';
-  const localizedDefinitionOriginal = shouldTranslateAll
-    ? await translateField(entry.definitionOriginal, l)
-    : entry.definitionOriginal || '';
 
   return {
     ...entry,
     gloss: meaning,
     localizedMeaning: meaning,
-    derivation,
-    kjvDef: localizedKjvDef,
-    definitionOriginal: localizedDefinitionOriginal || entry.definitionOriginal,
-    showEnglishReference: false,
+    derivation: entry.derivation || '',
+    kjvDef: entry.kjvDef || '',
+    definitionOriginal: entry.definitionOriginal || '',
+    showEnglishReference: l !== 'en' && meaning === baseGloss && Boolean(englishDef),
   };
 }

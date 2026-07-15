@@ -1,0 +1,13 @@
+{
+  "slug": "puissance-grace-faiblesses",
+  "title": "La puissance de Sa grâce dans nos faiblesses",
+  "description": "Introduction",
+  "audio_url": "/audio/podcasts/puissance-grace-faiblesses.mp3",
+  "transcript_url": "/audio/podcasts/puissance-grace-faiblesses.transcript.json",
+  "duration_seconds": 612,
+  "language": "fr",
+  "is_premium": false,
+  "content_type": "sermon",
+  "tts_engine": "elevenlabs",
+  "created_at": "2026-07-14T15:31:27.679Z"
+}

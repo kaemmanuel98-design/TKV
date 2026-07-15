@@ -91,6 +91,30 @@ export async function getOrderByReference(referenceCode) {
   return data;
 }
 
+function validatePayPalCapture(captureJson, order) {
+  if (captureJson?.status !== 'COMPLETED') {
+    throw new Error('paypal_not_completed');
+  }
+
+  const pricing = getPlanPricing(order.plan_type);
+  const unit =
+    captureJson.purchase_units?.find((u) => u.reference_id === order.reference_code) ||
+    captureJson.purchase_units?.[0];
+
+  if (!unit) throw new Error('paypal_invalid_capture');
+
+  const paymentCapture = unit.payments?.captures?.[0];
+  if (!paymentCapture || paymentCapture.status !== 'COMPLETED') {
+    throw new Error('paypal_capture_incomplete');
+  }
+
+  const amount = String(paymentCapture.amount?.value || '');
+  const currency = String(paymentCapture.amount?.currency_code || '');
+  if (amount !== pricing.paypalAmount || currency !== pricing.paypalCurrency) {
+    throw new Error('paypal_amount_mismatch');
+  }
+}
+
 export async function markOrderPaid(order, { externalId } = {}) {
   if (!order || order.status === 'paid') return order;
 
@@ -127,19 +151,29 @@ export async function capturePayPalOrder(orderId, userId, paypalOrderId) {
   const order = await getOrderForUser(orderId, userId);
   if (!order) throw new Error('order_not_found');
   if (order.payment_method !== 'paypal') throw new Error('invalid_method');
+  if (order.status !== 'pending') throw new Error('order_not_pending');
+
+  const effectivePaypalId = String(paypalOrderId || order.external_id || '').trim();
+  if (!effectivePaypalId) throw new Error('paypal_order_id_required');
+  if (order.external_id && paypalOrderId && paypalOrderId !== order.external_id) {
+    throw new Error('paypal_order_mismatch');
+  }
 
   if (config.paypalClientId && config.paypalClientSecret) {
-    await capturePayPalPayment(paypalOrderId || order.external_id);
-  } else if (!config.paymentSandbox) {
+    const captureJson = await capturePayPalPayment(effectivePaypalId);
+    validatePayPalCapture(captureJson, order);
+  } else if (config.paymentSandbox && !config.isProduction) {
+    // Sandbox local sans PayPal — dev uniquement
+  } else {
     throw new Error('paypal_not_configured');
   }
 
-  return markOrderPaid(order, { externalId: paypalOrderId || order.external_id });
+  return markOrderPaid(order, { externalId: effectivePaypalId });
 }
 
 /** Sandbox / admin : finalise une commande sans passerelle (dev uniquement). */
 export async function devCompleteOrder(orderId, userId, secret) {
-  if (!config.paymentSandbox || secret !== config.paymentDevSecret) {
+  if (config.isProduction || !config.paymentSandbox || secret !== config.paymentDevSecret) {
     throw new Error('forbidden');
   }
   const order = await getOrderForUser(orderId, userId);
@@ -228,7 +262,8 @@ async function capturePayPalPayment(paypalOrderId) {
     },
   });
   if (!res.ok) throw new Error('paypal_capture_failed');
-  return res.json();
+  const json = await res.json();
+  return json;
 }
 
 async function createWaveCheckout({ reference, amount, currency, returnUrl }) {
@@ -289,6 +324,18 @@ export function verifyWaveWebhookAuth(authorizationHeader) {
   return token.length > 0 && token === config.waveWebhookSecret;
 }
 
+async function claimWebhookEvent(eventId, provider) {
+  if (!eventId) return true;
+  const admin = getSupabaseAdmin();
+  if (!admin) return true;
+  const { error } = await admin.from('payment_webhook_events').insert({
+    id: String(eventId),
+    provider,
+  });
+  if (error?.code === '23505') return false;
+  return true;
+}
+
 export async function handleWaveWebhook(body) {
   const eventType = body?.type;
   if (eventType && eventType !== 'checkout.session.completed') {
@@ -300,7 +347,12 @@ export async function handleWaveWebhook(body) {
   if (!reference) return null;
   if (status !== 'succeeded' && status !== 'completed') return null;
 
-  const order = await getOrderByReference(reference);
+  const externalId = body?.data?.id || body?.data?.transaction_id;
+  const eventId = body?.id || externalId || `${reference}:${status}`;
+  if (!(await claimWebhookEvent(eventId, 'wave'))) {
+    const order = await getOrderByReference(reference);
+    return order?.status === 'paid' ? order : null;
+  }
   if (!order) return null;
   if (order.status === 'paid') return order;
   return markOrderPaid(order, { externalId: body?.data?.id || body?.data?.transaction_id });

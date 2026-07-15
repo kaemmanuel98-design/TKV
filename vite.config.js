@@ -2,6 +2,48 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
+function manualChunks(id) {
+  if (id.includes('node_modules/leaflet') || id.includes('react-leaflet')) {
+    return 'leaflet';
+  }
+  if (id.includes('node_modules/lucide-react')) {
+    return 'icons';
+  }
+  if (id.includes('node_modules/i18next') || id.includes('react-i18next')) {
+    return 'i18n';
+  }
+  if (id.includes('node_modules/@supabase')) {
+    return 'supabase';
+  }
+  if (id.includes('/src/i18n/cdcKeys')) {
+    return 'cdc-keys';
+  }
+  if (id.includes('/src/i18n/courseKeysExtended')) {
+    return 'course-keys';
+  }
+  if (id.includes('/src/i18n/confessionalI18n')) {
+    return 'confessional-i18n';
+  }
+  if (
+    id.includes('node_modules/react-dom') ||
+    id.includes('node_modules/react/') ||
+    id.includes('node_modules/react-router')
+  ) {
+    return 'react-vendor';
+  }
+  if (id.includes('/src/data/heritage/')) {
+    return 'heritage-data';
+  }
+  if (id.includes('/src/i18n/heritageI18n') || id.includes('/src/i18n/heritageI18nKeys')) {
+    return 'heritage-i18n';
+  }
+  if (id.includes('/src/data/gynosko_') || id.includes('/src/data/eido_')) {
+    const match = id.match(/\/src\/data\/(gynosko|eido)_([a-z]{2})\./);
+    if (match) return `book-${match[1]}-${match[2]}`;
+  }
+  return undefined;
+}
+
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
@@ -10,48 +52,14 @@ export default defineConfig(({ mode }) => {
   return {
   build: {
     target: 'es2020',
+    rolldownOptions: {
+      output: {
+        manualChunks,
+      },
+    },
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules/leaflet') || id.includes('react-leaflet')) {
-            return 'leaflet';
-          }
-          if (id.includes('node_modules/i18next') || id.includes('react-i18next')) {
-            return 'i18n';
-          }
-          if (id.includes('node_modules/@supabase')) {
-            return 'supabase';
-          }
-          if (id.includes('/src/i18n/cdcKeys')) {
-            return 'cdc-keys';
-          }
-          if (id.includes('/src/i18n/courseKeysExtended')) {
-            return 'course-keys';
-          }
-          if (id.includes('/src/i18n/confessionalI18n')) {
-            return 'confessional-i18n';
-          }
-          if (
-            id.includes('node_modules/react-dom') ||
-            id.includes('node_modules/react/') ||
-            id.includes('node_modules/react-router')
-          ) {
-            return 'react-vendor';
-          }
-          if (id.includes('/src/data/heritage/')) {
-            return 'heritage-data';
-          }
-          if (
-            id.includes('/src/i18n/heritageI18n') ||
-            id.includes('/src/i18n/heritageI18nKeys')
-          ) {
-            return 'heritage-i18n';
-          }
-          if (id.includes('/src/data/gynosko_') || id.includes('/src/data/eido_')) {
-            const match = id.match(/\/src\/data\/(gynosko|eido)_([a-z]{2})\./);
-            if (match) return `book-${match[1]}-${match[2]}`;
-          }
-        },
+        manualChunks,
       },
     },
   },
@@ -79,6 +87,17 @@ export default defineConfig(({ mode }) => {
               expiration: {
                 maxEntries: 400,
                 maxAgeSeconds: 60 * 60 * 24 * 90,
+              },
+            },
+          },
+          {
+            urlPattern: /\/audio\/podcasts\/.*\.(mp3|json)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'podcast-media',
+              expiration: {
+                maxEntries: 40,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
               },
             },
           },
@@ -112,18 +131,6 @@ export default defineConfig(({ mode }) => {
               expiration: {
                 maxEntries: 80,
                 maxAgeSeconds: 60 * 60 * 24 * 90,
-              },
-            },
-          },
-          {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/rest\/v1\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'supabase-rest',
-              networkTimeoutSeconds: 4,
-              expiration: {
-                maxEntries: 80,
-                maxAgeSeconds: 300,
               },
             },
           },

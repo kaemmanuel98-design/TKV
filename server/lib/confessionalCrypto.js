@@ -1,4 +1,5 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
+import { config } from '../config.js';
 
 const PREFIX = 'enc:v1:';
 const ALGO = 'aes-256-gcm';
@@ -27,7 +28,12 @@ export function encryptionEnabled() {
 export function encryptConfessionalContent(plaintext, sessionId) {
   const text = String(plaintext ?? '');
   const key = deriveKey(sessionId);
-  if (!key) return text;
+  if (!key) {
+    if (config.isProduction) {
+      throw new Error('confessional_encryption_required');
+    }
+    return text;
+  }
 
   const iv = randomBytes(IV_LEN);
   const cipher = createCipheriv(ALGO, key, iv);

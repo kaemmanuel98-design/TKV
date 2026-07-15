@@ -40,12 +40,8 @@ export async function loadCourseI18n() {
   mergeKeys(courseKeysExtended);
 }
 
-/** Clés de pages secondaires — après le premier rendu. */
+/** Clés de pages secondaires — après le premier rendu (confessionnal uniquement). */
 export async function loadSecondaryI18n() {
-  const [{ confessionalI18n }] = await Promise.all([
-    import('./confessionalI18n'),
-    loadHeritageI18n(),
-    loadCourseI18n(),
-  ]);
+  const { confessionalI18n } = await import('./confessionalI18n');
   mergeKeys(confessionalI18n);
 }

@@ -110,7 +110,7 @@ export async function translateTexts(texts, { from = 'fr', to, allowSameLanguage
     pending.push({ index, text });
   });
 
-  const BATCH = 4;
+  const BATCH = 8;
   for (let i = 0; i < pending.length; i += BATCH) {
     const slice = pending.slice(i, i + BATCH);
     try {
@@ -127,7 +127,6 @@ export async function translateTexts(texts, { from = 'fr', to, allowSameLanguage
       slice.forEach((item) => {
         results[item.index] = item.text;
       });
-      break;
     }
   }
 
@@ -167,5 +166,33 @@ export async function translateParagraphs(paragraphs, targetLang, sourceLang = '
   const from = normalizeLang(sourceLang);
   if (!paragraphs?.length) return [];
   if (to === from) return paragraphs;
-  return translateTexts(paragraphs, { from, to });
+
+  const DELIM = '\n\n§§§TKV§§§\n\n';
+  const BATCH = 12;
+  const out = new Array(paragraphs.length);
+
+  for (let i = 0; i < paragraphs.length; i += BATCH) {
+    const slice = paragraphs.slice(i, i + BATCH);
+    const joined = slice.join(DELIM);
+    try {
+      const [translated] = await translateTexts([joined], { from, to });
+      const parts = String(translated || joined).split(DELIM);
+      if (parts.length === slice.length) {
+        slice.forEach((orig, j) => {
+          out[i + j] = parts[j]?.trim() ? parts[j] : orig;
+        });
+      } else {
+        const fallback = await translateTexts(slice, { from, to });
+        slice.forEach((orig, j) => {
+          out[i + j] = fallback[j]?.trim() ? fallback[j] : orig;
+        });
+      }
+    } catch {
+      slice.forEach((orig, j) => {
+        out[i + j] = orig;
+      });
+    }
+  }
+
+  return out;
 }

@@ -1,6 +1,6 @@
 import { config } from '../config.js';
 
-const DEV_DEFAULT_FOUNDER = 'kaemmanuel98@gmail.com';
+const DEV_DEFAULT_FOUNDER = config.isProduction ? '' : 'kaemmanuel98@gmail.com';
 
 function parseEmailList(raw) {
   return raw
@@ -13,7 +13,7 @@ function parseEmailList(raw) {
 export function getFounderEmails() {
   const explicit = parseEmailList(process.env.FOUNDER_EMAILS || '');
   const merged = [
-    DEV_DEFAULT_FOUNDER,
+    ...(DEV_DEFAULT_FOUNDER ? [DEV_DEFAULT_FOUNDER] : []),
     ...explicit,
     ...config.jitsiHostEmails,
     ...config.companionEmails,
